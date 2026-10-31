@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -eo pipefail
+source /opt/ros/humble/setup.bash
+source /home/ly/beamng_ros2_0394_ws/install/setup.bash
+source /home/ly/town_memory_validation_20261014/curvature_contract_candidate1/install/setup.bash
+source /home/ly/wildos-console/install/setup.bash
+source /home/ly/exploration_owner_repair_20261016/final_install/setup.bash
+source /home/ly/frontier_cost_repair_20261016/install/setup.bash
+source /home/ly/frontier_cost_repair_20261016/release_install/setup.bash
+source /home/ly/exploration_scope_repair_20261016/install/setup.bash
+source /home/ly/frontier_resolution_repair_20261016/install/setup.bash
+source /home/ly/frontier_motion_handoff_20261016/install/setup.bash
+source /home/ly/visible_pursuit_repair_20261017/install/setup.bash
+source /home/ly/full_vehicle_acceptance_20261017/install/setup.bash
+source /home/ly/motion_handoff_field_20261018/install/setup.bash
+source /home/ly/controller_source_contract_20261018/install/setup.bash
+source /home/ly/planning_phase_physical_20261018/install/setup.bash
+export ROS_DOMAIN_ID=183 ROS_LOCALHOST_ONLY=0 RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+export FASTRTPS_DEFAULT_PROFILES_FILE=/home/ly/planning_phase_physical_20261018/candidate/nav2_adapter/config/fastdds_local_udp.xml
+export PYTHONPATH=/home/ly/planning_phase_physical_20261018/candidate/tools:$PYTHONPATH
+cd /home/ly/native_delay_20261018
+exec /home/ly/beamng_ros2_0394_ws/.venv/bin/python physical_brake_probe.py --stack

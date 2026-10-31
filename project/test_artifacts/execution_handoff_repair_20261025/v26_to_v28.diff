@@ -1,0 +1,428 @@
+--- v26/nav2_adapter/test/test_continuous_exploration_ros.py
++++ v28/nav2_adapter/test/test_continuous_exploration_ros.py
+@@ -66,6 +66,40 @@
+         self.assertEqual(n.epoch,epoch);self.assertFalse(n.follow_hold)
+         handle.cancel_goal_async.assert_not_called()
+ 
++    def test_new_nearby_intent_keeps_exact_destination_candidate(self):
++        n=self.moving();handle=n.follow_handle
++        n.plan_client=Mock();n.plan_client.send_goal_async.return_value=Future()
++        n.on_route(self.route((14.,0.),'frontier-B'))
++        request=n.plan_client.send_goal_async.call_args.args[0]
++        self.assertAlmostEqual(request.goal.pose.position.x,14.)
++        self.assertTrue(n.following);self.assertIs(n.follow_handle,handle)
++        handle.cancel_goal_async.assert_not_called()
++
++    def test_new_intent_can_shorten_current_action_after_normal_path_checks(self):
++        n=self.moving()
++        n.plan_client=Mock();n.plan_client.send_goal_async.return_value=Future()
++        n.on_route(self.route((10.,0.),'frontier-B'))
++        request=n.plan_client.send_goal_async.call_args.args[0]
++        self.assertAlmostEqual(request.goal.pose.position.x,10.)
++        self.assertTrue(n.following)
++
++    def test_same_intent_keeps_repeated_endpoint_filter(self):
++        n=self.moving()
++        candidates=[(14.,0.,0.,14.),(8.,0.,0.,8.)]
++        self.assertEqual(n.extension_candidates(candidates,(12.,0.)),[candidates[1]])
++
++    def test_old_motion_epoch_cannot_relax_endpoint_filter(self):
++        n=self.moving();n.route=self.route((14.,0.),'frontier-B')
++        n._motion_epoch=n.epoch-1
++        candidates=[(14.,0.,0.,14.),(8.,0.,0.,8.)]
++        self.assertEqual(n.extension_candidates(candidates,(12.,0.)),[candidates[1]])
++
++    def test_unacknowledged_motion_cannot_relax_endpoint_filter(self):
++        n=self.moving();n.route=self.route((14.,0.),'frontier-B')
++        n.active_follow_serial=8
++        candidates=[(14.,0.,0.,14.),(8.,0.,0.,8.)]
++        self.assertEqual(n.extension_candidates(candidates,(12.,0.)),[candidates[1]])
++
+     def test_same_frontier_republication_does_not_restart_motion_or_plan(self):
+         n=self.moving();n.start_segment=Mock()
+         n.on_route(self.route((12.,0.),'frontier-A'))
+--- v26/nav2_adapter/test/test_graph_path_bridge_routing.py
++++ v28/nav2_adapter/test/test_graph_path_bridge_routing.py
+@@ -462,7 +462,7 @@
+         self.assertIsNone(self.node.failed_goal_scope)
+         self.assertFalse(self.node.goal_recently_failed((0., 0.), (10., 0.), 0.))
+ 
+-    def test_side_lookback_turns_back_once_near_large_structure(self):
++    def test_unlabelled_obstacle_cluster_cannot_fabricate_target_lookback(self):
+         self.node.query = 'house'
+         self.node.query_origin = (-30., 0.)
+         self.node.query_started_ns = self.node.get_clock().now().nanoseconds - 21_000_000_000
+@@ -476,11 +476,40 @@
+             for iy in range(7, 14):
+                 if (ix, iy) != (10, 10):
+                     self.node.grid.data[iy*40+ix] = 100
+-        self.assertTrue(self.node.maybe_side_lookback((0., 0.), 0.))
+-        self.assertTrue(self.node.lookback_active)
+-        self.assertIsNotNone(self.node.expected)
+-        self.assertLess(self.node.expected[0], 0.)
+-        self.node.relay_destination.assert_called_once()
++        self.node.route=route((0.,0.),(10.,0.))
++        self.node.route_endpoint=(10.,0.)
++        self.node.plan_client=Mock()
++        self.node.try_candidate=Mock()
++        self.node.start_segment()
++        self.assertFalse(self.node.lookback_active)
++        self.assertIsNone(self.node.expected)
++        self.assertIsNone(self.node.visible_hint)
++        self.node.relay_destination.assert_not_called()
++        self.node.try_candidate.assert_called_once()
++
++    def test_obstacle_cluster_cannot_preempt_actual_visible_target(self):
++        self.node.query='green residential house'
++        self.node.query_origin=(-30.,0.)
++        self.node.query_started_ns=self.node.get_clock().now().nanoseconds-21_000_000_000
++        self.node.input_freshness_issue=Mock(return_value=None)
++        self.node.local_freshness_issue=Mock(return_value=None)
++        self.node.pose_blockers=Mock(return_value=[])
++        self.node.route=route((0.,0.),(10.,0.));self.node.route_endpoint=(10.,0.)
++        self.node.expected=(10.,0.);self.node.visible_approach_active=True
++        self.node.visible_approach_started_at=time.monotonic()
++        self.node.visible_approach_deadline=time.monotonic()+30.
++        self.node.visible_hint=dict(query=self.node.query,point=[10.,0.],bearing=0.,
++            observation_stamp_ns=self.node.get_clock().now().nanoseconds)
++        self.node.plan_client=Mock();self.node.try_candidate=Mock()
++        self.node.relay_destination=Mock()
++        for ix in range(7,14):
++            for iy in range(7,14):
++                if (ix,iy)!=(10,10):self.node.grid.data[iy*40+ix]=100
++        self.node.start_segment()
++        self.assertEqual(self.node.expected,(10.,0.))
++        self.assertEqual(self.node.visible_hint['point'],[10.,0.])
++        self.assertFalse(self.node.lookback_active)
++        self.node.relay_destination.assert_not_called()
+ 
+     def test_route_filter_falls_back_when_all_candidates_rejected(self):
+         self.node.follow_enabled = False
+--- v26/nav2_adapter/wildos_nav2_adapter/continuous_graph_path_bridge.py
++++ v28/nav2_adapter/wildos_nav2_adapter/continuous_graph_path_bridge.py
+@@ -171,6 +171,21 @@
+             self.route_endpoint = xy(message.poses[-1].pose)
+             self.start_segment()
+ 
++    def extension_candidates(self, candidates, old_target):
++        key = self.intent_key(self.route)
++        if (self._motion_intent is not None and key is not None
++                and self._motion_intent != key and self._motion_intent[0] == key[0]
++                and self._motion_epoch == self.epoch
++                and self._motion_serial is not None
++                and self._motion_serial == self.active_follow_serial):
++            # A new intention may end close to (or before) the old endpoint.
++            # The old 4m progress filter must not discard that exact goal and
++            # substitute a shorter graph prefix. This only admits planning;
++            # actual-pose, body/map, direction and action-ACK gates still own
++            # whether a result can replace the currently accepted section.
++            return candidates
++        return super().extension_candidates(candidates, old_target)
++
+     def start_segment(self, continuous=False):
+         self._planned_intent = self.intent_key(self.route)
+         self._rolling_plan_start = xy(self.odom.pose.pose) if self.odom is not None else None
+--- v26/nav2_adapter/wildos_nav2_adapter/graph_path_bridge.py
++++ v28/nav2_adapter/wildos_nav2_adapter/graph_path_bridge.py
+@@ -472,75 +472,6 @@
+         while len(self.failed_goals) > 128:
+             self.failed_goals.pop(next(iter(self.failed_goals)))
+ 
+-    def maybe_side_lookback(self, start, heading):
+-        """Turn back once after passing a nearby large structure.
+-
+-        The front camera cannot see a house that is beside/behind the car.
+-        This is a bounded observation maneuver, not a target confirmation:
+-        it is skipped around memory/confirmed/visible targets and recovers by
+-        requesting a fresh GraphNav route after the look-back goal is reached.
+-        """
+-        if (self.query is None
+-                or (self.expected is not None and not self.visible_approach_active)
+-                or self.memory_goal is not None
+-                or self.memory_selecting or self.confirmed_route_goal is not None
+-                or self.object_found or self.query_reset_pending or self.grid is None
+-                or self.query_origin is None
+-                or distance(start, self.query_origin) < 20.
+-                or self.get_clock().now().nanoseconds - self.query_started_ns < 20_000_000_000
+-                or time.monotonic() - self.lookback_last_at < 20.
+-                or (self.lookback_last_pose is not None
+-                    and distance(start, self.lookback_last_pose) < 10.)):
+-            return False
+-        resolution = self.grid.info.resolution
+-        occupied = 0
+-        sum_x = sum_y = 0.
+-        for dx in range(-12, 13):
+-            for dy in range(-12, 13):
+-                radial = math.hypot(dx, dy) * resolution
+-                if resolution <= 0 or radial < 1. or radial > 3.:
+-                    continue
+-                x = start[0] + dx * resolution
+-                y = start[1] + dy * resolution
+-                if cell_cost(self.grid, x, y) >= 99:
+-                    occupied += 1
+-                    sum_x += x
+-                    sum_y += y
+-        if occupied < 25:
+-            return False
+-        cluster_bearing = math.atan2(sum_y/occupied-start[1],
+-                                     sum_x/occupied-start[0])
+-        if self.visible_approach_active:
+-            # A large structure beside the car is more useful for the current
+-            # query than continuing an unreachable visible-target approach.
+-            # Block that target briefly and give exploration/look-back a turn.
+-            self.release_visible_approach('side_lookback_preempt')
+-            if self.visible_approach_active:
+-                return False
+-        back = heading + math.pi
+-        for distance_back in (6., 5.):
+-            point = (start[0] + distance_back * math.cos(back),
+-                     start[1] + distance_back * math.sin(back))
+-            if (cell_cost(self.grid, *point) >= 99
+-                    or self.pose_blockers(self.grid, point, cluster_bearing)):
+-                continue
+-            self.lookback_active = True
+-            self.lookback_started_at = time.monotonic()
+-            self.lookback_last_at = self.lookback_started_at
+-            self.lookback_last_pose = start
+-            self.visible_hint = dict(
+-                query=self.query, frame='spot1/odom',
+-                observation_stamp_ns=self.get_clock().now().nanoseconds,
+-                point=list(point), bearing=cluster_bearing, evidence='bearing_only',
+-                position_confirmed=False, search_confirmed=False)
+-            activated = self.activate_visible_approach()
+-            if activated:
+-                self.status('side_lookback', goal=list(point),
+-                            requires_visual_confirmation=False)
+-                return True
+-            self.lookback_active = False
+-        return False
+-
+     def validate_path(self, points, headings, route, grid, target, *, start=None,
+                       target_heading=None):
+         if self.carrier_model == "ideal_point":
+@@ -1786,6 +1717,10 @@
+             return float(value)
+         return None
+ 
++    def extension_candidates(self, candidates, old_target):
++        """Avoid redundant extensions of the same finite controller action."""
++        return [c for c in candidates if distance(c[:2], old_target) >= 4.]
++
+     def start_segment(self, continuous=False):
+         self.consume_pending_odometry()
+         if self.follow_release is not None:
+@@ -1850,8 +1785,6 @@
+         if (self.lookback_active
+                 and time.monotonic()-self.lookback_started_at > 15.):
+             self.release_visible_approach('side_lookback_timeout')
+-            return
+-        if self.maybe_side_lookback(start, yaw(self.odom.pose.pose)):
+             return
+         candidates = route_candidates(
+             start, points, self.grid, maximum=self.max_segment,
+@@ -1921,7 +1854,7 @@
+             self.memory_deadline = time.monotonic() + 25.0
+         if continuous and self.motion_queue:
+             old_target = xy(self.motion_queue[0].poses[-1].pose)
+-            self.candidates = [c for c in self.candidates if distance(c[:2], old_target) >= 4.]
++            self.candidates = self.extension_candidates(self.candidates, old_target)
+         self.begin_exploration_comparison()
+         self.candidate_index = 0
+         self.failure_reasons = []
+--- /dev/null
++++ v28/wildos_port/repro_check/src/nebula2-wildos/visual_navigation/test/test_fresh_bearing.py
+@@ -0,0 +1,138 @@
++"""Fresh observations must be evaluated without pretending to add a baseline."""
++import ast
++from copy import deepcopy
++from pathlib import Path
++from types import SimpleNamespace as S
++import unittest
++from unittest.mock import Mock
++import numpy as np
++from visual_navigation.explorfm_triangulation.localization_geometry import triangulate_bearings
++
++
++class FreshBearingTests(unittest.TestCase):
++    def setUp(self):
++        source = Path(__file__).parents[1]/'visual_navigation/explorfm_triangulation/obj_mask_triangulation.py'
++        tree = ast.parse(source.read_text(encoding='utf8'))
++        cls = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == 'ObjectMaskTriangulator')
++        cls.bases = []
++        cls.body = [n for n in cls.body if isinstance(n, ast.FunctionDef) and n.name in
++                    ('process_observation', 'prune_views', 'stamp_ns', 'bearing_observation')]
++        env = dict(np=np, triangulate_bearings=triangulate_bearings)
++        exec(compile(ast.fix_missing_locations(ast.Module(body=[cls], type_ignores=[])), str(source), 'exec'), env)
++        self.n = n = env['ObjectMaskTriangulator']()
++        n.active_query = 'green residential house'
++        n.query_started_ns = 90*10**9
++        n.last_observation_ns = 99_000_000_000
++        n.observation_timeout = 5.
++        n.min_view_distance = 1.
++        n.max_views = 12
++        n.views = ['anchor', 'last']
++        n.bearing_views = [self.bearing([-2., 0., 0.], 98_000_000_000),
++                           self.bearing([0., 0., 0.], 99_000_000_000)]
++        n.prev_view_pos = np.zeros(3)
++        n.get_clock = lambda: S(now=lambda: S(nanoseconds=100*10**9))
++        n.get_logger = Mock()
++        n.check_lidar_in_mask = Mock()
++        n.publish_localization_rejection = Mock()
++        n.publish_navigation_goal_and_marker = Mock()
++        n.publish_goal_hypotheses = Mock()
++        n.add_views = Mock(side_effect=self.add_view)
++        self.mask = np.zeros((101, 101), bool)
++        self.mask[50, 48] = True
++        self.camera = dict(object_mask=self.mask, K=np.array([[100.,0,50],[0,100.,50],[0,0,1]]),
++                           R_wc=np.eye(3), t_wc=np.array([[.2],[0.],[0.]]))
++        n.extract_data_from_obj_mask_msg = Mock(side_effect=lambda _: [self.camera])
++        self.message = S(query=n.active_query,
++                         header=S(stamp=S(sec=99, nanosec=300_000_000)),
++                         odom=S(pose=S(pose=S(position=S(x=.2,y=0.,z=0.)))))
++        n.msg_buffer = S(buffer=[1], pop_oldest_msg=lambda: (dict(obj_mask=self.message, lidar=object()),None,None))
++
++    def bearing(self, origin, stamp):
++        origin = np.array(origin)
++        return dict(origin=origin, ray=np.array([0.,0.,10.])-origin,
++                    stamp_ns=stamp, angular_tolerance=.04)
++
++    def add_view(self, cameras):
++        camera=cameras[0]
++        if not camera['object_mask'].any():return
++        v,u=np.median(np.argwhere(camera['object_mask']),axis=0)
++        b=dict(origin=camera['t_wc'].ravel(),
++               ray=camera['R_wc']@np.linalg.solve(camera['K'],[u,v,1.]),
++               stamp_ns=self.n.stamp_ns(self.n.current_observation.header.stamp),angular_tolerance=.04)
++        self.n.views.append('new')
++        self.n.bearing_views.append(b)
++
++    def test_close_fresh_frame_rechecks_against_independent_anchor(self):
++        n=self.n; before=deepcopy(n.bearing_views)
++        n.process_observation()
++        self.assertIsNotNone(n.triangulated_position)
++        np.testing.assert_allclose(n.triangulated_position, [0.,0.,10.], atol=1e-8)
++        n.add_views.assert_not_called()
++        self.assertEqual(len(n.bearing_views),len(before))
++        for a,b in zip(n.bearing_views,before):
++            np.testing.assert_array_equal(a['origin'],b['origin'])
++            self.assertEqual(a['stamp_ns'],b['stamp_ns'])
++        np.testing.assert_array_equal(n.prev_view_pos,np.zeros(3))
++
++    def test_four_fresh_frames_can_produce_four_current_positions(self):
++        stamps=[]
++        for i in range(4):
++            self.message.header.stamp.nanosec=300_000_000+i*100_000_000
++            self.n.process_observation()
++            self.assertIsNotNone(self.n.triangulated_position)
++            stamps.append(self.n.stamp_ns(self.n.current_observation.header.stamp))
++        self.assertEqual(len(set(stamps)),4)
++        self.assertEqual(len(self.n.bearing_views),2)
++
++    def test_close_frames_cannot_create_baseline(self):
++        self.n.views=['last']; self.n.bearing_views=self.n.bearing_views[-1:]
++        self.n.process_observation()
++        self.assertIsNone(self.n.triangulated_position)
++
++    def test_new_inconsistent_ray_cannot_republish_old_solution(self):
++        self.n.bearing_views.insert(1,self.bearing([-1.,0.,0.],98_500_000_000))
++        self.n.views.insert(1,'middle')
++        self.mask[:]=False; self.mask[50,95]=True
++        self.n.process_observation()
++        self.assertIsNone(self.n.triangulated_position)
++
++    def test_expired_anchor_cannot_be_reused(self):
++        self.n.bearing_views[0]['stamp_ns']=90*10**9
++        self.n.process_observation()
++        self.assertIsNone(self.n.triangulated_position)
++
++    def test_empty_mask_cannot_refresh_history(self):
++        self.mask[:]=False
++        self.n.process_observation()
++        self.assertIsNone(self.n.triangulated_position)
++
++    def test_duplicate_observation_is_not_counted_twice(self):
++        self.n.last_observation_ns=99_300_000_000
++        self.n.process_observation()
++        self.n.check_lidar_in_mask.assert_not_called()
++        self.n.publish_navigation_goal_and_marker.assert_not_called()
++
++    def test_old_query_cannot_refresh_position(self):
++        self.message.query='gas station'
++        self.n.process_observation()
++        self.n.check_lidar_in_mask.assert_not_called()
++
++    def test_independent_view_still_updates_keyframe(self):
++        self.message.odom.pose.pose.position.x=2.
++        self.camera['t_wc']=np.array([[2.],[0.],[0.]])
++        self.mask[:]=False;self.mask[50,30]=True
++        self.n.process_observation()
++        self.n.add_views.assert_called_once()
++        np.testing.assert_array_equal(self.n.prev_view_pos,[2.,0.,0.])
++        np.testing.assert_allclose(self.n.triangulated_position,[0.,0.,10.],atol=1e-8)
++
++    def test_ambiguous_depth_still_clears_history_and_blocks_fallback(self):
++        def ambiguity(*_):self.n.localization_quality={'association_validated':False}
++        self.n.check_lidar_in_mask.side_effect=ambiguity
++        self.n.process_observation()
++        self.assertEqual(self.n.bearing_views,[])
++        self.n.publish_localization_rejection.assert_called_once_with('ambiguous_depth_surfaces')
++        self.n.publish_navigation_goal_and_marker.assert_not_called()
++
++
++if __name__ == '__main__':unittest.main()
+--- v26/wildos_port/repro_check/src/nebula2-wildos/visual_navigation/visual_navigation/explorfm_triangulation/obj_mask_triangulation.py
++++ v28/wildos_port/repro_check/src/nebula2-wildos/visual_navigation/visual_navigation/explorfm_triangulation/obj_mask_triangulation.py
+@@ -309,17 +309,23 @@
+ 
+         # Triangulate using multiple views if LiDAR triangulation was not successful
+         if not self.found_lidar_in_mask:
+-            if self.prev_view_pos is not None:
+-                
+-                dist = np.linalg.norm(cur_pos - self.prev_view_pos)
+-                if dist < self.min_view_distance:
+-                    self.get_logger().info(f"Current view is too close to previous view (distance: {dist:.2f}m), skipping...")
+-                    return
+-
+-            self.add_views(all_cam_data)
+-            self.prev_view_pos = cur_pos
+-            if len(self.views) >= 2:
+-                quality = triangulate_bearings(self.bearing_views, self.min_view_distance)
++            independent = (self.prev_view_pos is None or
++                           np.linalg.norm(cur_pos-self.prev_view_pos) >= self.min_view_distance)
++            if independent:
++                self.add_views(all_cam_data)
++                self.prev_view_pos = cur_pos
++                bearings = self.bearing_views
++            else:
++                # The distance gate controls keyframe storage, not observation
++                # freshness. Re-evaluate the NEW ray against independent,
++                # unexpired anchors; never replay the old solved position or
++                # count nearby rays as extra geometric support.
++                current = self.bearing_observation(all_cam_data)
++                bearings = ([] if current is None else [v for v in self.bearing_views
++                    if np.linalg.norm(v['origin']-current['origin']) >= self.min_view_distance]
++                    + [current])
++            if len(bearings) >= 2:
++                quality = triangulate_bearings(bearings, self.min_view_distance)
+                 if quality is not None:
+                     self.localization_quality = quality
+                     self.triangulated_position = quality['position']
+@@ -451,6 +457,18 @@
+         if not pairs:
+             self.prev_view_pos = None
+ 
++    def bearing_observation(self, all_cam_data):
++        """A current ray only; this does not add an independent stored view."""
++        cam = max(all_cam_data, key=lambda c: int(np.count_nonzero(c['object_mask'])))
++        pixels = np.argwhere(cam['object_mask'] > 0)
++        if not len(pixels):
++            return None
++        v, u = np.median(pixels, axis=0)
++        return dict(origin=cam['t_wc'].ravel(),
++                    ray=cam['R_wc'] @ np.linalg.solve(cam['K'], [u, v, 1.]),
++                    stamp_ns=self.stamp_ns(self.current_observation.header.stamp),
++                    angular_tolerance=.04)
++
+     def add_views(self, all_cam_data):
+         """
+         Add camera views for triangulation.

@@ -1,0 +1,45 @@
+--- v25/official_adapter/beamng_wildos_adapter/goal_standoff.py
++++ v26/official_adapter/beamng_wildos_adapter/goal_standoff.py
+@@ -22,7 +22,8 @@
+ from wildos_nav2_adapter.vehicle_geometry import SBR_FRONT_EXTENT
+ from wildos_nav2_adapter.sensor_geometry import (SBR_CAMERA_OFFSET, observation_clearance,
+                                                geometry_restart_reason)
+-from wildos_nav2_adapter.arrival_criteria import STANDOFF_ARRIVAL_TOLERANCE_M
++from wildos_nav2_adapter.arrival_criteria import (
++    STANDOFF_ARRIVAL_TOLERANCE_M, vehicle_body_distance, within_body_arrival)
+ from rcl_interfaces.msg import SetParametersResult
+ from .visible_approach import visible_direction, observation_step
+ from wildos_nav2_adapter.observation_pose import (
+@@ -525,15 +526,28 @@
+                 or self.get_clock().now().nanoseconds - stamp > 5_000_000_000):
+             self.pending_confirmation = None
+             return
+-        reason = self.publish_standoff(target)
+-        ready = reason is None and self.last_goal is not None
++        within_arrival = False
++        if self.odom is not None and self.fresh(self.odom, 1.):
++            pose = self.odom.pose.pose
++            q = pose.orientation
++            heading = math.atan2(2*(q.w*q.z+q.x*q.y), 1-2*(q.y*q.y+q.z*q.z))
++            within_arrival = within_body_arrival(vehicle_body_distance(
++                (pose.position.x, pose.position.y), heading,
++                confirmation['object_position'],
++                str(self.get_parameter('carrier_model').value).strip().lower()))
++        # Completion needs no new waypoint, especially one behind the vehicle
++        # produced by the nominal standoff ring after it is already close.
++        reason = None if within_arrival else self.publish_standoff(target)
++        ready = not within_arrival and reason is None and self.last_goal is not None
+         confirmation['instance_id'] = (self.confirmed_instance_anchor.get('instance_id',
+                 f'{self.active_query}:{self.confirmed_instance_anchor["observation_stamp_ns"]}')
+             if self.confirmed_instance_anchor else f'{self.active_query}:{stamp}')
+-        status = (ready, reason, self.last_goal)
++        status = (ready, reason, self.last_goal, within_arrival)
+         if force or status != self.pending_status:
+             self.confirmation_pub.publish(String(data=json.dumps({**confirmation,
+-                'search_confirmed': ready, 'approach_goal_ready': ready,
++                # Semantic/geometric consensus is independent of route generation.
++                # The bridge measures current body clearance before completion.
++                'search_confirmed': True, 'approach_goal_ready': ready,
+                 'standoff': list(self.last_goal) if ready else None,
+                 'standoff_object_distance_m': (self.last_standoff_object_distance
+                                                if ready else None),

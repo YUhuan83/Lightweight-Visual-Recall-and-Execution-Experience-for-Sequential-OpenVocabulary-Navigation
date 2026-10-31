@@ -1,0 +1,14 @@
+{
+  "snapshot_date": "2026-10-31",
+  "purpose": "Public code review for Gemini, explicitly requested by project owner",
+  "local_project_base_commit": "affb478704b13a4190542bddedb8a6a78bdd444c",
+  "local_project_includes_uncommitted_work": true,
+  "original_repository_history_and_index_preserved": true,
+  "server_candidate": "v74_document_handoff",
+  "server_candidate_full_field_acceptance": false,
+  "snapshot_commit_is_not_a_repair_acceptance_commit": true,
+  "publication_sanitizer_unit_tests": {"passed": 6, "failed": 0},
+  "runtime_tests_reexecuted_for_publication": false,
+  "runtime_changes_for_publication": false,
+  "upstream_wildos": "https://github.com/nasa-jpl/nebula2-wildos"
+}

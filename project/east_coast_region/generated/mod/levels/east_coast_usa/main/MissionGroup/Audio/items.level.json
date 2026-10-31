@@ -1,0 +1,4 @@
+{"name":"Amb_2D","class":"SimGroup","persistentId":"4e586620-2168-484e-acab-86cf85f4c766","__parent":"Audio"}
+{"name":"Amb_3D","class":"SimGroup","persistentId":"a6bfccea-668e-4279-b915-0654c73d8508","__parent":"Audio"}
+{"name":"Snapshots","class":"SimGroup","persistentId":"9dacbc92-8317-4a22-a4cc-00d365b60c5a","__parent":"Audio"}
+{"name":"Reverb_Generic","class":"SFXEmitter","persistentId":"638ff54d-c685-4180-b203-3185a43ed4f9","__parent":"Audio","position":[697.299988,-334.570129,119.397369],"cloneOrigin":"Animal_QP875_1","fadeInTime":0,"fadeOutTime":0,"is3D":false,"isLooping":false,"maxDistance":0.00999999978,"referenceDistance":0,"scale":[0.00999999978,0.00999999978,0.00999999978],"track":"snapshot:>Reverb_EC","useTrackDescriptionOnly":true}

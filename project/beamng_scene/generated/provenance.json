@@ -1,0 +1,188 @@
+{
+  "level": "italy",
+  "terrain": "Existing BeamNG Italy, not a new terrain",
+  "model": "pickup",
+  "part_config": "vehicles/pickup/d15_4wd_A.pc",
+  "vehicle_metadata": {
+    "0-100 km/h": 9.8,
+    "0-100 mph": 34.9,
+    "0-60 mph": 9.2,
+    "100-0 km/h": 40.3,
+    "60-0 mph": 123.7,
+    "60-100 mph": 25.7,
+    "Body Style": "Pickup",
+    "BoundingBox": [
+      [
+        -0.6,
+        -1.42,
+        -0.3099
+      ],
+      [
+        1.7,
+        3.54,
+        1.41
+      ]
+    ],
+    "Braking G": 0.975,
+    "Config Type": "Factory",
+    "Configuration": "vehiclesData.pickup.d15_4wd_A.Configuration",
+    "Description": "vehiclesData.pickup.d15_4wd_A.Description",
+    "Drag Times": {
+      "brakingG": 0.9176964834,
+      "time_0_60": 9.382500559,
+      "time_1000": 14.21550086,
+      "time_1_4": 17.05050105,
+      "time_1_8": 10.88500064,
+      "time_330": 7.051000436,
+      "time_60": 2.518500189,
+      "velAt_1_4": 35.65013261,
+      "velAt_1_8": 29.00384965
+    },
+    "Drivetrain": "4WD",
+    "Fuel Type": "Gasoline",
+    "Induction Type": "NA",
+    "Off-Road Score": 46,
+    "Population": 10000,
+    "Power": 197,
+    "PowerPeakRPM": "3950 - 4600",
+    "Propulsion": "ICE",
+    "Top Speed": 48.48723133,
+    "Torque": 375,
+    "TorquePeakRPM": "2950 - 3650",
+    "Transmission": "Automatic",
+    "Value": 44500,
+    "Weight": 2060,
+    "Weight/Power": 10.45685279,
+    "Years": {
+      "max": 1997,
+      "min": 1992
+    },
+    "defaultPaintName1": "Sea Blue",
+    "vehicleSelectorSubGroup": "vehiclesData.pickup.d15_423sport_A.vehicleSelectorSubGroup"
+  },
+  "spawn": {
+    "name": "spawn_crossroads",
+    "class": "SpawnSphere",
+    "persistentId": "46b65a90-6da4-458b-a6aa-5a6b3fa48832",
+    "__parent": "spawnpoints",
+    "position": [
+      729.62677,
+      763.914001,
+      177.753006
+    ],
+    "cloneOrigin": "spawn_city",
+    "dataBlock": "SpawnSphereMarker",
+    "radius": 1,
+    "rotationMatrix": [
+      0.902616739,
+      -0.430445611,
+      0,
+      0.430445611,
+      0.902616739,
+      0,
+      0,
+      0,
+      1
+    ],
+    "spawnClass": "player",
+    "spawnDatablock": "DefaultPlayerData",
+    "sphereWeight": "1"
+  },
+  "rot_quat": [
+    0.0,
+    0.0,
+    0.22066202865021606,
+    0.9753503314768347
+  ],
+  "road": {
+    "class": "DecalRoad",
+    "persistentId": "d638a2ec-6b50-44e9-a5a9-6445e17a4d8a",
+    "__parent": "road_details",
+    "position": [
+      728.805359,
+      756.980896,
+      177.847168
+    ],
+    "breakAngle": 5,
+    "decalBias": 0.00150000001,
+    "distanceFade": [
+      80,
+      40
+    ],
+    "improvedSpline": true,
+    "material": "m_asphalt_damaged_01",
+    "nodes": [
+      [
+        728.805359,
+        756.980896,
+        177.847168,
+        4
+      ],
+      [
+        721.835876,
+        741.337097,
+        178.000366,
+        4
+      ]
+    ],
+    "renderPriority": 50,
+    "startEndFade": [
+      10,
+      10
+    ],
+    "textureLength": 16
+  },
+  "objects": [
+    {
+      "kind": "cube",
+      "name": "nz_cube",
+      "size": [
+        0.7,
+        0.7,
+        0.5
+      ],
+      "pos": [
+        724.27519505,
+        746.81242665,
+        178.1967467
+      ],
+      "road_node_fraction": 0.65,
+      "spawn_clearance_m": 17.919352658342433
+    },
+    {
+      "kind": "cylinder",
+      "name": "nz_cylinder",
+      "size": [
+        0.3,
+        1.5
+      ],
+      "pos": [
+        721.835876,
+        741.337097,
+        178.750366
+      ],
+      "road_node_fraction": 1.0,
+      "spawn_clearance_m": 23.88335452871837
+    }
+  ],
+  "evidence": {
+    "levels/italy/main/MissionGroup/spawnpoints/items.level.json": {
+      "archive": "D:\\BEAMNG\\BeamNG.tech.v0.39.4.0\\content\\levels\\italy.zip",
+      "sha256": "75a5811a03dcbe4e2ecbcc1418c5a1c02f6688f4f3516812d961affcf91a0344"
+    },
+    "levels/italy/main/MissionGroup/decalroads/asphalt/road_details/items.level.json": {
+      "archive": "D:\\BEAMNG\\BeamNG.tech.v0.39.4.0\\content\\levels\\italy.zip",
+      "sha256": "9e40e3f0da074b2737686572679eb286070eced0e4d32ed9ed6da6aa5195a07f"
+    },
+    "vehicles/pickup/info_d15_4wd_A.json": {
+      "archive": "D:\\BEAMNG\\BeamNG.tech.v0.39.4.0\\content\\vehicles\\pickup.zip",
+      "sha256": "3c4e14df02183dd707df2a84270957d79add0a85a76568f2f944f442baaf36d4"
+    },
+    "vehicles/pickup/d15_4wd_A.pc": {
+      "archive": "D:\\BEAMNG\\BeamNG.tech.v0.39.4.0\\content\\vehicles\\pickup.zip",
+      "sha256": "8cb98e42b4bc71f6c999e08a5a6a5811e94053fabbbf600365e9b91b5ee3beb4"
+    }
+  },
+  "beamngpy": "1.36",
+  "surface_note": "Existing asphalt at preview spawn; no physical cobblestones added"
+}

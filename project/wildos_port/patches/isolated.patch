@@ -1,0 +1,256 @@
+--- a/graphnav_mapper/CMakeLists.txt
++++ b/graphnav_mapper/CMakeLists.txt
+@@ -1,5 +1,8 @@
+ cmake_minimum_required(VERSION 3.8)
+-project(graphnav_mapper)
++project(graphnav_mapper)
++
++set(CMAKE_CXX_STANDARD 17)
++set(CMAKE_CXX_STANDARD_REQUIRED ON)
+ 
+ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+   add_compile_options(-Wall -Wextra -Wpedantic)
+--- a/nvidia_radio/radio/siglip2_adaptor.py
++++ b/nvidia_radio/radio/siglip2_adaptor.py
+@@ -38,8 +38,12 @@
+         with rank_gate():
+             print(f"[INFO] Loading SigLIP2 model and processor for version: {version}")
+             print(f"[INFO] Using checkpoint path: {ckpt_path}")
+-            ms_dir = Path(f"{ckpt_path}_ms")
+-            if (ms_dir / "config.json").is_file():
++            local_dir = Path(ckpt_path)
++            ms_dir = Path(f"{ckpt_path}_ms")
++            if (local_dir / "config.json").is_file():
++                model = AutoModel.from_pretrained(str(local_dir), trust_remote_code=True, local_files_only=True)
++                proc = AutoProcessor.from_pretrained(str(local_dir), trust_remote_code=True, local_files_only=True)
++            elif (ms_dir / "config.json").is_file():
+                 print(f"[INFO] Loading SigLIP2 from local ModelScope dir: {ms_dir}")
+                 model = AutoModel.from_pretrained(str(ms_dir), trust_remote_code=True)
+                 proc = AutoProcessor.from_pretrained(str(ms_dir), trust_remote_code=True)
+--- a/visual_navigation/configs/isolated_objsearch.yaml
++++ b/visual_navigation/configs/isolated_objsearch.yaml
+@@ -0,0 +1,11 @@
++# Frame names are a proposed interface, not BeamNG calibration.
++num_cameras: 3
++parent_frame: wheel_odom
++cam_frame: camera_{}_optical_frame
++lidar_frame: lidar_link
++object_mask_topic: /rover/object_mask
++lidar_topic: /rover/lidar/points
++triangulated_object_topic: /rover/triangulated_object
++# Deliberately not connected to a motion controller.
++navigation_goal_topic: /wildos_port/candidate_goal
++particle_viz_topic: /rover/object_hypotheses
+--- a/visual_navigation/configs/isolated_wildos.yaml
++++ b/visual_navigation/configs/isolated_wildos.yaml
+@@ -0,0 +1,24 @@
++# Preparation contract only. Supply real sensor calibration and mapping first.
++# Paths refer to a read-only deployment mount, NOT the original Windows weights.
++ckpt_root: /mnt/wildos-weights
++model_version: REPLACE_WITH_LOCAL_RADIO_CHECKPOINT.pth.tar
++adaptor_ckpt_path: /mnt/wildos-weights
++local_files_only: true
++frontier_ckpt: frontier_head.ckpt
++traversability_ckpt: trav_head.ckpt
++adaptor_version: null
++num_cameras: 3
++cams_inverted: false
++parent_frame: wheel_odom
++cam_frame: camera_{}_optical_frame
++camera_img_topic: /rover/camera/{}/image_raw
++camera_info_topic: /rover/camera/{}/camera_info
++odometry_topic: /rover/wheel_odom
++# Required upstream graph, not provided by this preparation.
++navigation_graph_topic: /rover/nav_graph
++scored_navgraph_topic: /rover/scored_nav_graph
++object_mask_topic: /rover/object_mask
++model_viz_topic: /rover/model_visualization
++valid_geofrontiers_topic: /rover/within_range_geofrontiers
++score_ring_topic: /rover/score_rings
++graph_viz_topic: /rover/nav_graph_viz
+--- a/visual_navigation/launch/explorfm_triangulation_launch.py
++++ b/visual_navigation/launch/explorfm_triangulation_launch.py
+@@ -8,7 +8,8 @@
+     robot_namespace = LaunchConfiguration('robot_namespace')
+     log_level = LaunchConfiguration('log_level')
+ 
+-    return LaunchDescription([
++    return LaunchDescription([
++        DeclareLaunchArgument('config', default_value='explorfm_triangulator_conf.yaml'),
+         DeclareLaunchArgument(
+             'use_sim_time',
+             default_value='false',
+@@ -32,7 +33,7 @@
+             name='explorfm_triangulator',
+             output='screen',
+             arguments=[
+-                '--config', 'explorfm_triangulator_conf.yaml',
++                '--config', LaunchConfiguration('config'),
+                 '--ros-args', '--log-level', log_level
+             ],
+             parameters=[
+--- a/visual_navigation/launch/wildos_launch.py
++++ b/visual_navigation/launch/wildos_launch.py
+@@ -11,7 +11,9 @@
+     do_object_search = LaunchConfiguration('do_object_search')
+     log_level = LaunchConfiguration('log_level')
+ 
+-    return LaunchDescription([
++    return LaunchDescription([
++        DeclareLaunchArgument('config', default_value='wildos_nav_conf.yaml'),
++        DeclareLaunchArgument('triangulation_config', default_value='triangulation3d_objsearch_conf.yaml'),
+         DeclareLaunchArgument(
+             'use_sim_time',
+             default_value='false',
+@@ -39,7 +41,7 @@
+             executable='wildos',
+             output='screen',
+             arguments=[
+-                '--config', 'wildos_nav_conf.yaml',
++                '--config', LaunchConfiguration('config'),
+                 '--do_object_search', do_object_search,
+                 '--ros-args', '--log-level', log_level
+             ],
+@@ -55,9 +57,10 @@
+         # Conditionally launch obj_mask_triangulation
+         Node(
+             package='visual_navigation',
+-            executable='obj_mask_triangulation',
+-            output='screen',
+-            arguments=[
++            executable='obj_mask_triangulation',
++            output='screen',
++            arguments=[
++                '--config', LaunchConfiguration('triangulation_config'),
+                 '--ros-args', '--log-level', log_level
+             ],
+             parameters=[
+--- a/visual_navigation/visual_navigation/explorfm_triangulation/explorfm_triangulator.py
++++ b/visual_navigation/visual_navigation/explorfm_triangulation/explorfm_triangulator.py
+@@ -22,7 +22,8 @@
+ 
+ from visual_navigation.utils.tf_lookup_sub import TFEdge, TFLookupSubscriber
+ from visual_navigation.utils.object_search_utils import localize_query
+-from explorfm import ExploRFMInference
++from explorfm import ExploRFMInference
++from visual_navigation.utils.local_models import model_paths
+ from visual_navigation.explorfm_triangulation.triangulator_viz import TriangulationViz
+ 
+ from triangulation3d.camera_data import Camera
+@@ -122,8 +123,7 @@
+         config = OmegaConf.merge(OmegaConf.create(self.default_config), config)
+ 
+         # Model path initialization
+-        self.model_path = HOME_DIR / "ckpts" / config.model_version
+-        self.adaptor_ckpt_path = HOME_DIR / "ckpts" / config.adaptor_version
++        _, self.model_path, self.adaptor_ckpt_path = model_paths(config, triangulation=True)
+ 
+         # init model before to prevent tf listener from spinning too early
+         np.random.seed(42)
+@@ -149,7 +149,8 @@
+         self.num_cameras = RobotCameraInfo[self.robot_name]["num_cameras"]
+         assert self.num_cameras in [1, 3], "Only 1 or 3 cameras are supported."
+ 
+-        self.cam_inverted = RobotCameraInfo[self.robot_name]["inverted_cameras"]
++        self.cam_inverted = (list(range(self.num_cameras)) if config.cams_inverted else []) \
++            if "cams_inverted" in config else RobotCameraInfo[self.robot_name]["inverted_cameras"]
+ 
+         # Triangulation parameters and initializations
+         self.view_data = {
+--- a/visual_navigation/visual_navigation/explorfm_triangulation/obj_mask_triangulation.py
++++ b/visual_navigation/visual_navigation/explorfm_triangulation/obj_mask_triangulation.py
+@@ -214,7 +214,7 @@
+             cam_data = {}
+             cam_frame = self.cam_tf_frame.format(CAMERA_MAPPING[cam_id])
+ 
+-            assert camera_infos[cam_id].header.frame_id[1:] == cam_frame, \
++            assert camera_infos[cam_id].header.frame_id.lstrip('/') == cam_frame, \
+                 f"CameraInfo frame_id {camera_infos[cam_id].header.frame_id} does not match expected {cam_frame}"
+             
+             assert camera_tfs[cam_id].child_frame_id == cam_frame, \
+@@ -421,10 +421,14 @@
+ def main(args=None):
+     rclpy.init(args=args)
+     from ament_index_python.packages import get_package_share_directory
+-    import os
++    import argparse
++
++    parser = argparse.ArgumentParser()
++    parser.add_argument("--config", default="triangulation3d_objsearch_conf.yaml")
++    custom_args = parser.parse_args(rclpy.utilities.remove_ros_args(args)[1:])
+ 
+     package_share_directory = Path(get_package_share_directory('visual_navigation'))
+-    conf = package_share_directory / "configs" / "triangulation3d_objsearch_conf.yaml"
++    conf = package_share_directory / "configs" / custom_args.config
+ 
+     mask_triang_node = ObjectMaskTriangulator(OmegaConf.load(conf))
+     rclpy.spin(mask_triang_node)
+--- a/visual_navigation/visual_navigation/utils/local_models.py
++++ b/visual_navigation/visual_navigation/utils/local_models.py
+@@ -0,0 +1,23 @@
++"""Resolve explicit deployment paths without importing ROS or model libraries."""
++from pathlib import Path
++
++
++def model_paths(config, triangulation=False):
++    root = Path(config.get("ckpt_root", Path.home() / "ckpts")).expanduser()
++    version = config["model_version"]
++    model = root / version if triangulation else version
++    adaptor = config.get("adaptor_ckpt_path", root / config["adaptor_version"]
++                         if triangulation else root)
++    adaptor = Path(adaptor).expanduser()
++    if config.get("local_files_only", False):
++        model = Path(version).expanduser()
++        if not model.is_absolute():
++            model = root / model
++        if not model.is_file():
++            raise FileNotFoundError(f"Local RADIO checkpoint required: {model}")
++        if config.get("adaptor_version") is not None:
++            candidates = (adaptor, adaptor / "siglip2_ms", Path(f"{adaptor}_ms"))
++            adaptor = next((p for p in candidates if (p / "config.json").is_file()), None)
++            if adaptor is None:
++                raise FileNotFoundError("Local SigLIP2 config.json required; no network fallback")
++    return root, model, adaptor
+--- a/visual_navigation/visual_navigation/wildos/nav.py
++++ b/visual_navigation/visual_navigation/wildos/nav.py
+@@ -19,7 +19,8 @@
+ from visual_navigation.wildos.goalagnostic_scoring import GoalAgnosticScoring
+ from visual_navigation.geofrontier_nav.geofrontier_to_image import GeoFrontierToImage
+ from visual_navigation.wildos.viz import VisualizeGoalAgnosticGeoFrontierScoring
+-from explorfm import ExploRFMInference
++from explorfm import ExploRFMInference
++from visual_navigation.utils.local_models import model_paths
+ from visual_navigation.utils.object_search_utils import localize_query, get_objectmask_msg
+ 
+ HOME_DIR = Path.home()
+@@ -220,13 +221,14 @@
+         if do_object_search and config.adaptor_version is None:
+             config.adaptor_version = "siglip2"
+ 
+-        # radio model
+-        self.model = ExploRFMInference(
+-            frontier_ckpt=HOME_DIR / "ckpts" / config.frontier_ckpt,
+-            traversability_ckpt=HOME_DIR / "ckpts" / config.traversability_ckpt,
+-            model_version=config.model_version,
+-            adaptor_version=config.adaptor_version,
+-            adaptor_ckpt_path=HOME_DIR / "ckpts",
++        ckpt_root, model_version, adaptor_path = model_paths(config)
++        # radio model
++        self.model = ExploRFMInference(
++            frontier_ckpt=ckpt_root / config.frontier_ckpt,
++            traversability_ckpt=ckpt_root / config.traversability_ckpt,
++            model_version=model_version,
++            adaptor_version=config.adaptor_version,
++            adaptor_ckpt_path=adaptor_path,
+             use_naclip=config.use_naclip,
+             use_summary_for_spatial=config.use_summary_for_spatial,
+             radio_dim=config.radio_dim,
+@@ -280,7 +282,7 @@
+         if self.object_search_mode:
+             self.object_mask_publisher = self.create_publisher(
+                 ObjectMaskWithTf,
+-                "/spot1/object_mask",
++                config.get("object_mask_topic", "/spot1/object_mask"),
+                 10
+             )
+ 

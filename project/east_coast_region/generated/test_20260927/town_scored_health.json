@@ -1,0 +1,29 @@
+{
+  "details": {
+    "scored_graph": {
+      "current_node_valid": true,
+      "edge_indices_valid": true,
+      "edges": 1372,
+      "frame": "spot1/odom",
+      "frontier_points": 103,
+      "frontiers": 38,
+      "nodes": 135,
+      "score_count": 608,
+      "score_max": 0.2999997138977051,
+      "score_min": 0.024092474952340126,
+      "scored_nodes": 38,
+      "trav_classes": [
+        "default"
+      ]
+    }
+  },
+  "mode": "scored",
+  "ok": true,
+  "required": [
+    "scored_graph"
+  ],
+  "results": {
+    "scored_graph": true
+  },
+  "timed_out": false
+}

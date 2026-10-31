@@ -1,0 +1,10 @@
+--- before/nav2_adapter/wildos_nav2_adapter/execution_feedback.py
++++ after/nav2_adapter/wildos_nav2_adapter/execution_feedback.py
+@@ -105,6 +105,7 @@
+ 
+     def execution_transport_unavailable(self, reason):
+         """Invalidate action ownership without blaming or releasing a route."""
++        self.retired_motion = None
+         self.retire_follow_transactions()
+         self.finish_execution_feedback(False, reason)
+         self.epoch += 1

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="4" failures="0" disabled="0" errors="0" time="0.419" timestamp="2026-10-20T16:47:54" name="AllTests">
+  <testsuite name="Connection" tests="2" failures="0" disabled="0" errors="0" time="0" timestamp="2026-10-20T16:47:54">
+    <testcase name="ExactForwardReverseAndArc" status="run" result="completed" time="0" timestamp="2026-10-20T16:47:54" classname="Connection" />
+    <testcase name="RejectsShortNonfiniteAndAllocationOverflow" status="run" result="completed" time="0" timestamp="2026-10-20T16:47:54" classname="Connection" />
+  </testsuite>
+  <testsuite name="Collision" tests="1" failures="0" disabled="0" errors="0" time="0" timestamp="2026-10-20T16:47:54">
+    <testcase name="InteriorBoundaryUnknownAndRecovery" status="run" result="completed" time="0" timestamp="2026-10-20T16:47:54" classname="Collision" />
+  </testsuite>
+  <testsuite name="Search" tests="1" failures="0" disabled="0" errors="0" time="0.419" timestamp="2026-10-20T16:47:54">
+    <testcase name="DeadlineAndEvaluationBounds" status="run" result="completed" time="0.419" timestamp="2026-10-20T16:47:54" classname="Search" />
+  </testsuite>
+</testsuites>

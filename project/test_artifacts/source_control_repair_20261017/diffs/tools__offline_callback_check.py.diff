@@ -1,0 +1,11 @@
+--- before/tools/offline_callback_check.py
++++ after/tools/offline_callback_check.py
+@@ -27,7 +27,7 @@
+                  'test_planner_execution_ownership_ros',
+                  'test_navigation_transactions_ros',
+                  'test_surface_association_ros', 'test_short_endpoint_handoff_ros', 'test_tracking_handoff_ros',
+-                 'test_triangulation_query_scope', 'test_native_vehicle_control_ros', 'test_wheel_contact',
++                 'test_triangulation_query_scope', 'test_native_vehicle_control_ros', 'test_source_control_ros', 'test_wheel_contact',
+                  'test_fail_closed_transport', 'test_direct_vehicle_control', 'test_vehicle_control_lease', 'test_kinematic_rpc_worker',
+                  'test_kinematic_profile_status', 'test_visible_approach_ros', 'test_arrival_criteria',
+                  'test_visualization_bridge_ros'):

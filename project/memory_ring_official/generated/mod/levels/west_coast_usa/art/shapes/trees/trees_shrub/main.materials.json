@@ -1,0 +1,160 @@
+{
+  "m_creosote_dead_branches": {
+    "name": "m_creosote_dead_branches",
+    "mapTo": "m_creosote_dead_branches",
+    "class": "Material",
+    "Stages": [
+      {
+        "ambientOcclusionMap": "/assets/materials/foliage/bush/t_creosote/t_creosote_dead_branches/t_creosote_dead_branches_ao.data.png",
+        "baseColorFactor": [
+          0.727931976,
+          0.673483014,
+          0.648163021,
+          1
+        ],
+        "baseColorMap": "/assets/materials/foliage/bush/t_creosote/t_creosote_dead_branches/t_creosote_dead_branches_b.color.png",
+        "normalMap": "/assets/materials/foliage/bush/t_creosote/t_creosote_dead_branches/t_creosote_dead_branches_nm.normal.png",
+        "normalMapStrength": 2,
+        "opacityMap": "/assets/materials/foliage/bush/t_creosote/t_creosote_dead_branches/t_creosote_dead_branches_o.data.png",
+        "roughnessMap": "/assets/materials/foliage/bush/t_creosote/t_creosote_dead_branches/t_creosote_dead_branches_r.data.png"
+      },
+      {},
+      {},
+      {}
+    ],
+    "alphaRef": 90,
+    "alphaTest": true,
+    "doubleSided": true,
+    "invertBackFaceNormals": true,
+    "subSurface": true,
+    "subSurfaceIntensity": 0.00999999978,
+    "translucentZWrite": true,
+    "version": 1.5
+  },
+  "m_creosote_foliage_dry": {
+    "name": "m_creosote_foliage_dry",
+    "mapTo": "m_creosote_foliage_dry",
+    "class": "Material",
+    "Stages": [
+      {
+        "ambientOcclusionMap": "/assets/materials/foliage/bush/t_creosote/t_creosote_foliage_dry/t_creosote_foliage_dry_ao.data.png",
+        "baseColorMap": "/assets/materials/foliage/bush/t_creosote/t_creosote_foliage_dry/t_creosote_foliage_dry_b.color.png",
+        "normalMap": "/assets/materials/foliage/bush/t_creosote/t_creosote_foliage_dry/t_creosote_foliage_green_nm.normal.png",
+        "opacityMap": "/assets/materials/foliage/bush/t_creosote/t_creosote_foliage_dry/t_creosote_foliage_green_o.data.png",
+        "roughnessMap": "/assets/materials/foliage/bush/t_creosote/t_creosote_foliage_dry/t_creosote_foliage_dry_r.data.png"
+      },
+      {},
+      {},
+      {}
+    ],
+    "alphaRef": 120,
+    "alphaTest": true,
+    "doubleSided": true,
+    "invertBackFaceNormals": true,
+    "subSurface": true,
+    "subSurfaceIntensity": 1,
+    "translucentZWrite": true,
+    "version": 1.5
+  },
+  "m_creosote_foliage_dry_02": {
+    "name": "m_creosote_foliage_dry_02",
+    "mapTo": "m_creosote_foliage_dry_02",
+    "class": "Material",
+    "Stages": [
+      {
+        "ambientOcclusionMap": "/assets/materials/foliage/bush/t_creosote/t_creosote_foliage_dry_02/t_creosote_foliage_dry_02_ao.data.png",
+        "baseColorMap": "/assets/materials/foliage/bush/t_creosote/t_creosote_foliage_dry_02/t_creosote_foliage_dry_02_b.color.png",
+        "normalMap": "/assets/materials/foliage/bush/t_creosote/t_creosote_foliage_dry_02/t_creosote_foliage_green_02_nm.normal.png",
+        "opacityMap": "/assets/materials/foliage/bush/t_creosote/t_creosote_foliage_dry_02/t_creosote_foliage_green_02_o.data.png",
+        "roughnessMap": "/assets/materials/foliage/bush/t_creosote/t_creosote_foliage_dry_02/t_creosote_foliage_dry_02_r.data.png"
+      },
+      {},
+      {},
+      {}
+    ],
+    "alphaRef": 90,
+    "alphaTest": true,
+    "doubleSided": true,
+    "invertBackFaceNormals": true,
+    "subSurface": true,
+    "subSurfaceIntensity": 1,
+    "translucentZWrite": true,
+    "version": 1.5
+  },
+  "m_creosote_foliage_green_dry": {
+    "name": "m_creosote_foliage_green_dry",
+    "mapTo": "m_creosote_foliage_green_dry",
+    "class": "Material",
+    "Stages": [
+      {
+        "ambientOcclusionMap": "/assets/materials/foliage/bush/t_creosote/t_creosote_foliage_dry/t_creosote_foliage_dry_ao.data.png",
+        "baseColorMap": "/assets/materials/foliage/bush/t_creosote/t_creosote_foliage_green_dry/t_creosote_foliage_green_dry_b.color.png",
+        "normalMap": "/assets/materials/foliage/bush/t_creosote/t_creosote_foliage_dry/t_creosote_foliage_green_nm.normal.png",
+        "opacityMap": "/assets/materials/foliage/bush/t_creosote/t_creosote_foliage_dry/t_creosote_foliage_green_o.data.png",
+        "roughnessMap": "/assets/materials/foliage/bush/t_creosote/t_creosote_foliage_dry/t_creosote_foliage_dry_r.data.png"
+      },
+      {},
+      {},
+      {}
+    ],
+    "alphaRef": 80,
+    "alphaTest": true,
+    "doubleSided": true,
+    "invertBackFaceNormals": true,
+    "subSurface": true,
+    "subSurfaceIntensity": 1,
+    "translucentZWrite": true,
+    "version": 1.5
+  },
+  "m_creosote_foliage_green_dry_02": {
+    "name": "m_creosote_foliage_green_dry_02",
+    "mapTo": "m_creosote_foliage_green_dry_02",
+    "class": "Material",
+    "Stages": [
+      {
+        "ambientOcclusionMap": "/assets/materials/foliage/bush/t_creosote/t_creosote_foliage_dry_02/t_creosote_foliage_dry_02_ao.data.png",
+        "baseColorMap": "/assets/materials/foliage/bush/t_creosote/t_creosote_foliage_green_dry_02/t_creosote_foliage_green_dry_02_b.color.png",
+        "normalMap": "/assets/materials/foliage/bush/t_creosote/t_creosote_foliage_dry_02/t_creosote_foliage_green_02_nm.normal.png",
+        "opacityFactor": 0.907999992,
+        "opacityMap": "/assets/materials/foliage/bush/t_creosote/t_creosote_foliage_dry_02/t_creosote_foliage_green_02_o.data.png",
+        "roughnessMap": "/assets/materials/foliage/bush/t_creosote/t_creosote_foliage_dry_02/t_creosote_foliage_dry_02_r.data.png"
+      },
+      {},
+      {},
+      {}
+    ],
+    "alphaRef": 80,
+    "alphaTest": true,
+    "doubleSided": true,
+    "invertBackFaceNormals": true,
+    "subSurface": true,
+    "subSurfaceIntensity": 1,
+    "translucentZWrite": true,
+    "version": 1.5
+  },
+  "m_creosote_merged_foliage": {
+    "name": "m_creosote_merged_foliage",
+    "mapTo": "m_creosote_merged_foliage",
+    "class": "Material",
+    "Stages": [
+      {
+        "ambientOcclusionMap": "/assets/materials/foliage/bush/t_creosote/t_creosote_merged_foliage/t_creosote_merged_foliage_ao.data.png",
+        "baseColorMap": "/assets/materials/foliage/bush/t_creosote/t_creosote_merged_foliage/t_creosote_merged_foliage_b.color.png",
+        "normalMap": "/assets/materials/foliage/bush/t_creosote/t_creosote_merged_foliage/t_creosote_merged_foliage_nm.normal.png",
+        "opacityMap": "/assets/materials/foliage/bush/t_creosote/t_creosote_merged_foliage/t_creosote_merged_foliage_o.data.png",
+        "roughnessMap": "/assets/materials/foliage/bush/t_creosote/t_creosote_merged_foliage/t_creosote_merged_foliage_r.data.png"
+      },
+      {},
+      {},
+      {}
+    ],
+    "alphaRef": 90,
+    "alphaTest": true,
+    "doubleSided": true,
+    "invertBackFaceNormals": true,
+    "subSurface": true,
+    "subSurfaceIntensity": 0.5,
+    "translucentZWrite": true,
+    "version": 1.5
+  }
+}

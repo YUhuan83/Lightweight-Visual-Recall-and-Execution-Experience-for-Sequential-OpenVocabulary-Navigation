@@ -1,0 +1,188 @@
+{
+  "started_utc": "2026-09-09T10:11:09.715068+00:00",
+  "commands": [
+    {
+      "name": "gpu",
+      "command": [
+        "nvidia-smi"
+      ],
+      "started_utc": "2026-09-09T10:11:09.716082+00:00",
+      "timeout_seconds": 30,
+      "returncode": 0,
+      "stdout": "Wed Sep  9 18:11:09 2026       \n+-----------------------------------------------------------------------------------------+\n| NVIDIA-SMI 610.88                 KMD Version: 610.88        CUDA UMD Version: 13.3     |\n+-----------------------------------------+------------------------+----------------------+\n| GPU  Name                  Driver-Model | Bus-Id          Disp.A | Volatile Uncorr. ECC |\n| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |\n|                                         |                        |               MIG M. |\n|=========================================+========================+======================|\n|   0  NVIDIA GeForce RTX 5060 ...  WDDM  |   00000000:01:00.0  On |                  N/A |\n| N/A   55C    P5             18W /  115W |    2234MiB /   8151MiB |      7%      Default |\n|                                         |                        |                  N/A |\n+-----------------------------------------+------------------------+----------------------+\n\n+-----------------------------------------------------------------------------------------+\n| Processes:                                                                              |\n|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |\n|        ID   ID                                                               Usage      |\n|=========================================================================================|\n|    0   N/A  N/A            1576    C+G   ...26wp6bftszj\\TranslucentTB.exe      N/A      |\n|    0   N/A  N/A            6280    C+G   ...y\\StartMenuExperienceHost.exe      N/A      |\n|    0   N/A  N/A            6936    C+G   ...8wekyb3d8bbwe\\M365Copilot.exe      N/A      |\n|    0   N/A  N/A            6960    C+G   ...m Files\\bilibili\\\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd.exe      N/A      |\n|    0   N/A  N/A            9564    C+G   ...lpaper_engine\\wallpaper32.exe      N/A      |\n|    0   N/A  N/A           10964    C+G   ...IA app\\CEF\\NVIDIA Overlay.exe      N/A      |\n|    0   N/A  N/A           11204    C+G   ...t\\Edge\\Application\\msedge.exe      N/A      |\n|    0   N/A  N/A           12016    C+G   ...indows\\System32\\ShellHost.exe      N/A      |\n|    0   N/A  N/A           12044    C+G   ...ntrolPanel\\SystemSettings.exe      N/A      |\n|    0   N/A  N/A           12776    C+G   ...IA app\\CEF\\NVIDIA Overlay.exe      N/A      |\n|    0   N/A  N/A           13320    C+G   ...xyewy\\ShellExperienceHost.exe      N/A      |\n|    0   N/A  N/A           13536    C+G   C:\\Windows\\explorer.exe               N/A      |\n|    0   N/A  N/A           14472    C+G   ....0.4191.66\\msedgewebview2.exe      N/A      |\n|    0   N/A  N/A           15184    C+G   ...2txyewy\\CrossDeviceResume.exe      N/A      |\n|    0   N/A  N/A           16344    C+G   ...em32\\ApplicationFrameHost.exe      N/A      |\n|    0   N/A  N/A           18928    C+G   ....0.4191.66\\msedgewebview2.exe      N/A      |\n|    0   N/A  N/A           18956    C+G   ...hushou\\QianWenApp\\qianwen.exe      N/A      |\n|    0   N/A  N/A           19184    C+G   ...Chrome\\Application\\chrome.exe      N/A      |\n|    0   N/A  N/A           21592    C+G   ..._cw5n1h2txyewy\\SearchHost.exe      N/A      |\n|    0   N/A  N/A           22024    C+G   ...8bbwe\\PhoneExperienceHost.exe      N/A      |\n|    0   N/A  N/A           24792    C+G   ....0.4191.66\\msedgewebview2.exe      N/A      |\n|    0   N/A  N/A           25032    C+G   ...5n1h2txyewy\\TextInputHost.exe      N/A      |\n|    0   N/A  N/A           25680    C+G   ...encode-aidesktop\\OpenCode.exe      N/A      |\n|    0   N/A  N/A           26092    C+G   ...2p2nqsd0c76g0\\app\\ChatGPT.exe      N/A      |\n|    0   N/A  N/A           26124    C+G   ...Chrome\\Application\\chrome.exe      N/A      |\n|    0   N/A  N/A           27664    C+G   ...hushou\\QianWenApp\\qianwen.exe      N/A      |\n|    0   N/A  N/A           27984    C+G   ...hushou\\QianWenApp\\qianwen.exe      N/A      |\n|    0   N/A  N/A           30544    C+G   ...2p2nqsd0c76g0\\app\\ChatGPT.exe      N/A      |\n|    0   N/A  N/A           33580    C+G   ....0.4191.66\\msedgewebview2.exe      N/A      |\n|    0   N/A  N/A           36588    C+G   D:\\Microsoft VS Code\\Code.exe         N/A      |\n+-----------------------------------------------------------------------------------------+\n",
+      "stderr": "",
+      "finished_utc": "2026-09-09T10:11:09.808384+00:00"
+    },
+    {
+      "name": "current_python",
+      "command": [
+        "D:\\python.exe",
+        "-I",
+        "-B",
+        "C:\\Users\\Yu\\Desktop\\\u62df\u771f\\model_check\\runtime_check.py",
+        "probe"
+      ],
+      "started_utc": "2026-09-09T10:11:09.809080+00:00",
+      "timeout_seconds": 60,
+      "returncode": 0,
+      "stdout": "{\n  \"started_utc\": \"2026-09-09T10:11:09.906987+00:00\",\n  \"mode\": \"probe\",\n  \"executable\": \"D:\\\\python.exe\",\n  \"python\": \"3.13.9 (tags/v3.13.9:8183fa5, Oct 14 2025, 14:09:13) [MSC v.1944 64 bit (AMD64)]\",\n  \"memory\": {\n    \"total_ram_bytes\": 16890322944,\n    \"available_ram_bytes\": 2011242496\n  },\n  \"packages\": {\n    \"torch\": \"2.11.0+cu128\",\n    \"transformers\": null,\n    \"safetensors\": \"0.8.0\",\n    \"Pillow\": \"12.2.0\",\n    \"tokenizers\": null,\n    \"accelerate\": \"1.14.0\",\n    \"torchvision\": \"0.26.0+cu128\"\n  },\n  \"offline\": {\n    \"HF_HUB_OFFLINE\": \"1\",\n    \"TRANSFORMERS_OFFLINE\": \"1\",\n    \"HF_HUB_DISABLE_TELEMETRY\": \"1\"\n  },\n  \"inference_ran\": false,\n  \"torch\": {\n    \"version\": \"2.11.0+cu128\",\n    \"cuda_runtime\": \"12.8\",\n    \"cuda_available\": true,\n    \"architectures\": [\n      \"sm_75\",\n      \"sm_80\",\n      \"sm_86\",\n      \"sm_90\",\n      \"sm_100\",\n      \"sm_120\"\n    ],\n    \"gpu\": \"NVIDIA GeForce RTX 5060 Laptop GPU\",\n    \"capability\": [\n      12,\n      0\n    ],\n    \"free_total_vram\": [\n      7385120768,\n      8546484224\n    ]\n  },\n  \"status\": \"passed\",\n  \"finished_utc\": \"2026-09-09T10:11:13.324281+00:00\",\n  \"elapsed_seconds\": 3.4061108000005333\n}\n",
+      "stderr": "",
+      "result": {
+        "started_utc": "2026-09-09T10:11:09.906987+00:00",
+        "mode": "probe",
+        "executable": "D:\\python.exe",
+        "python": "3.13.9 (tags/v3.13.9:8183fa5, Oct 14 2025, 14:09:13) [MSC v.1944 64 bit (AMD64)]",
+        "memory": {
+          "total_ram_bytes": 16890322944,
+          "available_ram_bytes": 2011242496
+        },
+        "packages": {
+          "torch": "2.11.0+cu128",
+          "transformers": null,
+          "safetensors": "0.8.0",
+          "Pillow": "12.2.0",
+          "tokenizers": null,
+          "accelerate": "1.14.0",
+          "torchvision": "0.26.0+cu128"
+        },
+        "offline": {
+          "HF_HUB_OFFLINE": "1",
+          "TRANSFORMERS_OFFLINE": "1",
+          "HF_HUB_DISABLE_TELEMETRY": "1"
+        },
+        "inference_ran": false,
+        "torch": {
+          "version": "2.11.0+cu128",
+          "cuda_runtime": "12.8",
+          "cuda_available": true,
+          "architectures": [
+            "sm_75",
+            "sm_80",
+            "sm_86",
+            "sm_90",
+            "sm_100",
+            "sm_120"
+          ],
+          "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+          "capability": [
+            12,
+            0
+          ],
+          "free_total_vram": [
+            7385120768,
+            8546484224
+          ]
+        },
+        "status": "passed",
+        "finished_utc": "2026-09-09T10:11:13.324281+00:00",
+        "elapsed_seconds": 3.4061108000005333
+      },
+      "finished_utc": "2026-09-09T10:11:13.742007+00:00"
+    },
+    {
+      "name": "existing_venv",
+      "command": [
+        "C:\\Users\\Yu\\nebula2-wildos\\.venv\\Scripts\\python.exe",
+        "-I",
+        "-B",
+        "C:\\Users\\Yu\\Desktop\\\u62df\u771f\\model_check\\runtime_check.py",
+        "probe"
+      ],
+      "started_utc": "2026-09-09T10:11:13.742743+00:00",
+      "timeout_seconds": 60,
+      "returncode": 0,
+      "stdout": "{\n  \"started_utc\": \"2026-09-09T10:11:13.864186+00:00\",\n  \"mode\": \"probe\",\n  \"executable\": \"C:\\\\Users\\\\Yu\\\\nebula2-wildos\\\\.venv\\\\Scripts\\\\python.exe\",\n  \"python\": \"3.13.9 (tags/v3.13.9:8183fa5, Oct 14 2025, 14:09:13) [MSC v.1944 64 bit (AMD64)]\",\n  \"memory\": {\n    \"total_ram_bytes\": 16890322944,\n    \"available_ram_bytes\": 2028756992\n  },\n  \"packages\": {\n    \"torch\": \"2.14.0\",\n    \"transformers\": \"4.51.3\",\n    \"safetensors\": \"0.8.0\",\n    \"Pillow\": \"12.3.0\",\n    \"tokenizers\": \"0.21.4\",\n    \"accelerate\": null,\n    \"torchvision\": \"0.29.0\"\n  },\n  \"offline\": {\n    \"HF_HUB_OFFLINE\": \"1\",\n    \"TRANSFORMERS_OFFLINE\": \"1\",\n    \"HF_HUB_DISABLE_TELEMETRY\": \"1\"\n  },\n  \"inference_ran\": false,\n  \"torch\": {\n    \"version\": \"2.14.0+cpu\",\n    \"cuda_runtime\": null,\n    \"cuda_available\": false,\n    \"architectures\": []\n  },\n  \"status\": \"passed\",\n  \"finished_utc\": \"2026-09-09T10:11:15.927205+00:00\",\n  \"elapsed_seconds\": 2.0571538000003784\n}\n",
+      "stderr": "",
+      "result": {
+        "started_utc": "2026-09-09T10:11:13.864186+00:00",
+        "mode": "probe",
+        "executable": "C:\\Users\\Yu\\nebula2-wildos\\.venv\\Scripts\\python.exe",
+        "python": "3.13.9 (tags/v3.13.9:8183fa5, Oct 14 2025, 14:09:13) [MSC v.1944 64 bit (AMD64)]",
+        "memory": {
+          "total_ram_bytes": 16890322944,
+          "available_ram_bytes": 2028756992
+        },
+        "packages": {
+          "torch": "2.14.0",
+          "transformers": "4.51.3",
+          "safetensors": "0.8.0",
+          "Pillow": "12.3.0",
+          "tokenizers": "0.21.4",
+          "accelerate": null,
+          "torchvision": "0.29.0"
+        },
+        "offline": {
+          "HF_HUB_OFFLINE": "1",
+          "TRANSFORMERS_OFFLINE": "1",
+          "HF_HUB_DISABLE_TELEMETRY": "1"
+        },
+        "inference_ran": false,
+        "torch": {
+          "version": "2.14.0+cpu",
+          "cuda_runtime": null,
+          "cuda_available": false,
+          "architectures": []
+        },
+        "status": "passed",
+        "finished_utc": "2026-09-09T10:11:15.927205+00:00",
+        "elapsed_seconds": 2.0571538000003784
+      },
+      "finished_utc": "2026-09-09T10:11:16.177781+00:00"
+    },
+    {
+      "name": "siglip_inference",
+      "command": [
+        "C:\\Users\\Yu\\nebula2-wildos\\.venv\\Scripts\\python.exe",
+        "-I",
+        "-B",
+        "C:\\Users\\Yu\\Desktop\\\u62df\u771f\\model_check\\runtime_check.py",
+        "infer"
+      ],
+      "started_utc": "2026-09-09T10:11:16.178519+00:00",
+      "timeout_seconds": 300,
+      "returncode": 1,
+      "stdout": "{\n  \"started_utc\": \"2026-09-09T10:11:16.292259+00:00\",\n  \"mode\": \"infer\",\n  \"executable\": \"C:\\\\Users\\\\Yu\\\\nebula2-wildos\\\\.venv\\\\Scripts\\\\python.exe\",\n  \"python\": \"3.13.9 (tags/v3.13.9:8183fa5, Oct 14 2025, 14:09:13) [MSC v.1944 64 bit (AMD64)]\",\n  \"memory\": {\n    \"total_ram_bytes\": 16890322944,\n    \"available_ram_bytes\": 2007314432\n  },\n  \"packages\": {\n    \"torch\": \"2.14.0\",\n    \"transformers\": \"4.51.3\",\n    \"safetensors\": \"0.8.0\",\n    \"Pillow\": \"12.3.0\",\n    \"tokenizers\": \"0.21.4\",\n    \"accelerate\": null,\n    \"torchvision\": \"0.29.0\"\n  },\n  \"offline\": {\n    \"HF_HUB_OFFLINE\": \"1\",\n    \"TRANSFORMERS_OFFLINE\": \"1\",\n    \"HF_HUB_DISABLE_TELEMETRY\": \"1\"\n  },\n  \"inference_ran\": false,\n  \"torch\": {\n    \"version\": \"2.14.0+cpu\",\n    \"cuda_runtime\": null,\n    \"cuda_available\": false,\n    \"architectures\": []\n  },\n  \"status\": \"blocked\",\n  \"error_type\": \"RuntimeError\",\n  \"error\": \"Less than 6 GiB available RAM; refusing large-model load\",\n  \"traceback\": \"Traceback (most recent call last):\\n  File \\\"C:\\\\Users\\\\Yu\\\\Desktop\\\\\\u62df\\u771f\\\\model_check\\\\runtime_check.py\\\", line 65, in child\\n    raise RuntimeError('Less than 6 GiB available RAM; refusing large-model load')\\nRuntimeError: Less than 6 GiB available RAM; refusing large-model load\\n\",\n  \"finished_utc\": \"2026-09-09T10:11:23.121822+00:00\",\n  \"elapsed_seconds\": 6.822071600001436\n}\n",
+      "stderr": "",
+      "result": {
+        "started_utc": "2026-09-09T10:11:16.292259+00:00",
+        "mode": "infer",
+        "executable": "C:\\Users\\Yu\\nebula2-wildos\\.venv\\Scripts\\python.exe",
+        "python": "3.13.9 (tags/v3.13.9:8183fa5, Oct 14 2025, 14:09:13) [MSC v.1944 64 bit (AMD64)]",
+        "memory": {
+          "total_ram_bytes": 16890322944,
+          "available_ram_bytes": 2007314432
+        },
+        "packages": {
+          "torch": "2.14.0",
+          "transformers": "4.51.3",
+          "safetensors": "0.8.0",
+          "Pillow": "12.3.0",
+          "tokenizers": "0.21.4",
+          "accelerate": null,
+          "torchvision": "0.29.0"
+        },
+        "offline": {
+          "HF_HUB_OFFLINE": "1",
+          "TRANSFORMERS_OFFLINE": "1",
+          "HF_HUB_DISABLE_TELEMETRY": "1"
+        },
+        "inference_ran": false,
+        "torch": {
+          "version": "2.14.0+cpu",
+          "cuda_runtime": null,
+          "cuda_available": false,
+          "architectures": []
+        },
+        "status": "blocked",
+        "error_type": "RuntimeError",
+        "error": "Less than 6 GiB available RAM; refusing large-model load",
+        "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\Yu\\Desktop\\\u62df\u771f\\model_check\\runtime_check.py\", line 65, in child\n    raise RuntimeError('Less than 6 GiB available RAM; refusing large-model load')\nRuntimeError: Less than 6 GiB available RAM; refusing large-model load\n",
+        "finished_utc": "2026-09-09T10:11:23.121822+00:00",
+        "elapsed_seconds": 6.822071600001436
+      },
+      "finished_utc": "2026-09-09T10:11:23.650629+00:00"
+    }
+  ],
+  "policy": "No installation, downloads, pickle deserialization, or original source scripts. All outputs confined to model_check.",
+  "finished_utc": "2026-09-09T10:11:23.650638+00:00"
+}

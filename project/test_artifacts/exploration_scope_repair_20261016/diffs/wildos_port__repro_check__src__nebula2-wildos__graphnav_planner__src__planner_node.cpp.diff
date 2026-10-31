@@ -1,0 +1,64 @@
+--- e6f28118/wildos_port/repro_check/src/nebula2-wildos/graphnav_planner/src/planner_node.cpp
++++ 23675e28/wildos_port/repro_check/src/nebula2-wildos/graphnav_planner/src/planner_node.cpp
+@@ -223,8 +223,8 @@
+       { reply(false, "origin_changed"); return; }
+     const auto found = std::find_if(vehicle_options_.begin(),vehicle_options_.end(),
+         [&](const auto& option) { return option.uuid == choice.chosen_uuid; });
+-    if (found == vehicle_options_.end() || exploration_backoff_.blocked(
+-        found->goal.position,now,goal_radius_) || !known_vehicle_destination(found->goal))
++    if (found == vehicle_options_.end() || exploration_backoff_.postponed(
++        found->goal.position,now,odom_->pose.pose.position) || !known_vehicle_destination(found->goal))
+       { reply(false, "invalid_option"); return; }
+     // Copy before retiring the old transaction (which clears its offers).
+     const auto selected = *found;
+@@ -263,13 +263,14 @@
+       return std::nullopt;
+     const size_t class_idx = std::distance(latest_graph_->trav_classes.begin(), class_it);
+     auto origin = latest_graph_->nodes[latest_graph_->current_node_idx].pose.position;
++    std::optional<geometry_msgs::msg::Point> actual_origin;
+     if (odom_ && odom_->header.frame_id == latest_graph_header_->frame_id)
+     {
+       const int64_t stamp = rclcpp::Time(odom_->header.stamp).nanoseconds();
+       const int64_t now = this->get_clock()->now().nanoseconds();
+       const auto& actual = odom_->pose.pose.position;
+       if (stamp > 0 && now >= stamp && now-stamp <= 500000000LL &&
+-          std::isfinite(actual.x) && std::isfinite(actual.y)) origin = actual;
++          std::isfinite(actual.x) && std::isfinite(actual.y)) { origin = actual; actual_origin = actual; }
+     }
+     if (exploration_target_.active())
+     {
+@@ -287,8 +288,8 @@
+                     exploration_target_.identity().c_str());
+         retire_exploration("observation_completed");
+       }
+-      else if (exploration_backoff_.blocked(exploration_target_.goal().pose.position,
+-                                            now, goal_radius_))
++      else if (exploration_backoff_.postponed(exploration_target_.goal().pose.position,
++                                            now, actual_origin))
+         retire_exploration("destination_backoff");
+       else
+         // Scoring updates can refine the route, but cannot steal its destination.
+@@ -325,8 +326,8 @@
+         }
+       }
+       const auto& pos = node.pose.position;
+-      if (exploration_backoff_.blocked(pos, this->get_clock()->now().nanoseconds(),
+-                                      goal_radius_)) continue;
++      if (exploration_backoff_.postponed(pos, this->get_clock()->now().nanoseconds(),
++                                        actual_origin)) continue;
+       const double distance = std::hypot(pos.x - origin.x, pos.y - origin.y);
+       if (distance <= goal_radius_)
+         continue;
+@@ -356,7 +357,12 @@
+       candidates.push_back({utility, i, uuid});
+     }
+     if (candidates.empty())
++    {
++      RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 2000,
++          "Exploration has no eligible destination; earliest postponed retry_ns=%ld",
++          exploration_backoff_.next_retry(this->get_clock()->now().nanoseconds(),actual_origin));
+       return std::nullopt;
++    }
+     std::stable_sort(candidates.begin(), candidates.end(),
+         [](const auto& a, const auto& b) { return a.utility > b.utility; });
+     const auto selected = candidates.begin();

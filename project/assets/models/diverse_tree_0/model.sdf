@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='utf-8'?>
+<sdf version="1.8">
+  <model name="diverse_tree_0">
+    <static>true</static>
+    <link name="body">
+      <visual name="visual">
+        <cast_shadows>false</cast_shadows>
+        <geometry>
+          <mesh>
+            <uri>model://diverse_tree_0/visual.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="trunk_proxy">
+        <pose>0 0 2.0141873528096745 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.3</radius>
+            <length>4.028374705619349</length>
+          </cylinder>
+        </geometry>
+      </collision>
+    </link>
+  </model>
+</sdf>

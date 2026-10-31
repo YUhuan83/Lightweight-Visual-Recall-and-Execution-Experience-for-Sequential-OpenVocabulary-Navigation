@@ -1,0 +1,107 @@
+{
+  "nzs_neutral": {
+    "name": "nzs_neutral",
+    "mapTo": "nzs_neutral",
+    "class": "Material",
+    "version": 1.5,
+    "Stages": [
+      {
+        "baseColorMap": "/levels/smallgrid/art/shapes/nz_sensor_calibration/neutral.color.png",
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "metallicFactor": 0,
+        "roughnessFactor": 1
+      }
+    ],
+    "doubleSided": true,
+    "groundType": "ASPHALT"
+  },
+  "nzs_red": {
+    "name": "nzs_red",
+    "mapTo": "nzs_red",
+    "class": "Material",
+    "version": 1.5,
+    "Stages": [
+      {
+        "baseColorMap": "/levels/smallgrid/art/shapes/nz_sensor_calibration/red.color.png",
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "metallicFactor": 0,
+        "roughnessFactor": 1
+      }
+    ],
+    "doubleSided": true,
+    "groundType": "ASPHALT"
+  },
+  "nzs_blue": {
+    "name": "nzs_blue",
+    "mapTo": "nzs_blue",
+    "class": "Material",
+    "version": 1.5,
+    "Stages": [
+      {
+        "baseColorMap": "/levels/smallgrid/art/shapes/nz_sensor_calibration/blue.color.png",
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "metallicFactor": 0,
+        "roughnessFactor": 1
+      }
+    ],
+    "doubleSided": true,
+    "groundType": "ASPHALT"
+  },
+  "nzs_green": {
+    "name": "nzs_green",
+    "mapTo": "nzs_green",
+    "class": "Material",
+    "version": 1.5,
+    "Stages": [
+      {
+        "baseColorMap": "/levels/smallgrid/art/shapes/nz_sensor_calibration/green.color.png",
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "metallicFactor": 0,
+        "roughnessFactor": 1
+      }
+    ],
+    "doubleSided": true,
+    "groundType": "ASPHALT"
+  },
+  "nzs_checker": {
+    "name": "nzs_checker",
+    "mapTo": "nzs_checker",
+    "class": "Material",
+    "version": 1.5,
+    "Stages": [
+      {
+        "baseColorMap": "/levels/smallgrid/art/shapes/nz_sensor_calibration/checker.color.png",
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "metallicFactor": 0,
+        "roughnessFactor": 1
+      }
+    ],
+    "doubleSided": true,
+    "groundType": "ASPHALT"
+  }
+}

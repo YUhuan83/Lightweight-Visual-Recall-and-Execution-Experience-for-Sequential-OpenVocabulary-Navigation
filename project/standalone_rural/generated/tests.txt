@@ -1,0 +1,14 @@
+test_all_dae_xml_normals_bindings (test_standalone.StandaloneTests.test_all_dae_xml_normals_bindings) ... ok
+test_cobbles_positive_relief_and_seams (test_standalone.StandaloneTests.test_cobbles_positive_relief_and_seams) ... ok
+test_ground_manifold_seams_and_normals (test_standalone.StandaloneTests.test_ground_manifold_seams_and_normals) ... ok
+test_installer_packed_unpacked_and_changed_refusal (test_standalone.StandaloneTests.test_installer_packed_unpacked_and_changed_refusal) ... ok
+test_native_hierarchy_spawn_no_duplicate_car (test_standalone.StandaloneTests.test_native_hierarchy_spawn_no_duplicate_car) ... ok
+test_real_beamngpy_full_prefab_serializer (test_standalone.StandaloneTests.test_real_beamngpy_full_prefab_serializer) ... ok
+test_road_connected_loop_branch_clearance (test_standalone.StandaloneTests.test_road_connected_loop_branch_clearance) ... ok
+test_runtime_requires_explicit_consent (test_standalone.StandaloneTests.test_runtime_requires_explicit_consent) ... ok
+test_zip_integrity_and_independence (test_standalone.StandaloneTests.test_zip_integrity_and_independence) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 8.717s
+
+OK

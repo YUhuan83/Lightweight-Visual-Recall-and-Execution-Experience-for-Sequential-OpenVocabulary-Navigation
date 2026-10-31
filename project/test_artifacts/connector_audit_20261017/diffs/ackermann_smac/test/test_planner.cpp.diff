@@ -1,0 +1,44 @@
+--- before/ackermann_smac/test/test_planner.cpp
++++ after/ackermann_smac/test/test_planner.cpp
+@@ -86,6 +86,41 @@
+   EXPECT_FALSE(node->set_parameter({"CarLike.max_planning_time",3.}).successful);
+   EXPECT_DOUBLE_EQ(node->get_parameter("CarLike.minimum_turning_radius").as_double(),8.);
+ }
++TEST_F(ActualPlanner, RecordedCompleteRouteAvoidsFirstFeasibleFourCuspDetour) {
++  // Closed 20261017 155029 public-map case 11; this is not a private-map
++  // reconstruction or vehicle arrival test. The old first feasible route had
++  // 4 cusps / 12.17 m. At least one existing connector yields 2 cusps / 11.24 m.
++  std::ifstream input(std::string(FIXTURE_DIR)+"/complete_route_case11.txt");
++  ASSERT_TRUE(input.good());
++  unsigned w,h; double res,ox,oy; Pose start,goal;
++  input>>w>>h>>res>>ox>>oy>>start.x>>start.y>>start.yaw>>goal.x>>goal.y>>goal.yaw;
++  ASSERT_TRUE(input.good()); grid->resizeMap(w,h,res,ox,oy);
++  std::fill(grid->getCharMap(),grid->getCharMap()+w*h,0);
++  unsigned index; int value;
++  while(input>>index>>value) {
++    ASSERT_LT(index,w*h); ASSERT_GE(value,-1); ASSERT_LE(value,100);
++    const unsigned char cost=value<0?255:value==100?254:value==99?253:value==0?0:1+(value-1)*251/97;
++    grid->setCost(index%w,index/w,cost);
++  }
++  ASSERT_TRUE(node->set_parameter({"CarLike.minimum_turning_radius",12.}).successful);
++  node->declare_parameter("CarLike.smooth_path",true); configure();
++  const auto began=Clock::now();
++  auto path=planner->createPlan(stamped(start),stamped(goal));
++  const auto seconds=std::chrono::duration<double>(Clock::now()-began).count();
++  ASSERT_GT(path.poses.size(),2u);
++  std::vector<Pose> poses;
++  for(const auto & p:path.poses) {
++    poses.push_back({p.pose.position.x,p.pose.position.y,tf2::getYaw(p.pose.orientation)});
++    EXPECT_TRUE(safe(*grid,map->getRobotFootprint(),poses.back(),true));
++  }
++  EXPECT_LT(maneuverCost(poses),20.);
++  EXPECT_TRUE(curvatureFeasible(poses,res,12.,72));
++  EXPECT_NEAR(poses.front().x,start.x,1e-6);
++  EXPECT_NEAR(poses.front().y,start.y,1e-6);
++  EXPECT_NEAR(std::remainder(poses.front().yaw-start.yaw,2*std::acos(-1.)),0.,1e-5);
++  EXPECT_LT(std::hypot(poses.back().x-goal.x,poses.back().y-goal.y),1.01);
++  EXPECT_LT(seconds,2.05);
++}
+ TEST_F(ActualPlanner, CollisionRejectAndRecovery) {
+   unsigned x,y;grid->worldToMap(2,0,x,y);grid->setCost(x,y,254);inflate();configure();
+   EXPECT_THROW(planner->createPlan(stamped({.125,.125,0}),stamped({5.125,.125,0})),nav2_core::PlannerException);

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="15" failures="0" disabled="0" errors="0" time="7.835" timestamp="2026-10-20T16:47:46" name="AllTests">
+  <testsuite name="ActualPlanner" tests="15" failures="0" disabled="0" errors="0" time="7.831" timestamp="2026-10-20T16:47:46">
+    <testcase name="SmoothingCannotDiscardFeasibleRawSuffixAtExactConnector" status="run" result="completed" time="0.688" timestamp="2026-10-20T16:47:46" classname="ActualPlanner" />
+    <testcase name="OrdinaryPathAndFrozenParameters" status="run" result="completed" time="0.276" timestamp="2026-10-20T16:47:47" classname="ActualPlanner" />
+    <testcase name="FreeContinuousGoalDoesNotRequireLatticeShunts" status="run" result="completed" time="1.077" timestamp="2026-10-20T16:47:47" classname="ActualPlanner" />
+    <testcase name="RecordedShortTaskPreservesContinuousGoal" status="run" result="completed" time="0.45" timestamp="2026-10-20T16:47:48" classname="ActualPlanner" />
+    <testcase name="ExactGoalConnectionDoesNotBypassObstaclesAndRecovers" status="run" result="completed" time="0.682" timestamp="2026-10-20T16:47:49" classname="ActualPlanner" />
+    <testcase name="ExactGoalRetainsLowerRiskLatticeAlternative" status="run" result="completed" time="0.27" timestamp="2026-10-20T16:47:49" classname="ActualPlanner" />
+    <testcase name="RecordedCompleteRouteAvoidsFirstFeasibleFourCuspDetour" status="run" result="completed" time="0.474" timestamp="2026-10-20T16:47:50" classname="ActualPlanner" />
+    <testcase name="CollisionRejectAndRecovery" status="run" result="completed" time="0.275" timestamp="2026-10-20T16:47:50" classname="ActualPlanner" />
+    <testcase name="InactiveChangesRequireReconfigureAndInvalidGoalsRejected" status="run" result="completed" time="0.281" timestamp="2026-10-20T16:47:50" classname="ActualPlanner" />
+    <testcase name="ArchivedContinuousStartAutomaticallyConnected" status="run" result="completed" time="0.634" timestamp="2026-10-20T16:47:51" classname="ActualPlanner" />
+    <testcase name="ExhaustedConnectorRejectsThenFreeMapRecovers" status="run" result="completed" time="0.748" timestamp="2026-10-20T16:47:51" classname="ActualPlanner" />
+    <testcase name="InvalidBudgetCannotConfigure" status="run" result="completed" time="0.273" timestamp="2026-10-20T16:47:52" classname="ActualPlanner" />
+    <testcase name="FreeOffLatticeStartPreservesActualPoseAndHeading" status="run" result="completed" time="0.683" timestamp="2026-10-20T16:47:52" classname="ActualPlanner" />
+    <testcase name="RecordedTownGoalReplannedFromActualAxlePose" status="run" result="completed" time="0.481" timestamp="2026-10-20T16:47:53" classname="ActualPlanner" />
+    <testcase name="RecordedCuspSmoothingHasSafeSameSearchFallback" status="run" result="completed" time="0.539" timestamp="2026-10-20T16:47:53" classname="ActualPlanner" />
+  </testsuite>
+</testsuites>

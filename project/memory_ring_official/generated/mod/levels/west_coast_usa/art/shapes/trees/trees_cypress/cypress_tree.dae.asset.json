@@ -1,0 +1,13 @@
+{
+  "imposters": [
+    {
+      "detailLevel": 2,
+      "dimension": 256,
+      "equatorSteps": 8,
+      "includePoles": false,
+      "polarAngle": 0,
+      "polarSteps": 0,
+      "size": 25
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "width": 960,
+  "height": 540,
+  "hfov": 1.35,
+  "base_frame": "base_link",
+  "odom_frame": "wheel_odom",
+  "optical_quaternion": [-0.5, 0.5, -0.5, 0.5],
+  "cameras": {"front": 0.0, "left": 1.5707963267948966, "right": -1.5707963267948966},
+  "camera_position": [0.25, 0.0, 0.62],
+  "lidar_position": [0.0, 0.0, 0.92],
+  "imu_position": [0.0, 0.0, 0.0],
+  "command_timeout": 0.5,
+  "command_rate": 20.0,
+  "linear_limit": 1.0,
+  "angular_limit": 1.0
+}

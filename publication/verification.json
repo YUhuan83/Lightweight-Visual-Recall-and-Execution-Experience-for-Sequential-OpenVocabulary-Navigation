@@ -1,0 +1,27 @@
+{
+  "snapshot_date": "2026-10-31",
+  "source_files": 28013,
+  "source_bytes": 270696538,
+  "supplemented_files": 1272,
+  "redactions": 2,
+  "redacted_files": [
+    "project/test_artifacts/continuous_exploration_20261024/candidate/vision_offline/test_kit.py",
+    "project/vision_offline/test_kit.py"
+  ],
+  "hash_verification_errors": [],
+  "original_runtime_modified": false,
+  "original_git_index_modified": false,
+  "full_field_acceptance": false,
+  "purpose": "Public source snapshot for independent code review, not a successful repair release",
+  "excluded": [
+    "credentials",
+    "chat exports",
+    "Git histories",
+    "virtual environments",
+    "build/install caches",
+    "videos",
+    "raw rosbags",
+    "model weights",
+    "large binary map assets"
+  ]
+}

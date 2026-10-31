@@ -1,0 +1,24 @@
+--- before/nav2_adapter/wildos_nav2_adapter/runtime_contract.py
++++ after/nav2_adapter/wildos_nav2_adapter/runtime_contract.py
+@@ -96,7 +96,8 @@
+         required['/controller_server']['goal_checker_plugins'] = checks['goal_checker_plugins']
+         required['/controller_server'].update({'cusp_goal_checker.'+key:value for key,value in cusp.items()})
+         required['/wildos_graph_path_bridge'] = {
+-            'carrier_model': 'ackermann', 'planner_id': 'CarLike', 'minimum_turning_radius': 8.0}
++            'carrier_model': 'ackermann', 'planner_id': 'CarLike', 'minimum_turning_radius': 8.0,
++            'require_source_control': True}
+         required['/beamng_wildos_adapter'] = {'carrier_model': 'ackermann',
+                                              'lidar_offset': list(SBR_LIDAR_OFFSET)}
+         required['/beamng_vehicle_goal_standoff'] = {
+@@ -109,7 +110,10 @@
+             'wheelbase': SBR_WHEELBASE, 'steer_sign': -1.0,
+             'max_steering': .6, 'max_steer_angle': .54,
+             'state_topic': '/vehicles/ego/sensors/state',
+-            'cmd_vel_topic': '/wildos/cmd_vel', 'control_topic': '/wildos/native_control'}
++            'cmd_vel_topic': '/wildos/cmd_vel', 'control_topic': '/wildos/native_control_command',
++            'control_protocol': 'wildos_source_control_v1'}
++        required['/wildos_native_vehicle_control'] = {
++            'control_topic': '/wildos/native_control_command', 'control_protocol': 'wildos_source_control_v1'}
+     for name in ('local_costmap', 'global_costmap'):
+         options = config[name][name]['ros__parameters']
+         if options.get('robot_base_frame') != 'spot1/nav_base_link':

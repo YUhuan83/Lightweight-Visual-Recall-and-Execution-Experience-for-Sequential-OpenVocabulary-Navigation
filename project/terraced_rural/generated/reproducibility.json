@@ -1,0 +1,37 @@
+{
+  "successful": true,
+  "cases": [
+    {
+      "seed": 20260911,
+      "mode": "passable",
+      "sha256": "76ab1de2046663ac3666b06cc12b3fb32623aa457a0258fdaac1b7630fe79472",
+      "bytes": 6606335
+    },
+    {
+      "seed": 20260911,
+      "mode": "passable",
+      "sha256": "76ab1de2046663ac3666b06cc12b3fb32623aa457a0258fdaac1b7630fe79472",
+      "bytes": 6606335
+    },
+    {
+      "seed": 20260912,
+      "mode": "passable",
+      "sha256": "6d21c2174fdd738d27d742ed0bf590fabdf13dd632a95222a73373662e8d5706",
+      "bytes": 6604627
+    },
+    {
+      "seed": 20260911,
+      "mode": "blocked",
+      "sha256": "66e3a3314315bfc5b49510adb5754e0d61c5f60222dd6f86e916be0a58826d7d",
+      "bytes": 6615144
+    },
+    {
+      "seed": 20260911,
+      "mode": "passable",
+      "sha256": "76ab1de2046663ac3666b06cc12b3fb32623aa457a0258fdaac1b7630fe79472",
+      "bytes": 6606335
+    }
+  ],
+  "blocked_and_final_verification_passed": true,
+  "game_started": false
+}

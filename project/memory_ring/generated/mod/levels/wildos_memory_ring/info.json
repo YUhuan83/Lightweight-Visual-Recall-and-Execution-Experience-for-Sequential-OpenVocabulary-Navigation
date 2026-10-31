@@ -1,0 +1,25 @@
+{
+  "title": "WildOS Memory Ring",
+  "description": "200x200 asphalt ring for WildOS visual-memory testing.",
+  "authors": "WildOS workspace",
+  "size": [
+    200,
+    200
+  ],
+  "biome": "suburban",
+  "roads": "asphalt_ring + dirt spur",
+  "previews": [
+    "preview.png"
+  ],
+  "defaultSpawnPointName": "spawn_default",
+  "spawnPoints": [
+    {
+      "objectname": "spawn_default",
+      "translationId": "Ring Road",
+      "preview": "preview.png"
+    }
+  ],
+  "isAuxiliary": false,
+  "supportsTraffic": false,
+  "supportsTimeOfDay": true
+}

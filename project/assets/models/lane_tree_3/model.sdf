@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='utf-8'?>
+<sdf version="1.8">
+  <model name="lane_tree_3">
+    <static>true</static>
+    <link name="body">
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://lane_tree_3/visual.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="cylinder_0">
+        <pose>0 0 1.9818698239435528 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.25</radius>
+            <length>3.9637396478871056</length>
+          </cylinder>
+        </geometry>
+      </collision>
+    </link>
+  </model>
+</sdf>

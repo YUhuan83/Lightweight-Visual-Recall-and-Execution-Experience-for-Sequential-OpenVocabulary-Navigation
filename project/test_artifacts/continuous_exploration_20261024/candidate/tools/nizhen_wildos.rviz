@@ -1,0 +1,151 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+    Property Tree Widget:
+      Expanded:
+        - /Grid1
+        - /WildOS Model Viz1
+      Splitter Ratio: 0.5
+  - Class: rviz_common/Views
+    Name: Views
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz_default_plugins/Grid
+      Enabled: true
+      Name: Grid
+      Alpha: 0.5
+      Cell Size: 1
+      Color: 160; 160; 164
+      Line Style:
+        Line Width: 0.03
+        Value: Lines
+      Normal Cell Count: 0
+      Plane: XY
+      Plane Cell Count: 120
+      Reference Frame: <Fixed Frame>
+    - Class: rviz_default_plugins/TF
+      Enabled: true
+      Name: TF
+      Marker Scale: 1
+      Show Arrows: false
+      Show Axes: true
+      Show Names: false
+    - Class: rviz_default_plugins/Image
+      Enabled: true
+      Name: WildOS Model Viz
+      Max Value: 1
+      Min Value: 0
+      Normalize Range: false
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Best Effort
+        Value: /spot1/model_visualization
+    - Class: rviz_default_plugins/Image
+      Enabled: true
+      Name: Front Camera
+      Max Value: 1
+      Min Value: 0
+      Normalize Range: false
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Best Effort
+        Value: /spot1/realsense/front/color/image_raw
+    - Class: rviz_default_plugins/PointCloud2
+      Enabled: true
+      Name: LiDAR
+      Style: Points
+      Size (Pixels): 2
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Best Effort
+        Value: /spot1/ouster/front/points_filtered
+    - Class: rviz_default_plugins/Map
+      Enabled: true
+      Name: Occupancy
+      Color Scheme: map
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /spot1/local_map
+    - Class: rviz_default_plugins/MarkerArray
+      Enabled: true
+      Name: NavGraph Viz
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /spot1/nav_graph_viz
+    - Class: rviz_default_plugins/MarkerArray
+      Enabled: true
+      Name: Within Range Geofrontiers
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /spot1/within_range_geofrontiers
+    - Class: rviz_default_plugins/MarkerArray
+      Enabled: true
+      Name: Score Rings
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /spot1/score_rings
+  Enabled: true
+  Global Options:
+    Background Color: 48; 48; 48
+    Fixed Frame: spot1/odom
+    Frame Rate: 30
+  Name: root
+  Tools:
+    - Class: rviz_default_plugins/MoveCamera
+    - Class: rviz_default_plugins/FocusCamera
+    - Class: rviz_default_plugins/Measure
+  Transformation:
+    Current:
+      Class: rviz_default_plugins/TF
+  Value: true
+  Views:
+    Current:
+      Class: rviz_default_plugins/Orbit
+      Distance: 45
+      Enable Stereo Rendering:
+        Stereo Eye Separation: 0.06
+        Stereo Focal Distance: 1
+        Swap Stereo Eyes: false
+        Value: false
+      Focal Point:
+        X: 0
+        Y: 0
+        Z: 0
+      Focal Shape Fixed Size: true
+      Focal Shape Size: 0.05
+      Invert Z Axis: false
+      Name: Current View
+      Near Clip Distance: 0.01
+      Pitch: 0.75
+      Target Frame: spot1/base_link
+      Value: Orbit (rviz)
+      Yaw: 0
+    Saved: ~
+Window Geometry:
+  Displays:
+    collapsed: false
+  Height: 1000
+  Hide Left Dock: false
+  Hide Right Dock: false
+  Width: 1680
+  X: 0
+  Y: 0

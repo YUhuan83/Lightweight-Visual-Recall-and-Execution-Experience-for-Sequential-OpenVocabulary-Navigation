@@ -1,0 +1,105 @@
+--- e6f28118/nav2_adapter/test/test_graph_path_bridge_routing.py
++++ 23675e28/nav2_adapter/test/test_graph_path_bridge_routing.py
+@@ -2087,6 +2087,93 @@
+         self.assertFalse(self.node.try_planning_escape())
+         self.node.send_motion_segment.assert_not_called()
+ 
++    def test_planning_failures_survive_temporary_local_staleness_and_idle_retirement(self):
++        self.prepare_planning_escape()
++        self.node.local_grid_received_at -= 5.
++        self.assertFalse(self.node.try_planning_escape())
++        self.second_failed_destination()
++        self.assertFalse(self.node.try_planning_escape())
++        self.node.on_exploration_retired(String(data=json.dumps(dict(
++            exploration_id='frontier-b:2', stamp_ns=self.node.get_clock().now().nanoseconds,
++            reason='vehicle_route_rejected'))))
++        self.assertIsNone(self.node.route)
++        self.node.local_grid_received_at = time.monotonic()
++        self.node.native_status_at = time.monotonic()
++        self.node.monitor_inputs()
++        self.node.send_motion_segment.assert_called_once()
++        self.assertTrue(self.node.recovering)
++
++    def test_idle_planning_escape_intent_cannot_cross_a_query_reset(self):
++        self.prepare_planning_escape()
++        self.node.execution_transport_issue = Mock(return_value='native_telemetry_stale')
++        self.assertFalse(self.node.try_planning_escape())
++        self.second_failed_destination()
++        self.assertFalse(self.node.try_planning_escape())
++        self.node.reset()
++        self.node.execution_transport_issue.return_value = None
++        self.node.monitor_inputs()
++        self.node.send_motion_segment.assert_not_called()
++
++    def defer_planning_escape(self):
++        self.prepare_planning_escape()
++        self.node.local_grid_received_at -= 5.
++        self.node.try_planning_escape()
++        self.second_failed_destination()
++        self.node.try_planning_escape()
++        self.assertIsNotNone(self.node.deferred_planning_escape)
++        self.node.local_grid_received_at = time.monotonic()
++        self.node.native_status_at = time.monotonic()
++
++    def test_deferred_planning_escape_checks_evidence_age_position_frame_and_goal_scope(self):
++        for case in ('expired_failure','moved','frame','object','memory','disabled'):
++            self.node.reset()
++            self.node.route=self.node.latest_route=route((0.,0.),(8.,0.))
++            self.node.route_endpoint=(8.,0.)
++            self.node.expected=self.node.memory_goal=None
++            self.node.follow_enabled=True
++            self.node.odom.pose.pose.position.x=0.
++            self.node.odom.header.frame_id='spot1/odom'
++            self.metadata(self.node.route,'frontier-a:1',(12.,0.))
++            self.defer_planning_escape()
++            if case=='expired_failure':
++                self.node.planning_escape_failures[0]=(*self.node.planning_escape_failures[0][:3],time.monotonic()-61.)
++            elif case=='moved':self.node.odom.pose.pose.position.x=1.
++            elif case=='frame':self.node.odom.header.frame_id='other'
++            elif case=='object':self.node.expected=(12.,0.)
++            elif case=='memory':self.node.memory_goal=(12.,0.)
++            else:self.node.follow_enabled=False
++            self.assertFalse(self.node.resume_planning_escape(),case)
++            self.assertIsNone(self.node.deferred_planning_escape,case)
++            self.node.send_motion_segment.assert_not_called()
++
++    def test_deferred_planning_escape_does_not_steal_active_or_uncertain_motion(self):
++        self.defer_planning_escape()
++        for name,value in [('pending',True),('following',True),('replacement_pending',True),
++                ('follow_request',{'serial':7}),('follow_active',{'serial':7}),
++                ('follow_quarantine',{7:{'terminal':False}})]:
++            old=getattr(self.node,name);setattr(self.node,name,value)
++            self.assertFalse(self.node.resume_planning_escape(),name)
++            setattr(self.node,name,old)
++        self.node.send_motion_segment.assert_not_called()
++
++    def test_deferred_escape_dispatch_and_acceptance_work_without_retired_graph_route(self):
++        self.defer_planning_escape()
++        self.node.on_exploration_retired(String(data=json.dumps(dict(
++            exploration_id='frontier-b:2',stamp_ns=self.node.get_clock().now().nanoseconds,
++            reason='vehicle_route_rejected'))))
++        self.node.send_motion_segment=GraphPathBridge.send_motion_segment.__get__(self.node)
++        self.node.follow_client=Mock()
++        accepted=Future();terminal=Future()
++        self.node.follow_client.send_goal_async.return_value=accepted
++        self.node.monitor_inputs()
++        self.node.follow_client.send_goal_async.assert_called_once()
++        handle=Mock(accepted=True);handle.get_result_async.return_value=terminal
++        accepted.set_result(handle)
++        self.assertTrue(self.node.following)
++        self.assertTrue(self.node.recovering)
++        self.assertIsNone(self.node.last_status['graph_goal'])
++        self.assertIsNone(self.node.deferred_planning_escape)
++
+     def test_retirement_frame_change_cancels_escape_and_clears_corridor(self):
+         self.prepare_planning_escape()
+         self.node.recovering=True
+@@ -2147,6 +2234,8 @@
+         self.node.follow_client.send_goal_async.assert_not_called()
+         self.node.follow_client.wait_for_server.return_value=True
+         self.node.follow_client.send_goal_async.return_value=Future()
++        self.assertFalse(self.node.try_planning_escape())  # controller retries are rate bounded
++        self.node.deferred_planning_escape['retry_at']=time.monotonic()
+         self.assertTrue(self.node.try_planning_escape())
+         self.assertTrue(self.node.recovering)
+         self.assertTrue(self.node.following)

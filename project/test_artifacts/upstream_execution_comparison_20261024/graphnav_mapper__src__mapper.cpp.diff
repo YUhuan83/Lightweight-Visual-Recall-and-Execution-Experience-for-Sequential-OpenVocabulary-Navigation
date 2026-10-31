@@ -1,0 +1,553 @@
+--- upstream/graphnav_mapper/src/mapper.cpp
++++ current/graphnav_mapper/src/mapper.cpp
+@@ -1,20 +1,48 @@
+ #include "graphnav_mapper/mapper.hpp"
++#include "graphnav_mapper/terrain_metrics.hpp"
+ #include "geometry_msgs/msg/pose_stamped.hpp"
+ #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
+ #include <tf2_eigen/tf2_eigen.hpp>
+ #include <grid_map_ros/grid_map_ros.hpp>
++#include <grid_map_core/iterators/LineIterator.hpp>
+ #include <opencv2/imgproc.hpp>
+ #include <opencv2/core/eigen.hpp>
++#include <algorithm>
++#include <cmath>
++#include <limits>
++#include <numeric>
++#include <stdexcept>
+ 
+ namespace graphnav_mapper
+ {
+ 
++namespace
++{
++float physical_value(const std::map<std::string,std::vector<float>>& metadata,
++                     const std::string& key,float fallback=0.f)
++{
++  const auto value=metadata.find(key);
++  return value==metadata.end() || value->second.empty() ? fallback : value->second.front();
++}
++
++template<typename Properties>
++bool retain_measured_violation(const Properties& previous,bool complete,bool violation)
++{
++  const float confidence=physical_value(previous.metadata,"physical_confidence");
++  return !complete && !violation && previous.physical_observed_at_ns>0 &&
++      physical_value(previous.metadata,"physical_violation_observed")==1.f &&
++      physical_value(previous.metadata,"physical_feasible",1.f)==0.f &&
++      std::isfinite(confidence) && confidence>=.7f && confidence<=1.f;
++}
++}
++
+ Mapper::Mapper(tf2_ros::Buffer& tf_buffer, rclcpp::Logger logger) : tf_buffer_(tf_buffer), logger_(logger)
+ {
+ }
+ 
+ void Mapper::odometry_update(const nav_msgs::msg::Odometry::ConstSharedPtr odom)
+ {
++  if (odom->header.stamp.sec < 0 || odom->header.stamp.nanosec >= 1000000000u) return;
+   rclcpp::Time now = odom->header.stamp;
+   auto map_frame = graph_.get_frame_id();
+   if (!map_frame)
+@@ -38,10 +66,31 @@
+     }
+   }
+   Eigen::Vector3d odom_position(pose.pose.position.x, pose.pose.position.y, pose.pose.position.z);
++  if (!odom_position.allFinite()) return;
++  const double measured_speed = std::hypot(odom->twist.twist.linear.x, odom->twist.twist.linear.y);
++  if (last_odom_position_ && last_odom_stamp_)
++  {
++    const double dt = (now - *last_odom_stamp_).seconds();
++    if (dt <= 0.0) return;
++    const double displacement = (odom_position - *last_odom_position_).norm();
++    const double speed = std::isfinite(measured_speed) ? std::max(last_odom_speed_, measured_speed) : 0.0;
++    const double maximum_step = std::max(2.0, speed * std::min(dt, 1.0) + 1.0);
++    if (displacement > maximum_step || (dt > 1.0 && displacement > 2.0))
++    {
++      // Teleports and unobserved odometry gaps establish no traversed connection.
++      current_node_.reset();
++      RCLCPP_WARN(logger_, "Odometry discontinuity: starting an unconnected current node");
++    }
++  }
++  last_odom_position_ = odom_position;
++  last_odom_stamp_ = now;
++  last_odom_speed_ = std::isfinite(measured_speed) ? measured_speed : 0.0;
+ 
+   if (!current_node_)
+   {
+     graphnav::NavigationGraph::NodeProperties properties;
++    properties.trav_properties[my_trav_class_].visited = true;
++    properties.trav_properties[my_trav_class_].first_visited_time = now;
+     current_node_ = graph_.add_node(odom_position, properties);
+     RCLCPP_DEBUG(logger_, "created initial node: %s", current_node_->to_string().c_str());
+   }
+@@ -58,6 +107,20 @@
+ 
+   Eigen::Vector3d current_node_position = graph_.get_node_position(*current_node_);
+   double current_node_distance = (current_node_position - odom_position).norm();
++  const auto current_properties = graph_.get_node_properties(*current_node_);
++  const auto confidence = physical_value(current_properties.metadata,"physical_confidence");
++  const int64_t physical_age = now.nanoseconds() -
++      static_cast<int64_t>(current_properties.physical_observed_at_ns);
++  // A graph centre is only a proxy for the moving vehicle. New measured
++  // danger at that old centre must not strand a vehicle still elsewhere.
++  // Reanchor without asserting the vehicle drove through the blocked centre;
++  // the normal measured-map edge builder still owns every new connection.
++  const bool blocked_proxy = current_node_distance > robot_minimum_clearance_ &&
++      current_properties.physical_observed_at_ns > 0 && physical_age >= 0 &&
++      physical_age <= 5000000000LL && std::isfinite(confidence) &&
++      confidence >= .7f && confidence <= 1.f &&
++      physical_value(current_properties.metadata,"physical_feasible",1.f) == 0.f &&
++      physical_value(current_properties.metadata,"physical_violation_observed") == 1.f;
+   auto nodes_in_radius = graph_.get_nodes_in_radius(odom_position, node_spacing_);
+   // find closest node in radius
+   std::optional<graphnav::NavigationGraph::UUID> closest_node;
+@@ -70,15 +133,31 @@
+     }
+     Eigen::Vector3d node_position = graph_.get_node_position(node_id);
+     double distance = (node_position - odom_position).norm();
++    const auto candidate_properties = graph_.get_node_properties(node_id);
++    const auto candidate_class = candidate_properties.trav_properties.find(my_trav_class_);
++    // The nearest sampled centre need not represent the vehicle's actual
++    // location. Its free ball must cover the attachment and the platform's
++    // necessary horizontal clearance; otherwise snapping can move the graph
++    // start onto an obstacle and manufacture a traversed connection to it.
++    // This necessary check does not authorize the full nonholonomic footprint:
++    // edge terrain assessment and the vehicle planner still own that decision.
++    if (candidate_class == candidate_properties.trav_properties.end() ||
++        !std::isfinite(candidate_class->second.free_radius) ||
++        candidate_class->second.free_radius < distance + robot_minimum_clearance_)
++      continue;
++    const float physical_confidence = physical_value(candidate_properties.metadata,"physical_confidence");
++    if (std::isfinite(physical_confidence) && physical_confidence >= .7f && physical_confidence <= 1.f &&
++        physical_value(candidate_properties.metadata,"physical_violation_observed") == 1.f)
++      continue;
+     if (distance < closest_distance)
+-    {  // TODO check that it is closer than the obstacle radius
++    {
+       closest_distance = distance;
+       closest_node = node_id;
+     }
+     // std::cout << "node: " << (int)node_id.id[0] << " distance: " << distance << std::endl;
+   }
+   // if closest node is closer than current node, switch to it
+-  if (closest_node && closest_distance < current_node_distance)
++  if (closest_node && (closest_distance < current_node_distance || blocked_proxy))
+   {
+     // add edge to closest node
+     graphnav::NavigationGraph::EdgeProperties properties;  // TODO: add traversability
+@@ -87,7 +166,9 @@
+       properties = graph_.get_edge_properties(*current_node_, *closest_node);
+     }
+     properties.trav_properties[my_trav_class_].traversed = true;
+-    graph_.add_edge(*current_node_, *closest_node, properties);
++    properties.trav_properties[my_trav_class_].cost =
++        (graph_.get_node_position(*current_node_) - graph_.get_node_position(*closest_node)).norm();
++    if (!blocked_proxy) graph_.add_edge(*current_node_, *closest_node, properties);
+     current_node_ = closest_node;
+     current_node_distance = closest_distance;
+     RCLCPP_DEBUG(logger_, "switched to node: %s", current_node_->to_string().c_str());
+@@ -101,15 +182,18 @@
+   }
+ 
+   // create new node if far enough
+-  if (current_node_distance > node_spacing_)
++  if (current_node_distance > node_spacing_ || (blocked_proxy && !closest_node))
+   {
+     // create new node
+     graphnav::NavigationGraph::NodeProperties node_properties;
+     node_properties.trav_properties[my_trav_class_].visited = true;
+     node_properties.trav_properties[my_trav_class_].first_visited_time = now;
+     auto new_node = graph_.add_node(odom_position, node_properties);
+-    graphnav::NavigationGraph::EdgeProperties edge_properties;  // TODO: add traversability
+-    graph_.add_edge(*current_node_, new_node, edge_properties);
++    graphnav::NavigationGraph::EdgeProperties edge_properties;
++    edge_properties.trav_properties[my_trav_class_].traversed = true;
++    edge_properties.trav_properties[my_trav_class_].cost =
++        (graph_.get_node_position(*current_node_) - odom_position).norm();
++    if (!blocked_proxy) graph_.add_edge(*current_node_, new_node, edge_properties);
+     current_node_ = new_node;
+     RCLCPP_DEBUG(logger_, "created new node: %s", current_node_->to_string().c_str());
+   }
+@@ -130,7 +214,62 @@
+     msg.header.stamp = stamp;
+     return msg;
+   }
+-  return graph_.to_msg(stamp, *current_node_);
++  auto msg = graph_.to_msg(stamp, *current_node_, robot_profile_id_);
++  graphnav_msgs::msg::RobotMotionConstraints profile;
++  profile.profile_id = robot_profile_id_;
++  profile.max_uphill_slope = static_cast<float>(std::atan(physical_max_slope_));
++  profile.max_downhill_slope = profile.max_uphill_slope;
++  profile.max_cross_slope = profile.max_uphill_slope;
++  profile.max_step_height = static_cast<float>(physical_max_step_height_);
++  profile.max_roughness = static_cast<float>(physical_max_roughness_);
++  profile.body_size.x = robot_body_front_extent_ >= 0. && robot_body_rear_extent_ >= 0. ?
++      robot_body_front_extent_ + robot_body_rear_extent_ : -1.;
++  profile.body_size.y = robot_body_half_width_ >= 0. ? 2. * robot_body_half_width_ : -1.;
++  profile.body_size.z = robot_body_height_;
++  profile.ground_clearance = static_cast<float>(robot_ground_clearance_);
++  profile.holonomic = robot_holonomic_;
++  profile.min_turning_radius = static_cast<float>(robot_min_turning_radius_);
++  // These dynamic limits have not been measured/configured by this producer.
++  profile.max_linear_velocity = -1.f;
++  profile.max_linear_acceleration = -1.f;
++  profile.max_linear_deceleration = -1.f;
++  profile.max_angular_velocity = -1.f;
++  const auto add_property = [&](const std::string& key, std::vector<float> values) {
++    graphnav_msgs::msg::KeyValue property;
++    property.key = key; property.value = std::move(values);
++    profile.properties.push_back(std::move(property));
++  };
++  add_property("minimum_horizontal_clearance", {static_cast<float>(robot_minimum_clearance_)});
++  if (robot_body_front_extent_ >= 0. && robot_body_rear_extent_ >= 0. && robot_body_half_width_ >= 0.)
++  {
++    // Preserve the asymmetric rear-axle reference: a size alone would imply
++    // the wrong centred body at future consumers.
++    const float front=robot_body_front_extent_, rear=robot_body_rear_extent_, width=robot_body_half_width_;
++    add_property("footprint_xy", {front,width,front,-width,-rear,-width,-rear,width});
++    add_property("footprint_padding", {static_cast<float>(robot_footprint_padding_)});
++  }
++  msg.robot_profiles.push_back(profile);
++  return msg;
++}
++
++void Mapper::validate_robot_profile() const
++{
++  const auto optional_limit=[](double value) { return std::isfinite(value) && (value == -1. || value >= 0.); };
++  if (robot_profile_id_.empty() || !std::isfinite(robot_minimum_clearance_) || robot_minimum_clearance_ < 0. ||
++      !std::isfinite(robot_footprint_padding_) || robot_footprint_padding_ < 0. ||
++      !optional_limit(robot_body_front_extent_) || !optional_limit(robot_body_rear_extent_) ||
++      !optional_limit(robot_body_half_width_) || !optional_limit(robot_body_height_) ||
++      !optional_limit(robot_ground_clearance_) || !optional_limit(robot_min_turning_radius_))
++    throw std::invalid_argument("Invalid robot geometry/profile limits");
++  const bool any_body = robot_body_front_extent_ >= 0. || robot_body_rear_extent_ >= 0. || robot_body_half_width_ >= 0.;
++  if (any_body)
++  {
++    if (robot_body_front_extent_ < 0. || robot_body_rear_extent_ < 0. || robot_body_half_width_ < 0.)
++      throw std::invalid_argument("Planar body extents must be specified together");
++    const double inscribed=std::min({robot_body_front_extent_,robot_body_rear_extent_,robot_body_half_width_}) + robot_footprint_padding_;
++    if (robot_minimum_clearance_ + 1.e-9 < inscribed)
++      throw std::invalid_argument("Graph clearance is smaller than the configured body inscribed radius");
++  }
+ }
+ 
+ static void grid_map_set_border_unknown(grid_map::GridMap& gridmap, const std::string& layer_name)
+@@ -152,8 +291,8 @@
+ {
+   cv::Mat in, sdf;
+   Eigen::MatrixXf mat = gridmap.get(layer_name);
+-  // treat NaN as traversable / known
+-  mat = (mat.array().isFinite()).select(mat, static_cast<float>(threshold - 1e-3f));
++  // Missing measurements establish neither free space nor known terrain.
++  mat = (mat.array().isFinite()).select(mat, static_cast<float>(threshold + 1.0f));
+   cv::eigen2cv(mat, in);
+   // distanceTransform computes distance to zero inputs (condition false), so in > threshold
+   cv::distanceTransform(in <= threshold, sdf, cv::DIST_L2, cv::DIST_MASK_5);
+@@ -255,6 +394,130 @@
+   }
+   double unknown_sdf_a = map.atPosition("unknown_sdf", pos_a);
+   double unknown_sdf_b = map.atPosition("unknown_sdf", pos_b);
++  // Evaluate terrain continuously along the connection, not only at its endpoints.
++  double edge_max_slope = 0.0;
++  double edge_max_step = 0.0;
++  double edge_roughness = 0.0;
++  double edge_min_clearance = std::numeric_limits<double>::infinity();
++  double measured_obstacle_clearance = std::numeric_limits<double>::infinity();
++  bool fully_observed = true;
++  bool terrain_observed = map.exists("elevation");
++  for (const auto& [name, traversal] : traversability_classes_)
++  {
++    const auto a = node_a.trav_properties.find(name);
++    const auto b = node_b.trav_properties.find(name);
++    if (a != node_a.trav_properties.end() && b != node_b.trav_properties.end())
++      edge_min_clearance = std::min({edge_min_clearance, a->second.free_radius, b->second.free_radius});
++  }
++  if (map.exists("elevation"))
++  {
++    const double distance = (pos_b - pos_a).norm();
++    double previous_z = std::numeric_limits<double>::quiet_NaN();
++    Eigen::Vector2d previous_sample = Eigen::Vector2d::Constant(std::numeric_limits<double>::quiet_NaN());
++    std::vector<double> valid_heights;
++    std::vector<double> valid_distances;
++    bool has_terrain_run=false;
++    const auto finish_run=[&]() {
++      // Unknown height separates measurements, not a measured ramp between them.
++      if (valid_heights.size()>=2 && distance>1e-3) {
++        Eigen::MatrixXd design(valid_heights.size(),2);
++        Eigen::VectorXd heights(valid_heights.size());
++        for (size_t i=0;i<valid_heights.size();++i) {
++          design.row(i)<<valid_distances[i],1.;heights[i]=valid_heights[i];
++        }
++        const auto decomposition=design.colPivHouseholderQr();
++        if (decomposition.rank()>=2) {
++          const Eigen::Vector2d slope=decomposition.solve(heights);
++          const Eigen::VectorXd residual=heights-design*slope;
++          edge_roughness=std::max(edge_roughness,std::sqrt(residual.squaredNorm()/valid_heights.size()));
++          for (size_t i=1;i<valid_heights.size();++i)
++            edge_max_step=std::max(edge_max_step,std::abs(residual[i]-residual[i-1]));
++          has_terrain_run=true;
++        }
++      }
++      valid_heights.clear();valid_distances.clear();
++    };
++    grid_map::Index first_cell,last_cell;
++    map.getIndex(pos_a,first_cell);map.getIndex(pos_b,last_cell);
++    // Visit raster cells directly. Fixed-distance floating-point samples can
++    // duplicate one cell and skip the next, hiding a curb or preventing a
++    // genuinely complete safe observation from clearing older evidence.
++    for (grid_map::LineIterator iterator(map,first_cell,last_cell);!iterator.isPastEnd();++iterator)
++    {
++      grid_map::Position cell_position;map.getPosition(*iterator,cell_position);
++      const double unknown_clearance = map.at("unknown_sdf",*iterator);
++      fully_observed = fully_observed && std::isfinite(unknown_clearance) &&
++          unknown_clearance >= robot_minimum_clearance_;
++      const bool valid_height = !map.exists("elevation_valid") ||
++          map.at("elevation_valid",*iterator) > 0.5f;
++      terrain_observed = terrain_observed && valid_height;
++      const double z = valid_height ? map.at("elevation",*iterator) :
++          std::numeric_limits<double>::quiet_NaN();
++      if (std::isfinite(z))
++      {
++        const double observed_step=(cell_position-previous_sample).norm();
++        if (std::isfinite(previous_z) && observed_step > 1e-6)
++        {
++          const double dz = z - previous_z;
++          edge_max_slope = std::max(edge_max_slope, std::abs(dz)/observed_step);
++        }
++        if (!std::isfinite(previous_z) || observed_step > 1e-6) {
++          valid_heights.push_back(z);
++          valid_distances.push_back(distance>1e-6 ? (cell_position-pos_a).dot((pos_b-pos_a)/distance) : 0.);
++        }
++        previous_z = z;
++        previous_sample = cell_position;
++      }
++      else
++      {
++        terrain_observed = false;
++        finish_run();
++        previous_z = std::numeric_limits<double>::quiet_NaN();
++        previous_sample.setConstant(std::numeric_limits<double>::quiet_NaN());
++      }
++      // The 0.5 m elevation samples cannot distinguish a step from a short
++      // ramp. The adapter's sub-cell witness preserves the measured vertical
++      // discontinuity; it is an observation and never a synthetic height.
++      if (map.exists("witnessed_step"))
++      {
++        const double witnessed = map.at("witnessed_step", *iterator);
++        if (std::isfinite(witnessed) && witnessed > 0.)
++          edge_max_step = std::max(edge_max_step, witnessed);
++      }
++      const auto physical_class=traversability_classes_.find(my_trav_class_);
++      if (physical_class!=traversability_classes_.end() && map.exists(physical_class->second.layer_name+"_sdf"))
++      {
++        const double clearance = map.at(physical_class->second.layer_name+"_sdf",*iterator);
++        if (std::isfinite(clearance)) {
++          edge_min_clearance = std::min(edge_min_clearance, clearance);
++          measured_obstacle_clearance=std::min(measured_obstacle_clearance,clearance);
++        }
++      }
++    }
++    finish_run();
++    terrain_observed=terrain_observed && has_terrain_run;
++  }
++  if (!std::isfinite(edge_min_clearance))
++    edge_min_clearance = 0.0;
++  const bool physical_edge_feasible = edge_max_slope <= physical_max_slope_ &&
++      edge_max_step <= physical_max_step_height_ && edge_roughness <= physical_max_roughness_ &&
++      edge_min_clearance >= robot_minimum_clearance_;
++  const bool violation=edge_max_slope>physical_max_slope_ || edge_max_step>physical_max_step_height_ ||
++      edge_roughness>physical_max_roughness_ || measured_obstacle_clearance<robot_minimum_clearance_;
++  const bool complete=fully_observed && terrain_observed;
++  if (!retain_measured_violation(properties,complete,violation)) {
++    properties.physical_observed_at_ns = map.getTimestamp();
++    properties.metadata["clearance_confidence"] = {
++        fully_observed || measured_obstacle_clearance<robot_minimum_clearance_ ? .8f : 0.f};
++    properties.metadata["physical_confidence"] = {complete || violation ? 0.8f : 0.0f};
++    properties.metadata["terrain_observed"] = {terrain_observed ? 1.0f : 0.0f};
++    properties.metadata["physical_feasible"] = {physical_edge_feasible ? 1.0f : 0.0f};
++    properties.metadata["physical_violation_observed"] = {violation ? 1.0f : 0.0f};
++    properties.metadata["maximum_slope"] = {static_cast<float>(edge_max_slope)};
++    properties.metadata["maximum_step_height"] = {static_cast<float>(edge_max_step)};
++    properties.metadata["roughness"] = {static_cast<float>(edge_roughness)};
++    properties.metadata["minimum_clearance"] = {static_cast<float>(edge_min_clearance)};
++  }
+   for (const auto& [trav_class, trav_prop] : traversability_classes_)
+   {
+     if (node_a.trav_properties.find(trav_class) == node_a.trav_properties.end() ||
+@@ -310,6 +573,17 @@
+ void Mapper::traversability_update(const grid_map_msgs::msg::GridMap::ConstSharedPtr map,
+                                    grid_map_msgs::msg::GridMap::SharedPtr dbg_map_out)
+ {
++  if (map->header.frame_id.empty() || map->header.stamp.sec < 0 ||
++      map->header.stamp.nanosec >= 1000000000u ||
++      (map->header.stamp.sec == 0 && map->header.stamp.nanosec == 0) ||
++      !std::isfinite(map->info.resolution) || map->info.resolution <= 0 ||
++      !std::isfinite(map->info.length_x) || map->info.length_x <= 0 ||
++      !std::isfinite(map->info.length_y) || map->info.length_y <= 0)
++  {
++    RCLCPP_WARN(logger_, "Ignoring grid map without valid geometry and measurement time");
++    return;
++  }
++  const rclcpp::Time now(map->header.stamp);
+   auto start_time = std::chrono::high_resolution_clock::now();
+   auto graph_frame = graph_.get_frame_id();
+   if (!graph_frame)
+@@ -321,8 +595,15 @@
+   try
+   {
+     geometry_msgs::msg::TransformStamped transform;
+-    // get latest available transform, assuming both reference frames are ~static
+-    transform = tf_buffer_.lookupTransform(map->header.frame_id, *graph_frame, tf2::TimePointZero);
++    // Local maps move with the vehicle: use the map's acquisition pose.
++    // TF and GridMap have separate DDS queues. A valid map can arrive before
++    // its already-published TF; the node's dedicated TF listener can service
++    // this bounded wait. Missing TF still rejects the map, never uses latest.
++    const auto tf_wait = tf_buffer_.isUsingDedicatedThread()
++                            ? tf2::durationFromSec(0.25) : tf2::Duration::zero();
++    transform = tf_buffer_.lookupTransform(map->header.frame_id, *graph_frame,
++        tf2::TimePoint(std::chrono::nanoseconds(now.nanoseconds())),
++        tf_wait);
+     graph2map = tf2::transformToEigen(transform);
+   }
+   catch (const tf2::TransformException& ex)
+@@ -330,8 +611,8 @@
+     RCLCPP_ERROR(logger_, "Transform lookuperror: %s", ex.what());
+     return;
+   }
++  if (!graph2map.matrix().allFinite()) return;
+   Eigen::Transform<double, 3, Eigen::Isometry> map2graph = graph2map.inverse();
+-  rclcpp::Time now = map->header.stamp;
+ 
+   auto start_time_gridmap = std::chrono::high_resolution_clock::now();
+   std::vector<std::string> layer_names;
+@@ -341,8 +622,17 @@
+   }
+   layer_names.push_back("unknown");
+   layer_names.push_back("elevation");
++  if (std::find(map->layers.begin(), map->layers.end(), "elevation_valid") != map->layers.end())
++    layer_names.push_back("elevation_valid");
++  if (std::find(map->layers.begin(), map->layers.end(), "witnessed_step") != map->layers.end())
++    layer_names.push_back("witnessed_step");
+   grid_map::GridMap gridmap;
+-  grid_map::GridMapRosConverter::fromMessage(*map, gridmap, layer_names, false, false);
++  if (!grid_map::GridMapRosConverter::fromMessage(*map, gridmap, layer_names, false, false) ||
++      gridmap.getSize()(0) < 2 || gridmap.getSize()(1) < 2)
++  {
++    RCLCPP_WARN(logger_, "Ignoring grid map with missing layers or invalid data layout");
++    return;
++  }
+   for (const auto& [trav_class, trav_prop] : traversability_classes_)
+   {
+     grid_map_create_sdf(gridmap, trav_prop.layer_name, trav_prop.obstacle_threshold);
+@@ -428,6 +718,110 @@
+           }
+         }
+       }
++
++      // Add conservative local terrain metadata without changing the ROS message schema.
++      if (gridmap.exists("elevation") && (!gridmap.exists("elevation_valid") ||
++          gridmap.atPosition("elevation_valid", node_pos_map) > 0.5f))
++      {
++        const double resolution = gridmap.getResolution();
++        const double center = gridmap.atPosition("elevation", node_pos_map);
++        if (std::isfinite(center))
++        {
++          std::vector<Eigen::Vector3d> terrain_samples;
++          terrain_samples.emplace_back(0., 0., center);
++          for (int dx = -1; dx <= 1; ++dx)
++          {
++            for (int dy = -1; dy <= 1; ++dy)
++            {
++              if (dx == 0 && dy == 0)
++                continue;
++              Eigen::Vector2d sample = node_pos_map + resolution * Eigen::Vector2d(dx, dy);
++              if (!gridmap.isInside(sample))
++                continue;
++              if (gridmap.exists("elevation_valid") &&
++                  gridmap.atPosition("elevation_valid", sample) <= 0.5f) continue;
++              const double z = gridmap.atPosition("elevation", sample);
++              if (!std::isfinite(z))
++                continue;
++              terrain_samples.emplace_back(resolution*dx, resolution*dy, z);
++            }
++          }
++          const auto metrics = terrain_metrics(terrain_samples);
++          const double max_slope = metrics.slope;
++          // The low-surface 3x3 samples cannot separate a physical step from
++          // a short ramp. Combine the fitted residual with the adapter's
++          // measured sub-cell discontinuity when that observation exists.
++          const double witnessed_step = gridmap.exists("witnessed_step") ?
++              gridmap.atPosition("witnessed_step", node_pos_map) : 0.;
++          const double step_height = std::isfinite(witnessed_step) ?
++              std::max(metrics.step, witnessed_step) : metrics.step;
++          const double roughness = metrics.roughness;
++          const double slope_risk = max_slope / std::max(physical_max_slope_, 1e-3);
++          const double step_risk = step_height / std::max(physical_max_step_height_, 1e-3);
++          const double roughness_risk = roughness / std::max(physical_max_roughness_, 1e-3);
++          const double physical_risk = std::clamp(
++              std::max({slope_risk, step_risk, roughness_risk}), 0.0, 1.0);
++          double minimum_clearance = node_prop.trav_properties.empty() ? 0.0 : std::min_element(
++                  node_prop.trav_properties.begin(), node_prop.trav_properties.end(),
++                  [](const auto& a, const auto& b) { return a.second.free_radius < b.second.free_radius; })
++                  ->second.free_radius;
++          const auto physical_class=traversability_classes_.find(my_trav_class_);
++          double measured_clearance=std::numeric_limits<double>::infinity();
++          if (physical_class!=traversability_classes_.end()) {
++            measured_clearance=gridmap.atPosition(physical_class->second.layer_name+"_sdf",node_pos_map);
++            if (std::isfinite(measured_clearance)) minimum_clearance=std::min(minimum_clearance,measured_clearance);
++          }
++          const bool violation=(metrics.observed && (max_slope>physical_max_slope_ ||
++              step_height>physical_max_step_height_ || roughness>physical_max_roughness_)) ||
++              (std::isfinite(measured_clearance) && measured_clearance<robot_minimum_clearance_);
++          const bool complete=metrics.observed && terrain_samples.size()==9 && unknown_dist>robot_minimum_clearance_;
++          const bool physical_feasible = !violation && max_slope <= physical_max_slope_ &&
++              step_height <= physical_max_step_height_ && roughness <= physical_max_roughness_ &&
++              minimum_clearance >= robot_minimum_clearance_;
++          if (!retain_measured_violation(node_prop,complete,violation)) {
++            node_prop.metadata["slope"] = {static_cast<float>(max_slope)};
++            node_prop.metadata["step_height"] = {static_cast<float>(step_height)};
++            node_prop.metadata["roughness"] = {static_cast<float>(roughness)};
++            node_prop.physical_observed_at_ns = gridmap.getTimestamp();
++            node_prop.metadata["physical_confidence"] = {complete || violation ? 0.8f : 0.0f};
++            node_prop.metadata["clearance_confidence"] = {
++                unknown_dist>robot_minimum_clearance_ || measured_clearance<robot_minimum_clearance_ ? .8f : 0.f};
++            node_prop.metadata["terrain_observed"] = {metrics.observed ? 1.0f : 0.0f};
++            node_prop.metadata["physical_risk"] = {violation ? 1.f : static_cast<float>(physical_risk)};
++            node_prop.metadata["minimum_clearance"] = {static_cast<float>(minimum_clearance)};
++            node_prop.metadata["physical_feasible"] = {physical_feasible ? 1.0f : 0.0f};
++            node_prop.metadata["physical_violation_observed"] = {violation ? 1.f : 0.f};
++            node_prop_changed = true;
++          }
++        }
++      }
++      if (!std::isfinite(gridmap.atPosition("elevation", node_pos_map)) ||
++          (gridmap.exists("elevation_valid") &&
++           gridmap.atPosition("elevation_valid", node_pos_map) <= 0.5f))
++      {
++        const auto physical_class=traversability_classes_.find(my_trav_class_);
++        const double clearance=physical_class==traversability_classes_.end() ?
++            std::numeric_limits<double>::quiet_NaN() :
++            gridmap.atPosition(physical_class->second.layer_name+"_sdf",node_pos_map);
++        const double witnessed_step = gridmap.exists("witnessed_step") ?
++            gridmap.atPosition("witnessed_step", node_pos_map) : 0.;
++        const bool step_violation=std::isfinite(witnessed_step) &&
++            witnessed_step>physical_max_step_height_;
++        const bool violation=(std::isfinite(clearance) &&
++            clearance<robot_minimum_clearance_) || step_violation;
++        if (!retain_measured_violation(node_prop,false,violation)) {
++          node_prop.physical_observed_at_ns = gridmap.getTimestamp();
++          node_prop.metadata["terrain_observed"] = {0.0f};
++          node_prop.metadata["step_height"] = {std::isfinite(witnessed_step) ? static_cast<float>(witnessed_step) : 0.f};
++          node_prop.metadata["minimum_clearance"] = {std::isfinite(clearance) ? static_cast<float>(clearance) : 0.f};
++          node_prop.metadata["clearance_confidence"] = {violation || unknown_dist>robot_minimum_clearance_ ? .8f : 0.f};
++          node_prop.metadata["physical_confidence"] = {violation ? .8f : 0.f};
++          node_prop.metadata["physical_feasible"] = {!step_violation && std::isfinite(clearance) && clearance>=robot_minimum_clearance_ ? 1.f : 0.f};
++          node_prop.metadata["physical_violation_observed"] = {violation ? 1.f : 0.f};
++          node_prop.metadata["physical_risk"] = {violation ? 1.f : 0.f};
++          node_prop_changed = true;
++        }
++      }
+       if (node_prop.trav_properties.empty())
+       {
+         RCLCPP_DEBUG(logger_, "removing node %s", node_id.to_string().c_str());

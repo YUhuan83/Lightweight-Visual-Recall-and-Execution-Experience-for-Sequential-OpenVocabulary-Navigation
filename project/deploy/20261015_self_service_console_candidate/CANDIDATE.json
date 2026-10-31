@@ -1,0 +1,24 @@
+{
+  "sha256": "5c6e501c457ab59b70637e1e15c499b01f4af5825ba32261168b6edf6f2374ae",
+  "members": 430,
+  "full_offline": {
+    "PASS": 48,
+    "WARN": 6
+  },
+  "console_tests": 26,
+  "harness_tests": 15,
+  "unpacked_console_tests": 26,
+  "powershell_parse": "passed",
+  "bash_syntax": "passed with normal local permissions",
+  "validation_scope": "Local pure tests / SDK and ROS doubles / syntax / archive identity only",
+  "server_connected": false,
+  "field_acceptance": false,
+  "commit_created": false,
+  "pending": [
+    "server independent build",
+    "actual scene/sensor/model startup and ROS/DDS discovery",
+    "query ACK and target handoff with real physics",
+    "stop / quit / SSH disconnect / owned group cleanup on server",
+    "20-round stability and multi-goal acceptance remain unstarted"
+  ]
+}

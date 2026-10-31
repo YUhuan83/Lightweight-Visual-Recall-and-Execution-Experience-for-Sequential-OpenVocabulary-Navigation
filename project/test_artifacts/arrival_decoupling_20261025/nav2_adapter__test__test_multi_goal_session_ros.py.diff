@@ -1,0 +1,84 @@
+--- v25/nav2_adapter/test/test_multi_goal_session_ros.py
++++ v26/nav2_adapter/test/test_multi_goal_session_ros.py
+@@ -17,6 +17,7 @@
+ from unittest.mock import Mock
+ import numpy as np
+ from nav_msgs.msg import Odometry, OccupancyGrid
++from builtin_interfaces.msg import Time
+ from std_msgs.msg import String
+ from beamng_wildos_adapter.goal_standoff import GoalStandoff
+ from wildos_nav2_adapter.graph_path_bridge import GraphPathBridge
+@@ -57,7 +58,7 @@
+         # This state-machine fixture supplies a co-located synthetic camera;
+         # real mounted-rig clearance is covered by the geometry regressions.
+         original_parameter = self.confirm.get_parameter
+-        overrides = {'standoff': 4., 'camera_offset': [0., 0., 0.],
++        overrides = {'carrier_model': 'ideal_point', 'standoff': 2., 'camera_offset': [0., 0., 0.],
+                      'minimum_camera_target_range': .1}
+         self.confirm.get_parameter = lambda name: (S(value=overrides[name])
+             if name in overrides else original_parameter(name))
+@@ -84,7 +85,7 @@
+         for name in ('frontier_uuid_to_scores', 'frontier_score_stats', 'frontier_uuid_to_scoring_distance',
+                      'frontier_last_scored_at'):
+             setattr(v, name, {})
+-        clock = S(now=lambda: S(nanoseconds=self.now, to_msg=lambda: S(sec=self.now//10**9, nanosec=self.now%10**9)))
++        clock = S(now=lambda: S(nanoseconds=self.now, to_msg=lambda: Time(sec=self.now//10**9, nanosec=self.now%10**9)))
+         for node in (self.bridge, self.confirm, v):
+             node.get_clock = lambda: clock
+             node.get_logger = lambda: Mock()
+@@ -187,7 +188,7 @@
+         # a transient candidate under comparison cannot accept arrival.
+         self.bridge.memory_selecting = False
+         for _ in range(5):
+-            self.localize('gas station', remembered_x + 2., remembered_x-2.)
++            self.localize('gas station', remembered_x + 2., remembered_x)
+         self.assertTrue(self.bridge.object_found)
+         self.assertTrue(v.object_goal_memory.candidates('gas station', time.time()))
+ 
+@@ -274,6 +275,9 @@
+         self.query('gas station')
+         for _ in range(5):
+             self.localize('gas station', 10., 6.)
++        self.assertFalse(self.bridge.object_found)  # Four metres exceeds the point-carrier limit.
++        for _ in range(5):
++            self.localize('gas station', 10., 8.)
+         self.assertTrue(self.bridge.object_found)
+         self.assertTrue(self.vision.object_goal_memory.candidates('gas station', time.time()))
+         self.query('house')
+@@ -287,7 +291,7 @@
+         self.assertFalse(self.bridge.object_found)
+         self.assertEqual(self.bridge.last_status['status'], 'confirmation_before_standoff')
+         for _ in range(5):
+-            self.localize('house', 30., 26.)
++            self.localize('house', 30., 28.)
+         self.assertTrue(self.bridge.object_found)
+         # Put the synthetic vehicle at the recorded route's start pose before
+         # checking same-process memory reuse below.
+@@ -299,17 +303,23 @@
+         self.bridge.route = self.bridge.latest_route = path
+         self.bridge.route_endpoint = (0., 0.)
+         # Feed a supplied valid local prefix through the real memory handover.
+-        self.bridge.memory_full_check = False
+         prefix = route((20., 0.), (15., 0.), (8., 0.))
+-        self.bridge.record_memory_path(prefix, [(20., 0.), (15., 0.), (8., 0.)], [0.]*3)
++        # A farther confirmed view and the final arrival view can both be
++        # retained. Supply a checked prefix for each candidate before selection.
++        for _ in range(8):
++            if not self.bridge.memory_selecting:
++                break
++            self.bridge.route = self.bridge.latest_route = path
++            self.bridge.memory_full_check = False
++            self.bridge.record_memory_path(prefix, [(20., 0.), (15., 0.), (8., 0.)], [0.]*3)
+         self.assertFalse(self.bridge.memory_selecting)
+         self.bridge.follow_client.send_goal_async.assert_called_once()
+         self.assertIsNotNone(self.bridge.memory_goal)
+         for _ in range(5):
+-            self.localize('gas station', 10., 14.)
++            self.localize('gas station', 10., 12.)
+         self.assertTrue(self.bridge.object_found)
+         self.assertEqual(self.bridge.last_status['status'], 'object_found')
+-        self.assertEqual(self.bridge.last_status['observer_position'][0], 14.)
++        self.assertEqual(self.bridge.last_status['observer_position'][0], 12.)
+         self.assertEqual(tuple(map(id, (self.vision, self.db, self.vision.object_goal_memory))), identities)
+         self.assertGreaterEqual(len(self.db.query_objects('town', now=self.now*1e-9)), 2)
+ 

@@ -1,0 +1,25 @@
+{
+  "scope": "One full current-feature green-house field trial, with original physics and evidence review required.",
+  "passed": false,
+  "errors": [
+    "TimeoutError('Field readiness/result deadline')"
+  ],
+  "complete_navigation_passed": false,
+  "video": false,
+  "round_timeout_sec": 120.0,
+  "startup_elapsed_sec": 47.16740356001537,
+  "search_timeout_sec": 120.0,
+  "startup_outside_search_budget": true,
+  "query_event_is_deadline_origin": true,
+  "search_elapsed_sec": 120.08947581390385,
+  "session": "/home/ly/execution_continuity_review_20261022/v74_document_handoff/full/trial_20261030_190118/sessions/session_20261030_190119",
+  "session_result": {
+    "errors": [],
+    "goals": 1,
+    "field_acceptance": false,
+    "video_recording_enabled": false
+  },
+  "console_exit": 0,
+  "closed": true,
+  "shutdown_elapsed_sec": 22.226504894089885
+}

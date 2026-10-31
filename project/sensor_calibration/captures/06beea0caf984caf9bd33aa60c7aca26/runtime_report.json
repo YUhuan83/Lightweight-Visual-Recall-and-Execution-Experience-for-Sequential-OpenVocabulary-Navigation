@@ -1,0 +1,14 @@
+{
+  "calibrated": false,
+  "runtime_observed": false,
+  "scope": "fixture diagnostics only; not navigation or production calibration",
+  "demanded": {
+    "static_camera": true,
+    "mounted": true,
+    "lidar": true,
+    "visual": true
+  },
+  "checks": {},
+  "actual_userpath": "D:\\BEAMNG\\rural-user\\current\\",
+  "error": "TimeoutError: timed out"
+}

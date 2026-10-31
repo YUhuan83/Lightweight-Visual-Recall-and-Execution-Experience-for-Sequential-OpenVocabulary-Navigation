@@ -1,0 +1,508 @@
+<?xml version='1.0' encoding='utf-8'?>
+<sdf version="1.8">
+  <world name="lane_sensor_sample">
+    <physics name="physics" type="ignored">
+      <max_step_size>0.002</max_step_size>
+      <real_time_factor>1</real_time_factor>
+    </physics>
+    <gravity>0 0 -9.81</gravity>
+    <plugin filename="ignition-gazebo-physics-system" name="ignition::gazebo::systems::Physics" />
+    <plugin filename="ignition-gazebo-user-commands-system" name="ignition::gazebo::systems::UserCommands" />
+    <plugin filename="ignition-gazebo-scene-broadcaster-system" name="ignition::gazebo::systems::SceneBroadcaster" />
+    <scene>
+      <ambient>.48 .49 .47 1</ambient>
+      <background>.66 .77 .84 1</background>
+      <shadows>true</shadows>
+    </scene>
+    <light name="sun" type="directional">
+      <pose>0 0 20 0 0 0</pose>
+      <direction>-.45 .35 -.82</direction>
+      <diffuse>.92 .87 .77 1</diffuse>
+      <specular>.15 .15 .15 1</specular>
+      <cast_shadows>true</cast_shadows>
+    </light>
+    <include>
+      <uri>model://lane_road</uri>
+      <name>road</name>
+      <pose>0 0 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://lane_terrain</uri>
+      <name>terrain</name>
+      <pose>0 0 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://lane_details</uri>
+      <name>details</name>
+      <pose>0 0 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://lane_cottage</uri>
+      <name>cottage</name>
+      <pose>-8 8 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://lane_barn</uri>
+      <name>barn</name>
+      <pose>11 -8 0 0 0 3.141592653589793</pose>
+    </include>
+    <include>
+      <uri>model://lane_water_tank</uri>
+      <name>water_tank_target</name>
+      <pose>20 6 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://lane_tree_0</uri>
+      <name>tree_00</name>
+      <pose>-26 9 0.37575171110541766 0 0 0.0</pose>
+    </include>
+    <include>
+      <uri>model://lane_tree_1</uri>
+      <name>tree_01</name>
+      <pose>-21 13 2.029727886238611 0 0 1.31</pose>
+    </include>
+    <include>
+      <uri>model://lane_tree_2</uri>
+      <name>tree_02</name>
+      <pose>-17 8 0.1770605577090727 0 0 2.62</pose>
+    </include>
+    <include>
+      <uri>model://lane_tree_3</uri>
+      <name>tree_03</name>
+      <pose>-12 17 1.6087782220734739 0 0 3.93</pose>
+    </include>
+    <include>
+      <uri>model://lane_tree_0</uri>
+      <name>tree_04</name>
+      <pose>-3 16 0.2490204583353453 0 0 5.24</pose>
+    </include>
+    <include>
+      <uri>model://lane_tree_1</uri>
+      <name>tree_05</name>
+      <pose>4 11 0.03884768259993926 0 0 6.550000000000001</pose>
+    </include>
+    <include>
+      <uri>model://lane_tree_2</uri>
+      <name>tree_06</name>
+      <pose>9 17 0.08606364970977988 0 0 7.86</pose>
+    </include>
+    <include>
+      <uri>model://lane_tree_3</uri>
+      <name>tree_07</name>
+      <pose>16 14 0.10155597964062409 0 0 9.17</pose>
+    </include>
+    <include>
+      <uri>model://lane_tree_0</uri>
+      <name>tree_08</name>
+      <pose>26 10 -0.010584971840403518 0 0 10.48</pose>
+    </include>
+    <include>
+      <uri>model://lane_tree_1</uri>
+      <name>tree_09</name>
+      <pose>30 18 -0.07654687643985138 0 0 11.790000000000001</pose>
+    </include>
+    <include>
+      <uri>model://lane_tree_2</uri>
+      <name>tree_10</name>
+      <pose>-27 -11 0.026926455767020345 0 0 13.100000000000001</pose>
+    </include>
+    <include>
+      <uri>model://lane_tree_3</uri>
+      <name>tree_11</name>
+      <pose>-21 -8 0.040850359250548265 0 0 14.41</pose>
+    </include>
+    <include>
+      <uri>model://lane_tree_0</uri>
+      <name>tree_12</name>
+      <pose>-15 -14 0.09684107708499097 0 0 15.72</pose>
+    </include>
+    <include>
+      <uri>model://lane_tree_1</uri>
+      <name>tree_13</name>
+      <pose>-6 -10 0.0020030841104052236 0 0 17.03</pose>
+    </include>
+    <include>
+      <uri>model://lane_tree_2</uri>
+      <name>tree_14</name>
+      <pose>0 -17 0.1535793590605747 0 0 18.34</pose>
+    </include>
+    <include>
+      <uri>model://lane_tree_3</uri>
+      <name>tree_15</name>
+      <pose>20 -15 2.2232161854580217 0 0 19.650000000000002</pose>
+    </include>
+    <include>
+      <uri>model://lane_tree_0</uri>
+      <name>tree_16</name>
+      <pose>27 -8 0.18718569942818564 0 0 20.96</pose>
+    </include>
+    <include>
+      <uri>model://lane_tree_1</uri>
+      <name>tree_17</name>
+      <pose>30 -19 2.5496470725024025 0 0 22.27</pose>
+    </include>
+    <include>
+      <uri>model://ph_rock_moss_set_01</uri>
+      <name>ph_rock_moss_set_01</name>
+      <pose>-20 6 0.013393458696645094 0 0 0.4</pose>
+    </include>
+    <include>
+      <uri>model://ph_dead_tree_trunk</uri>
+      <name>ph_dead_tree_trunk</name>
+      <pose>-17 -7 -0.018020416420916757 0 0 0.7</pose>
+    </include>
+    <include>
+      <uri>model://ph_wooden_barrels_01</uri>
+      <name>ph_wooden_barrels_01</name>
+      <pose>15 -11 0.0 0 0 0</pose>
+    </include>
+    <model name="survey_rover">
+      <pose>-18 0 0.595 0 0 0</pose>
+      <link name="base_link">
+        <inertial>
+          <mass>35</mass>
+          <inertia>
+            <ixx>1.6</ixx>
+            <iyy>3.0</iyy>
+            <izz>3.6</izz>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyz>0</iyz>
+          </inertia>
+        </inertial>
+        <visual name="chassis_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>1 0.65 0.24</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.85 0.56 0.08 1</ambient>
+            <diffuse>0.85 0.56 0.08 1</diffuse>
+          </material>
+        </visual>
+        <collision name="chassis_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>1 0.65 0.24</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="mast_visual">
+          <pose>0 0 0.47 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.035</radius>
+              <length>0.7</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.18 0.19 0.2 1</ambient>
+            <diffuse>0.18 0.19 0.2 1</diffuse>
+          </material>
+        </visual>
+        <collision name="mast_collision">
+          <pose>0 0 0.47 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.035</radius>
+              <length>0.7</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <sensor name="camera_front" type="camera">
+          <pose>0.25 0.0 0.62 0 0 0.0</pose>
+          <topic>/sim/camera/front</topic>
+          <update_rate>10</update_rate>
+          <camera>
+            <horizontal_fov>1.35</horizontal_fov>
+            <image>
+              <width>960</width>
+              <height>540</height>
+              <format>R8G8B8</format>
+            </image>
+            <clip>
+              <near>0.1</near>
+              <far>350</far>
+            </clip>
+          </camera>
+          <ignition_frame_id>camera_front_optical_frame</ignition_frame_id>
+          <always_on>true</always_on>
+        </sensor>
+        <sensor name="camera_left" type="camera">
+          <pose>0.25 0.0 0.62 0 0 1.5707963267948966</pose>
+          <topic>/sim/camera/left</topic>
+          <update_rate>10</update_rate>
+          <camera>
+            <horizontal_fov>1.35</horizontal_fov>
+            <image>
+              <width>960</width>
+              <height>540</height>
+              <format>R8G8B8</format>
+            </image>
+            <clip>
+              <near>0.1</near>
+              <far>350</far>
+            </clip>
+          </camera>
+          <ignition_frame_id>camera_left_optical_frame</ignition_frame_id>
+          <always_on>true</always_on>
+        </sensor>
+        <sensor name="camera_right" type="camera">
+          <pose>0.25 0.0 0.62 0 0 -1.5707963267948966</pose>
+          <topic>/sim/camera/right</topic>
+          <update_rate>10</update_rate>
+          <camera>
+            <horizontal_fov>1.35</horizontal_fov>
+            <image>
+              <width>960</width>
+              <height>540</height>
+              <format>R8G8B8</format>
+            </image>
+            <clip>
+              <near>0.1</near>
+              <far>350</far>
+            </clip>
+          </camera>
+          <ignition_frame_id>camera_right_optical_frame</ignition_frame_id>
+          <always_on>true</always_on>
+        </sensor>
+        <sensor name="lidar" type="gpu_lidar">
+          <pose>0.0 0.0 0.92 0 0 0</pose>
+          <topic>/sim/lidar</topic>
+          <update_rate>10</update_rate>
+          <lidar>
+            <scan>
+              <horizontal>
+                <samples>1024</samples>
+                <resolution>1</resolution>
+                <min_angle>-3.141592653589793</min_angle>
+                <max_angle>3.141592653589793</max_angle>
+              </horizontal>
+              <vertical>
+                <samples>64</samples>
+                <resolution>1</resolution>
+                <min_angle>-0.55</min_angle>
+                <max_angle>0.55</max_angle>
+              </vertical>
+            </scan>
+            <range>
+              <min>0.3</min>
+              <max>100</max>
+              <resolution>0.02</resolution>
+            </range>
+            <noise>
+              <type>gaussian</type>
+              <mean>0</mean>
+              <stddev>0.02</stddev>
+            </noise>
+          </lidar>
+          <ignition_frame_id>lidar_link</ignition_frame_id>
+          <always_on>true</always_on>
+        </sensor>
+        <sensor name="imu" type="imu">
+          <topic>/sim/imu</topic>
+          <update_rate>100</update_rate>
+          <imu />
+          <pose>0.0 0.0 0.0 0 0 0</pose>
+          <ignition_frame_id>imu_link</ignition_frame_id>
+          <always_on>true</always_on>
+        </sensor>
+      </link>
+      <link name="front_left">
+        <pose>0.34 0.4 -.17 0 0 0</pose>
+        <inertial>
+          <mass>2</mass>
+          <inertia>
+            <ixx>0.04</ixx>
+            <iyy>0.06</iyy>
+            <izz>0.04</izz>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyz>0</iyz>
+          </inertia>
+        </inertial>
+        <visual name="tire_visual">
+          <pose>0 0 0 1.5707963267948966 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.23</radius>
+              <length>0.15</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.065 0.07 0.075 1</ambient>
+            <diffuse>0.065 0.07 0.075 1</diffuse>
+          </material>
+        </visual>
+        <collision name="tire_collision">
+          <pose>0 0 0 1.5707963267948966 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.23</radius>
+              <length>0.15</length>
+            </cylinder>
+          </geometry>
+        </collision>
+      </link>
+      <joint name="front_left_joint" type="revolute">
+        <parent>base_link</parent>
+        <child>front_left</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+        </axis>
+      </joint>
+      <link name="front_right">
+        <pose>0.34 -0.4 -.17 0 0 0</pose>
+        <inertial>
+          <mass>2</mass>
+          <inertia>
+            <ixx>0.04</ixx>
+            <iyy>0.06</iyy>
+            <izz>0.04</izz>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyz>0</iyz>
+          </inertia>
+        </inertial>
+        <visual name="tire_visual">
+          <pose>0 0 0 1.5707963267948966 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.23</radius>
+              <length>0.15</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.065 0.07 0.075 1</ambient>
+            <diffuse>0.065 0.07 0.075 1</diffuse>
+          </material>
+        </visual>
+        <collision name="tire_collision">
+          <pose>0 0 0 1.5707963267948966 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.23</radius>
+              <length>0.15</length>
+            </cylinder>
+          </geometry>
+        </collision>
+      </link>
+      <joint name="front_right_joint" type="revolute">
+        <parent>base_link</parent>
+        <child>front_right</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+        </axis>
+      </joint>
+      <link name="rear_left">
+        <pose>-0.34 0.4 -.17 0 0 0</pose>
+        <inertial>
+          <mass>2</mass>
+          <inertia>
+            <ixx>0.04</ixx>
+            <iyy>0.06</iyy>
+            <izz>0.04</izz>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyz>0</iyz>
+          </inertia>
+        </inertial>
+        <visual name="tire_visual">
+          <pose>0 0 0 1.5707963267948966 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.23</radius>
+              <length>0.15</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.065 0.07 0.075 1</ambient>
+            <diffuse>0.065 0.07 0.075 1</diffuse>
+          </material>
+        </visual>
+        <collision name="tire_collision">
+          <pose>0 0 0 1.5707963267948966 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.23</radius>
+              <length>0.15</length>
+            </cylinder>
+          </geometry>
+        </collision>
+      </link>
+      <joint name="rear_left_joint" type="revolute">
+        <parent>base_link</parent>
+        <child>rear_left</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+        </axis>
+      </joint>
+      <link name="rear_right">
+        <pose>-0.34 -0.4 -.17 0 0 0</pose>
+        <inertial>
+          <mass>2</mass>
+          <inertia>
+            <ixx>0.04</ixx>
+            <iyy>0.06</iyy>
+            <izz>0.04</izz>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyz>0</iyz>
+          </inertia>
+        </inertial>
+        <visual name="tire_visual">
+          <pose>0 0 0 1.5707963267948966 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.23</radius>
+              <length>0.15</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.065 0.07 0.075 1</ambient>
+            <diffuse>0.065 0.07 0.075 1</diffuse>
+          </material>
+        </visual>
+        <collision name="tire_collision">
+          <pose>0 0 0 1.5707963267948966 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.23</radius>
+              <length>0.15</length>
+            </cylinder>
+          </geometry>
+        </collision>
+      </link>
+      <joint name="rear_right_joint" type="revolute">
+        <parent>base_link</parent>
+        <child>rear_right</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+        </axis>
+      </joint>
+      <plugin filename="ignition-gazebo-diff-drive-system" name="ignition::gazebo::systems::DiffDrive">
+        <left_joint>front_left_joint</left_joint>
+        <right_joint>front_right_joint</right_joint>
+        <left_joint>rear_left_joint</left_joint>
+        <right_joint>rear_right_joint</right_joint>
+        <wheel_separation>0.8</wheel_separation>
+        <wheel_radius>0.23</wheel_radius>
+        <topic>/sim/cmd_vel</topic>
+        <odom_topic>/sim/wheel_odom</odom_topic>
+        <tf_topic>/sim/wheel_tf</tf_topic>
+        <frame_id>wheel_odom</frame_id>
+        <child_frame_id>base_link</child_frame_id>
+        <odom_publish_frequency>30</odom_publish_frequency>
+        <max_linear_velocity>1.0</max_linear_velocity>
+        <max_angular_velocity>1.0</max_angular_velocity>
+      </plugin>
+    </model>
+    <plugin filename="ignition-gazebo-sensors-system" name="ignition::gazebo::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+    <plugin filename="ignition-gazebo-imu-system" name="ignition::gazebo::systems::Imu" />
+  </world>
+</sdf>

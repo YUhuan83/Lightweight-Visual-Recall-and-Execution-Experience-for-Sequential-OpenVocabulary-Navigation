@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="10" failures="0" disabled="0" errors="0" time="4.382" timestamp="2026-10-17T17:08:34" name="AllTests">
+  <testsuite name="ActualPlanner" tests="10" failures="0" disabled="0" errors="0" time="4.378" timestamp="2026-10-17T17:08:34">
+    <testcase name="OrdinaryPathAndFrozenParameters" status="run" result="completed" time="0.333" timestamp="2026-10-17T17:08:34" classname="wildos_ackermann_smac.ActualPlanner" />
+    <testcase name="RecordedCompleteRouteAvoidsFirstFeasibleFourCuspDetour" status="run" result="completed" time="0.47" timestamp="2026-10-17T17:08:35" classname="wildos_ackermann_smac.ActualPlanner" />
+    <testcase name="CollisionRejectAndRecovery" status="run" result="completed" time="0.321" timestamp="2026-10-17T17:08:35" classname="wildos_ackermann_smac.ActualPlanner" />
+    <testcase name="InactiveChangesRequireReconfigureAndInvalidGoalsRejected" status="run" result="completed" time="0.321" timestamp="2026-10-17T17:08:35" classname="wildos_ackermann_smac.ActualPlanner" />
+    <testcase name="ArchivedContinuousStartAutomaticallyConnected" status="run" result="completed" time="0.613" timestamp="2026-10-17T17:08:36" classname="wildos_ackermann_smac.ActualPlanner" />
+    <testcase name="ExhaustedConnectorRejectsThenFreeMapRecovers" status="run" result="completed" time="0.656" timestamp="2026-10-17T17:08:36" classname="wildos_ackermann_smac.ActualPlanner" />
+    <testcase name="InvalidBudgetCannotConfigure" status="run" result="completed" time="0.27" timestamp="2026-10-17T17:08:37" classname="wildos_ackermann_smac.ActualPlanner" />
+    <testcase name="FreeOffLatticeStartPreservesActualPoseAndHeading" status="run" result="completed" time="0.491" timestamp="2026-10-17T17:08:37" classname="wildos_ackermann_smac.ActualPlanner" />
+    <testcase name="RecordedTownGoalReplannedFromActualAxlePose" status="run" result="completed" time="0.387" timestamp="2026-10-17T17:08:38" classname="wildos_ackermann_smac.ActualPlanner" />
+    <testcase name="RecordedCuspSmoothingHasSafeSameSearchFallback" status="run" result="completed" time="0.516" timestamp="2026-10-17T17:08:38" classname="wildos_ackermann_smac.ActualPlanner" />
+  </testsuite>
+</testsuites>

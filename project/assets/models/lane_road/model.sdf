@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='utf-8'?>
+<sdf version="1.8">
+  <model name="lane_road">
+    <static>true</static>
+    <link name="body">
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://lane_road/visual.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="surface">
+        <geometry>
+          <mesh>
+            <uri>model://lane_road/collision.dae</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+  </model>
+</sdf>

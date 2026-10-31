@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Operational normalized sensor calibration, NOT a draft-value schema",
+  "type": "object",
+  "required": ["version", "kind", "evidence", "sensor_id", "input_frame", "output_frame", "time_source", "time_kind", "input_provenance"],
+  "properties": {
+    "version": {"const": 1},
+    "kind": {"enum": ["camera", "lidar", "imu"]},
+    "evidence": {"$ref": "#/$defs/evidence"},
+    "sensor_id": {"$ref": "#/$defs/text"},
+    "input_frame": {"$ref": "#/$defs/text"},
+    "output_frame": {"$ref": "#/$defs/text"},
+    "time_source": {"$ref": "#/$defs/text"},
+    "time_kind": {"const": "acquisition"},
+    "input_provenance": {"const": "sensor_measurement"},
+    "transform": {"$ref": "#/$defs/transform"},
+    "extrinsic_evidence": {"$ref": "#/$defs/evidence"},
+    "coordinates": {"enum": ["world", "sensor_local"]},
+    "transform_policy": {"const": "matched_external"},
+    "colocated_origin_validated": {"const": true},
+    "angular_unit": {"const": "rad/s"},
+    "acceleration_unit": {"const": "m/s^2"},
+    "gravity": {"enum": ["included", "excluded"]},
+    "smoothing": {"$ref": "#/$defs/text"},
+    "camera": {
+      "type": "object",
+      "required": ["evidence", "width", "height", "projection", "pixel_center", "axes", "pixels_in_target_optical_frame", "hfov_deg", "vfov_deg", "D"],
+      "properties": {
+        "evidence": {"$ref": "#/$defs/evidence"},
+        "width": {"type": "integer", "minimum": 1},
+        "height": {"type": "integer", "minimum": 1},
+        "projection": {"const": "rectilinear_pinhole"},
+        "pixel_center": {"const": "integer_centers_half_extent"},
+        "axes": {"const": "x_right_y_down_z_forward"},
+        "pixels_in_target_optical_frame": {"const": true},
+        "hfov_deg": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 180},
+        "vfov_deg": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 180},
+        "D": {"type": "array", "minItems": 5, "maxItems": 5, "items": {"const": 0}}
+      },
+      "additionalProperties": false
+    }
+  },
+  "allOf": [
+    {"if": {"properties": {"kind": {"const": "lidar"}}}, "then": {"required": ["coordinates", "transform_policy"]}, "else": {"required": ["transform", "extrinsic_evidence"]}},
+    {"if": {"properties": {"kind": {"const": "camera"}}}, "then": {"required": ["camera"]}},
+    {"if": {"properties": {"kind": {"const": "imu"}}}, "then": {"required": ["colocated_origin_validated", "angular_unit", "acceleration_unit", "gravity", "smoothing"]}}
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "text": {"type": "string", "pattern": "\\S"},
+    "evidence": {
+      "type": "object", "required": ["accepted", "reference"],
+      "properties": {"accepted": {"const": true}, "reference": {"$ref": "#/$defs/text"}},
+      "additionalProperties": false
+    },
+    "transform": {
+      "type": "object",
+      "description": "p_target = R(q_xyzw) p_source + translation_m. Runtime additionally validates finite values, unit quaternion (1e-9), frame matching, and IMU colocation.",
+      "required": ["source_frame", "target_frame", "translation_m", "quaternion_xyzw"],
+      "properties": {
+        "source_frame": {"$ref": "#/$defs/text"}, "target_frame": {"$ref": "#/$defs/text"},
+        "translation_m": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"type": "number"}},
+        "quaternion_xyzw": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"type": "number"}}
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,11 @@
+# Frame names are a proposed interface, not BeamNG calibration.
+num_cameras: 3
+parent_frame: wheel_odom
+cam_frame: camera_{}_optical_frame
+lidar_frame: lidar_link
+object_mask_topic: /rover/object_mask
+lidar_topic: /rover/lidar/points
+triangulated_object_topic: /rover/triangulated_object
+# Deliberately not connected to a motion controller.
+navigation_goal_topic: /wildos_port/candidate_goal
+particle_viz_topic: /rover/object_hypotheses

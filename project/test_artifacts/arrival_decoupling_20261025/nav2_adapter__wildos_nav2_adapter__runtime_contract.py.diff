@@ -1,0 +1,12 @@
+--- v25/nav2_adapter/wildos_nav2_adapter/runtime_contract.py
++++ v26/nav2_adapter/wildos_nav2_adapter/runtime_contract.py
+@@ -134,7 +134,8 @@
+         required['/controller_server'].update({'cusp_goal_checker.'+key:value for key,value in cusp.items()})
+         required['/wildos_graph_path_bridge'] = {
+             'carrier_model': 'ackermann', 'planner_id': 'CarLike', 'minimum_turning_radius': 8.0,
+-            'require_source_control': True}
++            'require_source_control': True,
++            'object_arrival_distance': 2.0, 'traffic_light_arrival_distance': 2.0}
+         required['/beamng_wildos_adapter'] = {'carrier_model': 'ackermann',
+                                              'lidar_offset': list(SBR_LIDAR_OFFSET),
+                                              'obstacle_min_height': .1, 'ground_max_slope': .35}

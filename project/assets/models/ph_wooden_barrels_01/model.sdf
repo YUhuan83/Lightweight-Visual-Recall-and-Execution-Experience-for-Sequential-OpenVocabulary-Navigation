@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='utf-8'?>
+<sdf version="1.8">
+  <model name="ph_wooden_barrels_01">
+    <static>true</static>
+    <link name="body">
+      <collision name="proxy0">
+        <pose>1.7400639168918133 -1.3300449401140213 0.03990399045869708 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.13878272101283073 0.4937112629413605 0.030383802019059658</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name="proxy1">
+        <pose>1.5729618426412344 -1.3348711133003235 0.039903965312987566 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.09313628077507019 0.39029479026794434 0.029969156719744205</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name="proxy2">
+        <pose>1.3627388719469309 -1.3315491080284119 0.03978808782994747 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.05124395340681076 0.27018874883651733 0.028156964108347893</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name="proxy3">
+        <pose>-1.2717127595096827 -1.208858547732234 0.08488638466224074 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.5722975134849548 0.09986254945397377 0.020441805012524128</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name="proxy4">
+        <pose>-1.2724801320582628 -0.8844026047736406 0.08488630828583155 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.5340619534254074 0.09919998422265053 0.02</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name="proxy5">
+        <pose>-0.3416775558143854 -1.603195033967495 0.08277956535403064 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.38282960653305054 0.08454573899507523 0.02</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name="proxy6">
+        <pose>-0.3306159619241953 -1.3578552436083555 0.08277970128301604 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.5721890032291412 0.09920002147555351 0.02</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name="proxy7">
+        <pose>-0.3306159172207117 -0.9528702050447464 0.08277984312735498 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.40939828753471375 0.086419016122818 0.02578517096117139</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name="proxy8">
+        <pose>0.8530355077236891 -1.629995159804821 0.02828259509988129 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.38523177802562714 0.08454568684101105 0.02</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name="proxy9">
+        <pose>0.8542927857488394 -1.2763225808739662 0.028856703080236912 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.5696744024753571 0.39952345192432404 0.057713406160473824</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name="proxy10">
+        <pose>1.2994915079325438 0.05912754684686661 0.08310177270323038 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.07635173201560974 0.31175096333026886 0.08567648194730282</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name="proxy11">
+        <pose>2.1789285615086555 -0.3499995470046997 0.09018607251346111 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.08257514610886574 0.6908333897590637 0.09981321170926094</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name="proxy12">
+        <pose>1.873676123097539 -0.2603352516889572 0.0920567698776722 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.06237278878688812 0.870933324098587 0.10395346581935883</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name="proxy13">
+        <pose>1.5809204299002886 -0.2603352665901184 0.09306803904473782 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.07593762129545212 0.8712632060050964 0.10060110315680504</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name="proxy14">
+        <pose>0.4760004188865423 -0.2603352665901184 0.1379323322325945 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.5810012221336365 0.8738878965377808 0.19577916339039803</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name="proxy15">
+        <pose>-1.9396183583885431 -0.2603352591395378 0.13522555527742952 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.5611955523490906 0.8769893646240234 0.187544520245865</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name="proxy16">
+        <pose>-0.6338351611047983 -0.24973786994814873 0.2141585808712989 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.7475803196430206 0.8757271468639374 0.3539718226529658</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name="proxy17">
+        <pose>-0.8275026325136423 1.3007919043302536 0.4967710634227842 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.7430001795291901 0.7429521977901459 0.9198697214014828</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name="proxy18">
+        <pose>1.5877749677747488 1.3005771040916443 0.4983155135987545 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.7430001795291901 0.7429977059364319 0.9167808210495423</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="scan">
+        <geometry>
+          <mesh>
+            <uri>model://ph_wooden_barrels_01/visual.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+  </model>
+</sdf>

@@ -1,0 +1,11 @@
+--- before/nav2_adapter/wildos_nav2_adapter/graph_path_bridge.py
++++ after/nav2_adapter/wildos_nav2_adapter/graph_path_bridge.py
+@@ -91,6 +91,8 @@
+         self.carrier_model = str(self.get_parameter("carrier_model").value).strip().lower()
+         if self.carrier_model not in ("ideal_point", "ackermann"):
+             raise ValueError("carrier_model must be ideal_point or ackermann")
++        self.declare_parameter('require_source_control', self.carrier_model == 'ackermann')
++        self.require_source_control = bool(self.get_parameter('require_source_control').value)
+         configured_planner = str(self.get_parameter("planner_id").value).strip()
+         self.planner_id = configured_planner or (
+             "GridBased" if self.carrier_model == "ideal_point" else "CarLike")

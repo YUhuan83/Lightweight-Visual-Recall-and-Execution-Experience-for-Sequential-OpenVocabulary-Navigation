@@ -1,0 +1,74 @@
+[
+  {
+    "trial": "/home/ly/execution_continuity_review_20261022/v73_document_plan/full/trial_20261030_184621",
+    "first_raw_q": 59.588444129,
+    "phases": [
+      {
+        "phase": "before_target",
+        "covered_s": 59.50045667400001,
+        "near_stop_s": 21.287058989999984,
+        "near_stop_percent": 35.77629514111244
+      },
+      {
+        "phase": "after_target",
+        "covered_s": 60.34593339000005,
+        "near_stop_s": 2.3031724060000003,
+        "near_stop_percent": 3.816615762847178
+      }
+    ],
+    "fraction_of_stops_before_target": 0.9023675364884071,
+    "failures": [
+      {
+        "q": 28.58298539998941,
+        "reason": "retired_controller_progress_unavailable"
+      },
+      {
+        "q": 34.630471865064465,
+        "reason": "follow_aborted"
+      }
+    ],
+    "final_xy_to_last_raw_m": 35.78115156457363
+  },
+  {
+    "trial": "/home/ly/execution_continuity_review_20261022/v74_document_handoff/full/trial_20261030_190118",
+    "first_raw_q": 87.221930071,
+    "phases": [
+      {
+        "phase": "before_target",
+        "covered_s": 87.0940752210001,
+        "near_stop_s": 36.93778663699998,
+        "near_stop_percent": 42.411365575983005
+      },
+      {
+        "phase": "after_target",
+        "covered_s": 32.700769144000006,
+        "near_stop_s": 2.5155605920000004,
+        "near_stop_percent": 7.69266490620622
+      }
+    ],
+    "fraction_of_stops_before_target": 0.9362396154273331,
+    "failures": [
+      {
+        "q": 16.504115746938623,
+        "reason": "retired_controller_progress_unavailable"
+      },
+      {
+        "q": 46.606903870007955,
+        "reason": "retired_controller_progress_unavailable"
+      },
+      {
+        "q": 58.85434073593933,
+        "reason": "follow_aborted"
+      },
+      {
+        "q": 66.69539678399451,
+        "reason": "retired_controller_progress_unavailable"
+      },
+      {
+        "q": 78.74626152694691,
+        "reason": "retired_controller_progress_unavailable"
+      }
+    ],
+    "final_xy_to_last_raw_m": 55.166799556883305
+  }
+]

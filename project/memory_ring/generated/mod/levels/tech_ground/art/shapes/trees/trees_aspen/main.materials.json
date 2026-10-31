@@ -1,0 +1,115 @@
+{
+  "Birch_Bark_01": {
+    "name": "Birch_Bark_01",
+    "mapTo": "Birch_Bark_01",
+    "class": "Material",
+    "persistentId": "b40cb532-6fe4-11ed-a1eb-0242ac120002",
+    "Stages": [
+      {
+        "ambientOcclusionMap": "/levels/tech_ground/art/shapes/trees/trees_aspen/t_birch_bark_ao.data.png",
+        "baseColorFactor": [
+          0.996078491,
+          0.996078491,
+          0.996078491,
+          1
+        ],
+        "baseColorMap": "/levels/tech_ground/art/shapes/trees/trees_aspen/t_birch_bark_b.color.png",
+        "normalMap": "/levels/tech_ground/art/shapes/trees/trees_aspen/t_birch_bark_nm.normal.png",
+        "roughnessMap": "/levels/tech_ground/art/shapes/trees/trees_aspen/t_birch_bark_r.data.png"
+      },
+      {},
+      {},
+      {}
+    ],
+    "annotation": "NATURE",
+    "groundType": "WOOD",
+    "materialTag0": "vegetation",
+    "materialTag1": "beamng",
+    "materialTag2": "Natural",
+    "materialTag3": "vegetation",
+    "materialTag4": "east_coast_usa",
+    "version": 1.5
+  },
+  "Birch_Branch_01": {
+    "name": "Birch_Branch_01",
+    "mapTo": "Birch_Branch_01",
+    "class": "Material",
+    "persistentId": "6004f7c6-146c-4a22-9e85-68e58ff9c241",
+    "Stages": [
+      {
+        "ambientOcclusionMap": "/levels/tech_ground/art/shapes/trees/trees_aspen/t_birch_branch_ao.data.png",
+        "baseColorFactor": [
+          0.712957978,
+          0.712951005,
+          0.712951005,
+          1
+        ],
+        "baseColorMap": "/levels/tech_ground/art/shapes/trees/trees_aspen/t_birch_branch_b.color.png",
+        "normalMap": "/levels/tech_ground/art/shapes/trees/trees_aspen/t_birch_branch_nm.normal.png",
+        "opacityMap": "/levels/tech_ground/art/shapes/trees/trees_aspen/t_birch_branch_o.data.png",
+        "roughnessMap": "/levels/tech_ground/art/shapes/trees/trees_aspen/t_birch_branch_r.data.png",
+        "specular": [
+          0.992156982,
+          0.992156982,
+          0.992156982,
+          1
+        ]
+      },
+      {},
+      {},
+      {}
+    ],
+    "alphaRef": 40,
+    "alphaTest": true,
+    "annotation": "NATURE",
+    "doubleSided": true,
+    "groundType": "WOOD",
+    "materialTag0": "beamng",
+    "materialTag1": "vegetation",
+    "materialTag2": "Natural",
+    "materialTag3": "vegetation",
+    "version": 1.5
+  },
+  "m_ind_birch_leaves_01": {
+    "name": "m_ind_birch_leaves_01",
+    "mapTo": "m_ind_birch_leaves_01",
+    "class": "Material",
+    "persistentId": "45f63263-9705-4fcb-8c84-59e37090669f",
+    "Stages": [
+      {
+        "ambientOcclusionMap": "/levels/tech_ground/art/shapes/trees/trees_aspen/t_ind_birch_leaves_ao.data.png",
+        "baseColorFactor": [
+          0.996078491,
+          0.996078491,
+          0.996078491,
+          1
+        ],
+        "baseColorMap": "/levels/tech_ground/art/shapes/trees/trees_aspen/t_ind_birch_leaves_b.color.png",
+        "normalMap": "/levels/tech_ground/art/shapes/trees/trees_aspen/t_ind_birch_leaves_nm.normal.png",
+        "opacityMap": "/levels/tech_ground/art/shapes/trees/trees_aspen/t_ind_birch_leaves_o.data.png",
+        "roughnessMap": "/levels/tech_ground/art/shapes/trees/trees_aspen/t_ind_birch_leaves_r.data.png",
+        "specular": [
+          0.992156923,
+          0.992156923,
+          0.992156923,
+          1
+        ]
+      },
+      {},
+      {},
+      {}
+    ],
+    "alphaRef": 70,
+    "alphaTest": true,
+    "annotation": "NATURE",
+    "doubleSided": true,
+    "groundType": "LEAVES_THIN",
+    "materialTag0": "beamng",
+    "materialTag1": "vegetation",
+    "materialTag2": "Natural",
+    "materialTag3": "vegetation",
+    "materialTag4": "east_coast_usa",
+    "translucentBlendOp": "None",
+    "version": 1.5
+  }
+}

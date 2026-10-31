@@ -1,0 +1,98 @@
+--- v25/nav2_adapter/test/test_execution_mechanism_ros.py
++++ v26/nav2_adapter/test/test_execution_mechanism_ros.py
+@@ -8,7 +8,7 @@
+ import unittest
+ from unittest.mock import Mock, patch
+ from builtin_interfaces.msg import Time
+-from graphnav_msgs.msg import NavigationGraph, UUID
++from graphnav_msgs.msg import NavigationGraph, UUID, Node as GraphNode
+ from nav_msgs.msg import Odometry, OccupancyGrid
+ from std_msgs.msg import String
+ from wildos_nav2_adapter.graph_path_bridge import GraphPathBridge
+@@ -20,6 +20,8 @@
+ class ExecutionMechanismTests(unittest.TestCase):
+     def setUp(self):
+         self.node = configure_ackermann(GraphPathBridge())
++        for name in ('execution_feedback_pub','execution_event_pub','route_rejection_pub'):
++            setattr(self.node,name,Mock())
+         self.now = 100 * 10**9
+         self.node.get_clock = lambda: S(now=lambda: S(nanoseconds=self.now, to_msg=lambda:
+             Time(sec=self.now//10**9, nanosec=self.now%10**9)))
+@@ -212,7 +214,7 @@
+         for age in (6., -1.):
+             bad = route((0., 0.), (30., 0.))
+             stamp = self.now - int(age * 1e9)
+-            bad.header.stamp = S(sec=stamp//10**9, nanosec=stamp%10**9)
++            bad.header.stamp = Time(sec=stamp//10**9, nanosec=stamp%10**9)
+             self.node.on_route_status(String(data=json.dumps(dict(
+                 stamp_ns=stamp, complete=True, goal=[40., 0.]))))
+             self.node.on_route(bad)
+@@ -339,7 +341,7 @@
+         graph = NavigationGraph()
+         graph.header.frame_id = 'spot1/odom'
+         graph.header.stamp = self.node.get_clock().now().to_msg()
+-        graph.nodes = [S(pose=pose(x, 0.).pose, uuid=UUID(id=[n]+[0]*15)) for n, x in ((1, 0.), (2, 4.))]
++        graph.nodes = [GraphNode(pose=pose(x, 0.).pose, uuid=UUID(id=[n]+[0]*15)) for n, x in ((1, 0.), (2, 4.))]
+         self.node.on_feedback_graph(graph)
+         self.node.start_execution_feedback(route((0., 0.), (4., 0.)))
+         self.node.on_control_status(String(data=json.dumps(dict(stamp_ns=self.now, actuating=True))))
+@@ -351,13 +353,13 @@
+         self.assertEqual(msg.to_node.id[0], 2)
+         self.assertAlmostEqual(msg.observed_distance, 4.)
+         self.assertEqual(msg.outcome, 1)
+-        self.assertEqual(msg.observations[0].value, [1.])
++        self.assertEqual(list(msg.observations[0].value), [1.])
+ 
+     def feedback_graph(self):
+         graph = NavigationGraph()
+         graph.header.frame_id = 'spot1/odom'
+         graph.header.stamp = self.node.get_clock().now().to_msg()
+-        graph.nodes = [S(pose=pose(x, 0.).pose, uuid=UUID(id=[n]+[0]*15))
++        graph.nodes = [GraphNode(pose=pose(x, 0.).pose, uuid=UUID(id=[n]+[0]*15))
+                        for n, x in ((1, 0.), (2, 4.), (3, 12.))]
+         self.node.on_feedback_graph(graph)
+ 
+@@ -372,7 +374,7 @@
+         self.assertEqual(msg.to_node.id[0], 2)
+         self.assertAlmostEqual(msg.commanded_distance, 4.)
+         self.assertAlmostEqual(msg.observed_distance, 4.)
+-        self.assertEqual(msg.observations[-1].value, [1.])
++        self.assertEqual(list(msg.observations[-1].value), [1.])
+         self.assertEqual(self.node.execution_attempt['start'].pose.pose.position.x, 4.)
+ 
+     def test_extension_between_graph_nodes_keeps_evidence_and_distance(self):
+@@ -538,7 +540,7 @@
+         graph = NavigationGraph()
+         graph.header.frame_id = 'spot1/odom'
+         graph.header.stamp = self.node.get_clock().now().to_msg()
+-        graph.nodes = [S(pose=pose(x, 0.).pose, uuid=UUID(id=[n]+[0]*15)) for n, x in ((1, 0.), (2, -4.))]
++        graph.nodes = [GraphNode(pose=pose(x, 0.).pose, uuid=UUID(id=[n]+[0]*15)) for n, x in ((1, 0.), (2, -4.))]
+         self.node.on_feedback_graph(graph)
+         self.node.start_execution_feedback(route((0., 0.), (-4., 0.)))
+         self.node.on_control_status(String(data=json.dumps(dict(stamp_ns=self.now, actuating=True))))
+@@ -554,14 +556,14 @@
+             def __deepcopy__(self, memo):
+                 raise AssertionError('Unused graph edges must not block action acceptance')
+ 
+-        graph = S(header=S(frame_id='spot1/odom', stamp=self.node.get_clock().now().to_msg()),
+-                  nodes=[S(pose=pose(x, 0.).pose, uuid=UUID(id=[n]+[0]*15))
++        graph = S(header=deepcopy(self.node.odom.header),
++                  nodes=[GraphNode(pose=pose(x, 0.).pose, uuid=UUID(id=[n]+[0]*15))
+                          for n, x in ((1, 0.), (2, 4.))], edges=UnusedEdges())
+         self.node.on_feedback_graph(graph)
+         self.node.start_execution_feedback(route((0., 0.), (4., 0.)))
+         replacement = NavigationGraph()
+         replacement.header = deepcopy(graph.header)
+-        replacement.nodes = [S(pose=pose(x, 0.).pose, uuid=UUID(id=[n]+[0]*15))
++        replacement.nodes = [GraphNode(pose=pose(x, 0.).pose, uuid=UUID(id=[n]+[0]*15))
+                              for n, x in ((3, 0.), (4, 4.))]
+         self.node.on_feedback_graph(replacement)
+         self.node.on_control_status(String(data=json.dumps(dict(stamp_ns=self.now, actuating=True))))
+@@ -614,6 +616,7 @@
+         from geometry_msgs.msg import Twist
+         node = CmdVelToControl()
+         try:
++            node.control_status_pub=Mock()
+             node.enabled = True
+             cmd = Twist()
+             cmd.linear.x, cmd.angular.z = 4., 2.

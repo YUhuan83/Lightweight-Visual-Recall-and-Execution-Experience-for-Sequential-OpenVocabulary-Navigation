@@ -1,0 +1,501 @@
+<?xml version='1.0' encoding='utf-8'?>
+<sdf version="1.8">
+  <world name="diverse_preview">
+    <physics name="physics" type="ignored">
+      <max_step_size>0.002</max_step_size>
+      <real_time_factor>1</real_time_factor>
+    </physics>
+    <gravity>0 0 -9.81</gravity>
+    <plugin filename="ignition-gazebo-physics-system" name="ignition::gazebo::systems::Physics" />
+    <plugin filename="ignition-gazebo-user-commands-system" name="ignition::gazebo::systems::UserCommands" />
+    <plugin filename="ignition-gazebo-scene-broadcaster-system" name="ignition::gazebo::systems::SceneBroadcaster" />
+    <scene>
+      <ambient>.65 .65 .65 1</ambient>
+      <background>.64 .77 .87 1</background>
+      <shadows>false</shadows>
+    </scene>
+    <light name="sun" type="directional">
+      <direction>-.4 -.3 -1</direction>
+      <diffuse>.85 .82 .75 1</diffuse>
+      <specular>.05 .05 .05 1</specular>
+      <cast_shadows>false</cast_shadows>
+    </light>
+    <include>
+      <uri>model://diverse_terrain</uri>
+    </include>
+    <include>
+      <uri>model://diverse_tree_0</uri>
+      <name>broadleaf_00</name>
+      <pose>20.17104 -18.66512 -0.50964 0 0 0.41386</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_1</uri>
+      <name>broadleaf_01</name>
+      <pose>14.95278 -27.20712 -0.39871 0 0 2.33576</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_2</uri>
+      <name>broadleaf_02</name>
+      <pose>-13.88068 27.99284 1.13596 0 0 -1.98125</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_3</uri>
+      <name>broadleaf_03</name>
+      <pose>-25.97125 -31.92822 0.13398 0 0 2.64683</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_4</uri>
+      <name>broadleaf_04</name>
+      <pose>4.27744 19.61265 1.52560 0 0 2.10026</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_5</uri>
+      <name>broadleaf_05</name>
+      <pose>-11.56774 -17.68207 -0.24032 0 0 -1.21799</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_6</uri>
+      <name>broadleaf_06</name>
+      <pose>-4.29641 27.55311 0.50628 0 0 -2.95041</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_7</uri>
+      <name>broadleaf_07</name>
+      <pose>-23.80631 14.04860 1.72030 0 0 -2.25135</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_0</uri>
+      <name>broadleaf_08</name>
+      <pose>27.67763 -21.32133 -0.50939 0 0 -1.42204</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_1</uri>
+      <name>broadleaf_09</name>
+      <pose>-18.58714 8.47578 0.87716 0 0 -0.50666</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_2</uri>
+      <name>broadleaf_10</name>
+      <pose>22.82029 23.64829 5.45876 0 0 1.65534</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_3</uri>
+      <name>broadleaf_11</name>
+      <pose>29.37544 17.48201 3.72517 0 0 -3.00743</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_4</uri>
+      <name>broadleaf_12</name>
+      <pose>34.50524 -21.86426 -0.43139 0 0 -2.01360</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_5</uri>
+      <name>broadleaf_13</name>
+      <pose>32.05951 29.61345 3.79115 0 0 -1.36209</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_6</uri>
+      <name>broadleaf_14</name>
+      <pose>-26.75869 25.40450 2.06481 0 0 -0.56808</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_7</uri>
+      <name>broadleaf_15</name>
+      <pose>8.90754 -18.54016 -0.25241 0 0 -2.34068</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_0</uri>
+      <name>broadleaf_16</name>
+      <pose>-9.89883 -23.50864 -0.13422 0 0 -2.43519</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_1</uri>
+      <name>broadleaf_17</name>
+      <pose>1.90218 13.65315 0.88813 0 0 2.73470</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_2</uri>
+      <name>broadleaf_18</name>
+      <pose>-8.43855 -9.21870 0.14173 0 0 0.19740</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_3</uri>
+      <name>broadleaf_19</name>
+      <pose>33.49979 -15.02415 -0.32774 0 0 0.07695</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_4</uri>
+      <name>broadleaf_20</name>
+      <pose>22.77470 -8.57939 -0.08039 0 0 -1.93860</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_5</uri>
+      <name>broadleaf_21</name>
+      <pose>-17.59469 -19.48466 -0.43705 0 0 -1.81638</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_6</uri>
+      <name>broadleaf_22</name>
+      <pose>20.17915 -30.86275 -0.61462 0 0 0.74451</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_7</uri>
+      <name>broadleaf_23</name>
+      <pose>-31.60493 -26.44507 0.10346 0 0 -1.87823</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_0</uri>
+      <name>broadleaf_24</name>
+      <pose>12.65830 -33.25662 -0.52022 0 0 -1.59315</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_1</uri>
+      <name>broadleaf_25</name>
+      <pose>25.64015 -29.28739 -0.59694 0 0 -1.04553</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_2</uri>
+      <name>broadleaf_26</name>
+      <pose>-19.28907 25.30840 1.74047 0 0 -2.58169</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_3</uri>
+      <name>broadleaf_27</name>
+      <pose>-28.47332 18.15035 1.83358 0 0 2.91002</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_4</uri>
+      <name>broadleaf_28</name>
+      <pose>-19.16255 34.06183 0.99524 0 0 -1.92407</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_5</uri>
+      <name>broadleaf_29</name>
+      <pose>-27.91860 31.71949 1.27714 0 0 -1.94769</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_6</uri>
+      <name>broadleaf_30</name>
+      <pose>26.41620 31.04475 4.70927 0 0 1.27517</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_7</uri>
+      <name>broadleaf_31</name>
+      <pose>-14.15324 -32.65820 -0.16474 0 0 0.29462</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_0</uri>
+      <name>broadleaf_32</name>
+      <pose>0.94647 -23.66508 -0.24428 0 0 0.18122</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_1</uri>
+      <name>broadleaf_33</name>
+      <pose>28.69831 -9.54132 -0.06981 0 0 0.67454</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_2</uri>
+      <name>broadleaf_34</name>
+      <pose>-8.82618 -34.24967 0.16087 0 0 0.77983</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_3</uri>
+      <name>broadleaf_35</name>
+      <pose>-0.86134 -12.79898 0.04933 0 0 2.81322</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_4</uri>
+      <name>broadleaf_36</name>
+      <pose>-9.31945 14.79089 0.66617 0 0 0.38789</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_5</uri>
+      <name>broadleaf_37</name>
+      <pose>14.34921 -13.79853 -0.36749 0 0 -2.25957</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_6</uri>
+      <name>broadleaf_38</name>
+      <pose>-34.98968 18.45415 1.37601 0 0 2.40586</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_7</uri>
+      <name>broadleaf_39</name>
+      <pose>-8.51689 8.49631 0.43224 0 0 -0.91683</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_0</uri>
+      <name>broadleaf_40</name>
+      <pose>-22.03675 -9.39858 0.12110 0 0 2.70771</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_1</uri>
+      <name>broadleaf_41</name>
+      <pose>6.88976 -28.91207 -0.33606 0 0 0.21442</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_2</uri>
+      <name>broadleaf_42</name>
+      <pose>30.74561 -31.55506 -0.45118 0 0 1.54977</pose>
+    </include>
+    <include>
+      <uri>model://diverse_tree_3</uri>
+      <name>broadleaf_43</name>
+      <pose>-1.75282 21.74945 0.79888 0 0 -2.76603</pose>
+    </include>
+    <include>
+      <uri>model://ph_rock_moss_set_01</uri>
+      <name>sample_0</name>
+      <pose>25.00000 18.00000 4.47168 0 0 -0.82906</pose>
+    </include>
+    <include>
+      <uri>model://ph_rock_moss_set_01</uri>
+      <name>sample_1</name>
+      <pose>-29.00000 -19.00000 -0.00647 0 0 0.07096</pose>
+    </include>
+    <include>
+      <uri>model://ph_dead_tree_trunk</uri>
+      <name>sample_2</name>
+      <pose>-17.00000 12.00000 1.19237 0 0 1.79718</pose>
+    </include>
+    <include>
+      <uri>model://ph_dead_tree_trunk</uri>
+      <name>sample_3</name>
+      <pose>23.00000 -12.00000 -0.34970 0 0 0.01684</pose>
+    </include>
+    <include>
+      <uri>model://ph_wooden_barrels_01</uri>
+      <name>sample_4</name>
+      <pose>-12.00000 -6.00000 -0.03765 0 0 -2.79271</pose>
+    </include>
+    <model name="survey_rover">
+      <pose>0 0 0.45 0 0 0</pose>
+      <link name="base_link">
+        <inertial>
+          <mass>35</mass>
+          <inertia>
+            <ixx>1.6</ixx>
+            <iyy>3.0</iyy>
+            <izz>3.6</izz>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyz>0</iyz>
+          </inertia>
+        </inertial>
+        <visual name="chassis_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>1 0.65 0.24</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.85 0.56 0.08 1</ambient>
+            <diffuse>0.85 0.56 0.08 1</diffuse>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+        <collision name="chassis_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>1 0.65 0.24</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <link name="front_left">
+        <pose>0.34 0.4 -.17 0 0 0</pose>
+        <inertial>
+          <mass>2</mass>
+          <inertia>
+            <ixx>0.04</ixx>
+            <iyy>0.06</iyy>
+            <izz>0.04</izz>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyz>0</iyz>
+          </inertia>
+        </inertial>
+        <visual name="tire_visual">
+          <pose>0 0 0 1.5707963267948966 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.23</radius>
+              <length>0.15</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.065 0.07 0.075 1</ambient>
+            <diffuse>0.065 0.07 0.075 1</diffuse>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+        <collision name="tire_collision">
+          <pose>0 0 0 1.5707963267948966 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.23</radius>
+              <length>0.15</length>
+            </cylinder>
+          </geometry>
+        </collision>
+      </link>
+      <joint name="front_left_joint" type="revolute">
+        <parent>base_link</parent>
+        <child>front_left</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+        </axis>
+      </joint>
+      <link name="front_right">
+        <pose>0.34 -0.4 -.17 0 0 0</pose>
+        <inertial>
+          <mass>2</mass>
+          <inertia>
+            <ixx>0.04</ixx>
+            <iyy>0.06</iyy>
+            <izz>0.04</izz>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyz>0</iyz>
+          </inertia>
+        </inertial>
+        <visual name="tire_visual">
+          <pose>0 0 0 1.5707963267948966 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.23</radius>
+              <length>0.15</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.065 0.07 0.075 1</ambient>
+            <diffuse>0.065 0.07 0.075 1</diffuse>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+        <collision name="tire_collision">
+          <pose>0 0 0 1.5707963267948966 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.23</radius>
+              <length>0.15</length>
+            </cylinder>
+          </geometry>
+        </collision>
+      </link>
+      <joint name="front_right_joint" type="revolute">
+        <parent>base_link</parent>
+        <child>front_right</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+        </axis>
+      </joint>
+      <link name="rear_left">
+        <pose>-0.34 0.4 -.17 0 0 0</pose>
+        <inertial>
+          <mass>2</mass>
+          <inertia>
+            <ixx>0.04</ixx>
+            <iyy>0.06</iyy>
+            <izz>0.04</izz>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyz>0</iyz>
+          </inertia>
+        </inertial>
+        <visual name="tire_visual">
+          <pose>0 0 0 1.5707963267948966 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.23</radius>
+              <length>0.15</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.065 0.07 0.075 1</ambient>
+            <diffuse>0.065 0.07 0.075 1</diffuse>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+        <collision name="tire_collision">
+          <pose>0 0 0 1.5707963267948966 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.23</radius>
+              <length>0.15</length>
+            </cylinder>
+          </geometry>
+        </collision>
+      </link>
+      <joint name="rear_left_joint" type="revolute">
+        <parent>base_link</parent>
+        <child>rear_left</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+        </axis>
+      </joint>
+      <link name="rear_right">
+        <pose>-0.34 -0.4 -.17 0 0 0</pose>
+        <inertial>
+          <mass>2</mass>
+          <inertia>
+            <ixx>0.04</ixx>
+            <iyy>0.06</iyy>
+            <izz>0.04</izz>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyz>0</iyz>
+          </inertia>
+        </inertial>
+        <visual name="tire_visual">
+          <pose>0 0 0 1.5707963267948966 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.23</radius>
+              <length>0.15</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.065 0.07 0.075 1</ambient>
+            <diffuse>0.065 0.07 0.075 1</diffuse>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+        <collision name="tire_collision">
+          <pose>0 0 0 1.5707963267948966 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.23</radius>
+              <length>0.15</length>
+            </cylinder>
+          </geometry>
+        </collision>
+      </link>
+      <joint name="rear_right_joint" type="revolute">
+        <parent>base_link</parent>
+        <child>rear_right</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+        </axis>
+      </joint>
+      <plugin filename="ignition-gazebo-diff-drive-system" name="ignition::gazebo::systems::DiffDrive">
+        <left_joint>front_left_joint</left_joint>
+        <right_joint>front_right_joint</right_joint>
+        <left_joint>rear_left_joint</left_joint>
+        <right_joint>rear_right_joint</right_joint>
+        <wheel_separation>0.8</wheel_separation>
+        <wheel_radius>0.23</wheel_radius>
+        <topic>/rover/cmd_vel</topic>
+        <odom_topic>/rover/wheel_odom</odom_topic>
+        <tf_topic>/rover/wheel_tf</tf_topic>
+        <frame_id>odom</frame_id>
+        <child_frame_id>base_link</child_frame_id>
+        <odom_publish_frequency>30</odom_publish_frequency>
+        <max_linear_velocity>1.5</max_linear_velocity>
+        <max_angular_velocity>1.0</max_angular_velocity>
+      </plugin>
+    </model>
+  </world>
+</sdf>

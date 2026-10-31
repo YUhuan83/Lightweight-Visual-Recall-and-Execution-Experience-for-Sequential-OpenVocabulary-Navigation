@@ -1,0 +1,577 @@
+--- before/wildos_port/repro_check/src/nebula2-wildos/graphnav_mapper/src/mapper.cpp
++++ after/wildos_port/repro_check/src/nebula2-wildos/graphnav_mapper/src/mapper.cpp
+@@ -4,6 +4,7 @@
+ #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
+ #include <tf2_eigen/tf2_eigen.hpp>
+ #include <grid_map_ros/grid_map_ros.hpp>
++#include <grid_map_core/iterators/LineIterator.hpp>
+ #include <opencv2/imgproc.hpp>
+ #include <opencv2/core/eigen.hpp>
+ #include <algorithm>
+@@ -13,6 +14,26 @@
+ 
+ namespace graphnav_mapper
+ {
++
++namespace
++{
++float physical_value(const std::map<std::string,std::vector<float>>& metadata,
++                     const std::string& key,float fallback=0.f)
++{
++  const auto value=metadata.find(key);
++  return value==metadata.end() || value->second.empty() ? fallback : value->second.front();
++}
++
++template<typename Properties>
++bool retain_measured_violation(const Properties& previous,bool complete,bool violation)
++{
++  const float confidence=physical_value(previous.metadata,"physical_confidence");
++  return !complete && !violation && previous.physical_observed_at_ns>0 &&
++      physical_value(previous.metadata,"physical_violation_observed")==1.f &&
++      physical_value(previous.metadata,"physical_feasible",1.f)==0.f &&
++      std::isfinite(confidence) && confidence>=.7f && confidence<=1.f;
++}
++}
+ 
+ Mapper::Mapper(tf2_ros::Buffer& tf_buffer, rclcpp::Logger logger) : tf_buffer_(tf_buffer), logger_(logger)
+ {
+@@ -302,6 +323,7 @@
+   double edge_max_step = 0.0;
+   double edge_roughness = 0.0;
+   double edge_min_clearance = std::numeric_limits<double>::infinity();
++  double measured_obstacle_clearance = std::numeric_limits<double>::infinity();
+   bool fully_observed = true;
+   bool terrain_observed = map.exists("elevation");
+   for (const auto& [name, traversal] : traversability_classes_)
+@@ -314,34 +336,49 @@
+   if (map.exists("elevation"))
+   {
+     const double distance = (pos_b - pos_a).norm();
+-    const double resolution = std::max(map.getResolution(), 1e-3);
+-    const int samples = std::max(1, static_cast<int>(std::ceil(distance / resolution)));
+     double previous_z = std::numeric_limits<double>::quiet_NaN();
+     Eigen::Vector2d previous_sample = Eigen::Vector2d::Constant(std::numeric_limits<double>::quiet_NaN());
+     std::vector<double> valid_heights;
+     std::vector<double> valid_distances;
+-    const double sample_step = distance/samples;
+-    for (int i = 0; i <= samples; ++i)
+-    {
+-      const Eigen::Vector2d p = pos_a + (pos_b - pos_a) * (static_cast<double>(i) / samples);
+-      if (!map.isInside(p))
+-      {
+-        fully_observed = terrain_observed = false;
+-        continue;
+-      }
+-      const double unknown_clearance = map.atPosition("unknown_sdf", p);
++    bool has_terrain_run=false;
++    const auto finish_run=[&]() {
++      // Unknown height separates measurements, not a measured ramp between them.
++      if (valid_heights.size()>=2 && distance>1e-3) {
++        Eigen::MatrixXd design(valid_heights.size(),2);
++        Eigen::VectorXd heights(valid_heights.size());
++        for (size_t i=0;i<valid_heights.size();++i) {
++          design.row(i)<<valid_distances[i],1.;heights[i]=valid_heights[i];
++        }
++        const auto decomposition=design.colPivHouseholderQr();
++        if (decomposition.rank()>=2) {
++          const Eigen::Vector2d slope=decomposition.solve(heights);
++          const Eigen::VectorXd residual=heights-design*slope;
++          edge_roughness=std::max(edge_roughness,std::sqrt(residual.squaredNorm()/valid_heights.size()));
++          for (size_t i=1;i<valid_heights.size();++i)
++            edge_max_step=std::max(edge_max_step,std::abs(residual[i]-residual[i-1]));
++          has_terrain_run=true;
++        }
++      }
++      valid_heights.clear();valid_distances.clear();
++    };
++    grid_map::Index first_cell,last_cell;
++    map.getIndex(pos_a,first_cell);map.getIndex(pos_b,last_cell);
++    // Visit raster cells directly. Fixed-distance floating-point samples can
++    // duplicate one cell and skip the next, hiding a curb or preventing a
++    // genuinely complete safe observation from clearing older evidence.
++    for (grid_map::LineIterator iterator(map,first_cell,last_cell);!iterator.isPastEnd();++iterator)
++    {
++      grid_map::Position cell_position;map.getPosition(*iterator,cell_position);
++      const double unknown_clearance = map.at("unknown_sdf",*iterator);
+       fully_observed = fully_observed && std::isfinite(unknown_clearance) &&
+           unknown_clearance >= robot_minimum_clearance_;
+       const bool valid_height = !map.exists("elevation_valid") ||
+-          map.atPosition("elevation_valid", p) > 0.5f;
++          map.at("elevation_valid",*iterator) > 0.5f;
+       terrain_observed = terrain_observed && valid_height;
+-      const double z = valid_height ? map.atPosition("elevation", p) :
++      const double z = valid_height ? map.at("elevation",*iterator) :
+           std::numeric_limits<double>::quiet_NaN();
+       if (std::isfinite(z))
+       {
+-        grid_map::Index cell;
+-        grid_map::Position cell_position;
+-        map.getIndex(p, cell); map.getPosition(cell, cell_position);
+         const double observed_step=(cell_position-previous_sample).norm();
+         if (std::isfinite(previous_z) && observed_step > 1e-6)
+         {
+@@ -358,46 +395,44 @@
+       else
+       {
+         terrain_observed = false;
++        finish_run();
+         previous_z = std::numeric_limits<double>::quiet_NaN();
+         previous_sample.setConstant(std::numeric_limits<double>::quiet_NaN());
+       }
+-      if (map.exists("traversability_sdf"))
+-      {
+-        const double clearance = map.atPosition("traversability_sdf", p);
+-        if (std::isfinite(clearance))
++      const auto physical_class=traversability_classes_.find(my_trav_class_);
++      if (physical_class!=traversability_classes_.end() && map.exists(physical_class->second.layer_name+"_sdf"))
++      {
++        const double clearance = map.at(physical_class->second.layer_name+"_sdf",*iterator);
++        if (std::isfinite(clearance)) {
+           edge_min_clearance = std::min(edge_min_clearance, clearance);
+-      }
+-    }
+-    if (valid_heights.size() >= 2 && distance > 1e-3)
+-    {
+-      Eigen::MatrixXd design(valid_heights.size(), 2);
+-      Eigen::VectorXd heights(valid_heights.size());
+-      for (size_t i=0; i<valid_heights.size(); ++i) {
+-        design.row(i) << valid_distances[i], 1.; heights[i]=valid_heights[i];
+-      }
+-      const Eigen::Vector2d slope=design.colPivHouseholderQr().solve(heights);
+-      const Eigen::VectorXd residual=heights-design*slope;
+-      edge_roughness=std::sqrt(residual.squaredNorm()/valid_heights.size());
+-      for (size_t i=1; i<valid_heights.size(); ++i)
+-        if (valid_distances[i]-valid_distances[i-1] <= sample_step*1.01)
+-          edge_max_step=std::max(edge_max_step,std::abs(residual[i]-residual[i-1]));
+-    }
+-    else terrain_observed = false;
++          measured_obstacle_clearance=std::min(measured_obstacle_clearance,clearance);
++        }
++      }
++    }
++    finish_run();
++    terrain_observed=terrain_observed && has_terrain_run;
+   }
+   if (!std::isfinite(edge_min_clearance))
+     edge_min_clearance = 0.0;
+   const bool physical_edge_feasible = edge_max_slope <= physical_max_slope_ &&
+       edge_max_step <= physical_max_step_height_ && edge_roughness <= physical_max_roughness_ &&
+       edge_min_clearance >= robot_minimum_clearance_;
+-  properties.physical_observed_at_ns = map.getTimestamp();
+-  properties.metadata["clearance_confidence"] = {fully_observed ? 0.8f : 0.0f};
+-  properties.metadata["physical_confidence"] = {fully_observed && terrain_observed ? 0.8f : 0.0f};
+-  properties.metadata["terrain_observed"] = {terrain_observed ? 1.0f : 0.0f};
+-  properties.metadata["physical_feasible"] = {physical_edge_feasible ? 1.0f : 0.0f};
+-  properties.metadata["maximum_slope"] = {static_cast<float>(edge_max_slope)};
+-  properties.metadata["maximum_step_height"] = {static_cast<float>(edge_max_step)};
+-  properties.metadata["roughness"] = {static_cast<float>(edge_roughness)};
+-  properties.metadata["minimum_clearance"] = {static_cast<float>(edge_min_clearance)};
++  const bool violation=edge_max_slope>physical_max_slope_ || edge_max_step>physical_max_step_height_ ||
++      edge_roughness>physical_max_roughness_ || measured_obstacle_clearance<robot_minimum_clearance_;
++  const bool complete=fully_observed && terrain_observed;
++  if (!retain_measured_violation(properties,complete,violation)) {
++    properties.physical_observed_at_ns = map.getTimestamp();
++    properties.metadata["clearance_confidence"] = {
++        fully_observed || measured_obstacle_clearance<robot_minimum_clearance_ ? .8f : 0.f};
++    properties.metadata["physical_confidence"] = {complete || violation ? 0.8f : 0.0f};
++    properties.metadata["terrain_observed"] = {terrain_observed ? 1.0f : 0.0f};
++    properties.metadata["physical_feasible"] = {physical_edge_feasible ? 1.0f : 0.0f};
++    properties.metadata["physical_violation_observed"] = {violation ? 1.0f : 0.0f};
++    properties.metadata["maximum_slope"] = {static_cast<float>(edge_max_slope)};
++    properties.metadata["maximum_step_height"] = {static_cast<float>(edge_max_step)};
++    properties.metadata["roughness"] = {static_cast<float>(edge_roughness)};
++    properties.metadata["minimum_clearance"] = {static_cast<float>(edge_min_clearance)};
++  }
+   for (const auto& [trav_class, trav_prop] : traversability_classes_)
+   {
+     if (node_a.trav_properties.find(trav_class) == node_a.trav_properties.end() ||
+@@ -633,38 +668,60 @@
+           const double roughness_risk = roughness / std::max(physical_max_roughness_, 1e-3);
+           const double physical_risk = std::clamp(
+               std::max({slope_risk, step_risk, roughness_risk}), 0.0, 1.0);
+-          node_prop.metadata["slope"] = {static_cast<float>(max_slope)};
+-          node_prop.metadata["step_height"] = {static_cast<float>(step_height)};
+-          node_prop.metadata["roughness"] = {static_cast<float>(roughness)};
+-          node_prop.physical_observed_at_ns = gridmap.getTimestamp();
+-          node_prop.metadata["physical_confidence"] = {
+-              metrics.observed && unknown_dist > robot_minimum_clearance_ ? 0.8f : 0.0f};
+-          node_prop.metadata["terrain_observed"] = {metrics.observed ? 1.0f : 0.0f};
+-          node_prop.metadata["physical_risk"] = {static_cast<float>(physical_risk)};
+-          const double minimum_clearance = node_prop.trav_properties.empty() ? 0.0 : std::min_element(
++          double minimum_clearance = node_prop.trav_properties.empty() ? 0.0 : std::min_element(
+                   node_prop.trav_properties.begin(), node_prop.trav_properties.end(),
+                   [](const auto& a, const auto& b) { return a.second.free_radius < b.second.free_radius; })
+                   ->second.free_radius;
+-          const bool physical_feasible = max_slope <= physical_max_slope_ &&
++          const auto physical_class=traversability_classes_.find(my_trav_class_);
++          double measured_clearance=std::numeric_limits<double>::infinity();
++          if (physical_class!=traversability_classes_.end()) {
++            measured_clearance=gridmap.atPosition(physical_class->second.layer_name+"_sdf",node_pos_map);
++            if (std::isfinite(measured_clearance)) minimum_clearance=std::min(minimum_clearance,measured_clearance);
++          }
++          const bool violation=(metrics.observed && (max_slope>physical_max_slope_ ||
++              step_height>physical_max_step_height_ || roughness>physical_max_roughness_)) ||
++              (std::isfinite(measured_clearance) && measured_clearance<robot_minimum_clearance_);
++          const bool complete=metrics.observed && terrain_samples.size()==9 && unknown_dist>robot_minimum_clearance_;
++          const bool physical_feasible = !violation && max_slope <= physical_max_slope_ &&
+               step_height <= physical_max_step_height_ && roughness <= physical_max_roughness_ &&
+               minimum_clearance >= robot_minimum_clearance_;
+-          node_prop.metadata["minimum_clearance"] = {static_cast<float>(minimum_clearance)};
+-          node_prop.metadata["physical_feasible"] = {physical_feasible ? 1.0f : 0.0f};
+-          node_prop_changed = true;
++          if (!retain_measured_violation(node_prop,complete,violation)) {
++            node_prop.metadata["slope"] = {static_cast<float>(max_slope)};
++            node_prop.metadata["step_height"] = {static_cast<float>(step_height)};
++            node_prop.metadata["roughness"] = {static_cast<float>(roughness)};
++            node_prop.physical_observed_at_ns = gridmap.getTimestamp();
++            node_prop.metadata["physical_confidence"] = {complete || violation ? 0.8f : 0.0f};
++            node_prop.metadata["clearance_confidence"] = {
++                unknown_dist>robot_minimum_clearance_ || measured_clearance<robot_minimum_clearance_ ? .8f : 0.f};
++            node_prop.metadata["terrain_observed"] = {metrics.observed ? 1.0f : 0.0f};
++            node_prop.metadata["physical_risk"] = {violation ? 1.f : static_cast<float>(physical_risk)};
++            node_prop.metadata["minimum_clearance"] = {static_cast<float>(minimum_clearance)};
++            node_prop.metadata["physical_feasible"] = {physical_feasible ? 1.0f : 0.0f};
++            node_prop.metadata["physical_violation_observed"] = {violation ? 1.f : 0.f};
++            node_prop_changed = true;
++          }
+         }
+       }
+       if (!std::isfinite(gridmap.atPosition("elevation", node_pos_map)) ||
+           (gridmap.exists("elevation_valid") &&
+            gridmap.atPosition("elevation_valid", node_pos_map) <= 0.5f))
+       {
+-        const double clearance = gridmap.atPosition("traversability_sdf", node_pos_map);
+-        node_prop.physical_observed_at_ns = gridmap.getTimestamp();
+-        node_prop.metadata["terrain_observed"] = {0.0f};
+-        node_prop.metadata["minimum_clearance"] = {static_cast<float>(clearance)};
+-        node_prop.metadata["clearance_confidence"] = {unknown_dist > robot_minimum_clearance_ ? 0.8f : 0.0f};
+-        node_prop.metadata["physical_confidence"] = {0.0f};
+-        node_prop.metadata["physical_feasible"] = {clearance >= robot_minimum_clearance_ ? 1.0f : 0.0f};
+-        node_prop_changed = true;
++        const auto physical_class=traversability_classes_.find(my_trav_class_);
++        const double clearance=physical_class==traversability_classes_.end() ?
++            std::numeric_limits<double>::quiet_NaN() :
++            gridmap.atPosition(physical_class->second.layer_name+"_sdf",node_pos_map);
++        const bool violation=std::isfinite(clearance) && clearance<robot_minimum_clearance_;
++        if (!retain_measured_violation(node_prop,false,violation)) {
++          node_prop.physical_observed_at_ns = gridmap.getTimestamp();
++          node_prop.metadata["terrain_observed"] = {0.0f};
++          node_prop.metadata["minimum_clearance"] = {std::isfinite(clearance) ? static_cast<float>(clearance) : 0.f};
++          node_prop.metadata["clearance_confidence"] = {violation || unknown_dist>robot_minimum_clearance_ ? .8f : 0.f};
++          node_prop.metadata["physical_confidence"] = {violation ? .8f : 0.f};
++          node_prop.metadata["physical_feasible"] = {std::isfinite(clearance) && clearance>=robot_minimum_clearance_ ? 1.f : 0.f};
++          node_prop.metadata["physical_violation_observed"] = {violation ? 1.f : 0.f};
++          node_prop.metadata["physical_risk"] = {violation ? 1.f : 0.f};
++          node_prop_changed = true;
++        }
+       }
+       if (node_prop.trav_properties.empty())
+       {
+--- before/wildos_port/repro_check/src/nebula2-wildos/graphnav_mapper/test/test_mapper.cpp
++++ after/wildos_port/repro_check/src/nebula2-wildos/graphnav_mapper/test/test_mapper.cpp
+@@ -97,6 +97,36 @@
+   std::shared_ptr<grid_map_msgs::msg::GridMap> dbg_map_;
+   std::shared_ptr<pose_graph_msgs::msg::PoseGraph> pose_graph_;
+   rclcpp::Time stamp_;
++
++  auto measured_connection()
++  {
++    mapper_->traversability_update_nb_nodes_sample_ = 0;
++    grid_map_.add("elevation_valid",1.f);
++    graphnav::NavigationGraph::NodeProperties properties;
++    properties.trav_properties["default"].free_radius=2.;
++    properties.trav_properties["default"].visited=true;
++    auto& graph=mapper_->get_graph();
++    const auto a=graph.add_node(Eigen::Vector3d(2.,2.,0.),properties);
++    const auto b=graph.add_node(Eigen::Vector3d(6.,2.,0.),properties);
++    graphnav::NavigationGraph::EdgeProperties connection;
++    connection.trav_properties["default"].cost=4.;
++    connection.trav_properties["default"].traversed=true;
++    graph.add_edge(a,b,connection);
++    return std::make_pair(a,b);
++  }
++
++  void update_measured_map(int seconds=1)
++  {
++    grid_map_.setTimestamp(static_cast<uint64_t>(seconds)*1000000000ULL);
++    mapper_->traversability_update(grid_map::GridMapRosConverter::toMessage(grid_map_));
++  }
++
++  template<typename Properties>
++  static float evidence(const Properties& properties,const std::string& key)
++  {
++    const auto value=properties.metadata.find(key);
++    return value==properties.metadata.end() || value->second.empty() ? 0.f : value->second[0];
++  }
+ };
+ 
+ TEST_F(MapperTest, OdometryUpdateTest)
+@@ -612,3 +642,89 @@
+   EXPECT_FLOAT_EQ(graph.get_edge_properties(a,b).metadata.at("terrain_observed")[0],0.f);
+ }
+ 
++TEST_F(MapperTest, MeasuredSteepSegmentCannotBeCancelledByMissingHeightElsewhere)
++{
++  const auto [a,b]=measured_connection();
++  for (grid_map::GridMapIterator it(grid_map_);!it.isPastEnd();++it) {
++    grid_map::Position p;grid_map_.getPosition(*it,p);
++    grid_map_.at("elevation",*it)=.6*std::clamp(p.x()-3.,0.,.4);
++    if (p.x()>5. && p.x()<5.3) grid_map_.at("elevation_valid",*it)=0.f;
++    if (p.x()>5. && p.x()<5.5 && std::abs(p.y()-2.)<.5) grid_map_.at("unknown",*it)=1.f;
++  }
++  update_measured_map();
++  const auto edge=mapper_->get_graph().get_edge_properties(a,b);
++  EXPECT_GT(evidence(edge,"maximum_slope"),.35f);
++  EXPECT_FLOAT_EQ(evidence(edge,"terrain_observed"),0.f);
++  EXPECT_FLOAT_EQ(evidence(edge,"physical_feasible"),0.f);
++  EXPECT_GE(evidence(edge,"physical_confidence"),.7f);
++  EXPECT_FLOAT_EQ(evidence(edge,"physical_violation_observed"),1.f);
++  EXPECT_FLOAT_EQ(evidence(edge,"clearance_confidence"),0.f);
++  const auto message=mapper_->get_graph().to_msg(stamp_,a);
++  const auto serialized=std::find_if(message.edges.begin(),message.edges.end(),[&](const auto& item) {
++    return message.nodes[item.from_idx].uuid==a.to_msg() && message.nodes[item.to_idx].uuid==b.to_msg();
++  });
++  ASSERT_NE(serialized,message.edges.end());
++  EXPECT_FLOAT_EQ(serialized->robot_traversability[0].physical_traversability,0.f);
++  EXPECT_GE(serialized->robot_traversability[0].confidence,.7f);
++}
++
++TEST_F(MapperTest, MissingHeightDoesNotJoinSeparateFlatSurfacesIntoRoughTerrain)
++{
++  const auto [a,b]=measured_connection();
++  for (grid_map::GridMapIterator it(grid_map_);!it.isPastEnd();++it) {
++    grid_map::Position p;grid_map_.getPosition(*it,p);
++    grid_map_.at("elevation",*it)=p.x()<4.?0.f:.6f;
++    if (p.x()>3. && p.x()<5.) grid_map_.at("elevation_valid",*it)=0.f;
++  }
++  update_measured_map();
++  const auto edge=mapper_->get_graph().get_edge_properties(a,b);
++  EXPECT_NEAR(evidence(edge,"maximum_slope"),0.f,1e-6);
++  EXPECT_NEAR(evidence(edge,"maximum_step_height"),0.f,1e-6);
++  EXPECT_NEAR(evidence(edge,"roughness"),0.f,1e-6);
++  EXPECT_FLOAT_EQ(evidence(edge,"physical_confidence"),0.f);
++  EXPECT_FLOAT_EQ(evidence(edge,"physical_violation_observed"),0.f);
++}
++
++TEST_F(MapperTest, KnownNodeSlopeSurvivesUnknownSpaceNearItsFootprint)
++{
++  const auto [a,b]=measured_connection();(void)b;
++  for (grid_map::GridMapIterator it(grid_map_);!it.isPastEnd();++it) {
++    grid_map::Position p;grid_map_.getPosition(*it,p);
++    grid_map_.at("elevation",*it)=.6*p.x();
++    if (p.x()>2.15 && p.x()<2.75 && std::abs(p.y()-2.)<.4) grid_map_.at("unknown",*it)=1.f;
++  }
++  update_measured_map();
++  const auto node=mapper_->get_graph().get_node_properties(a);
++  EXPECT_FLOAT_EQ(evidence(node,"physical_feasible"),0.f);
++  EXPECT_GE(evidence(node,"physical_confidence"),.7f);
++  EXPECT_FLOAT_EQ(evidence(node,"physical_violation_observed"),1.f);
++}
++
++TEST_F(MapperTest, UnknownUpdateDoesNotRefreshOrErasePreviousMeasuredViolation)
++{
++  const auto [a,b]=measured_connection();
++  for (grid_map::GridMapIterator it(grid_map_);!it.isPastEnd();++it) {
++    grid_map::Position p;grid_map_.getPosition(*it,p);
++    grid_map_.at("elevation",*it)=.6*p.x();
++  }
++  update_measured_map();
++  grid_map_["elevation_valid"].setZero();
++  update_measured_map(2);
++  const auto node=mapper_->get_graph().get_node_properties(a);
++  const auto edge=mapper_->get_graph().get_edge_properties(a,b);
++  EXPECT_FLOAT_EQ(evidence(node,"physical_violation_observed"),1.f);
++  EXPECT_FLOAT_EQ(evidence(edge,"physical_violation_observed"),1.f);
++  EXPECT_EQ(node.physical_observed_at_ns,1000000000ULL);
++  EXPECT_EQ(edge.physical_observed_at_ns,1000000000ULL);
++  grid_map_["elevation_valid"].setOnes();grid_map_["elevation"].setZero();
++  update_measured_map(3);
++  const auto cleared_node=mapper_->get_graph().get_node_properties(a);
++  const auto cleared_edge=mapper_->get_graph().get_edge_properties(a,b);
++  EXPECT_FLOAT_EQ(evidence(cleared_node,"physical_violation_observed"),0.f);
++  EXPECT_FLOAT_EQ(evidence(cleared_edge,"physical_violation_observed"),0.f);
++  EXPECT_FLOAT_EQ(evidence(cleared_node,"physical_feasible"),1.f);
++  EXPECT_FLOAT_EQ(evidence(cleared_edge,"physical_feasible"),1.f);
++  EXPECT_EQ(cleared_node.physical_observed_at_ns,3000000000ULL);
++  EXPECT_EQ(cleared_edge.physical_observed_at_ns,3000000000ULL);
++}
++
+--- before/wildos_port/repro_check/src/nebula2-wildos/graphnav_planner/src/planner.cpp
++++ after/wildos_port/repro_check/src/nebula2-wildos/graphnav_planner/src/planner.cpp
+@@ -14,6 +14,13 @@
+ 
+ namespace
+ {
++bool measured_physical_violation(const std::vector<graphnav_msgs::msg::KeyValue>& properties)
++{
++  return std::any_of(properties.begin(),properties.end(),[](const auto& property) {
++    return property.key=="physical_violation_observed" && property.value.size()==1 && property.value[0]==1.f;
++  });
++}
++
+ double node_property(const graphnav_msgs::msg::Node& node, const std::string& key, double fallback)
+ {
+   for (const auto& property : node.properties)
+@@ -103,7 +110,7 @@
+ 
+ void Planner::update_graph(graphnav_msgs::msg::NavigationGraph::ConstSharedPtr graph)
+ {
+-  graph_ = graaf::undirected_graph<graphnav_msgs::msg::Node, double>();
++  graph_ = decltype(graph_){};
+   for (size_t i = 0; i < graph->nodes.size(); i++)
+   {
+     graphnav_msgs::msg::Node node = graph->nodes[i];
+@@ -158,14 +165,21 @@
+       return assessment_fresh(assessment, rclcpp::Time(graph->header.stamp), stale_observation_seconds_);
+     };
+     bool endpoints_feasible = true;
++    bool measured_endpoint_blocked = false;
+     for (const auto index : {edge.from_idx, edge.to_idx}) {
+       const auto* assessment = profile_node_assessment(graph->nodes[index], robot_profile_id_);
+       if (fresh(assessment) && !assessment->feasible) endpoints_feasible = false;
++      if (fresh(assessment) && !assessment->feasible && measured_physical_violation(graph->nodes[index].properties))
++        measured_endpoint_blocked=true;
+     }
+     const bool fresh_dynamic_assessment = fresh(edge_assessment);
+     const bool hard_blocked = fresh_dynamic_assessment &&
+         edge_assessment->physical_traversability <= 0.0f;
+-    if (traversed || (endpoints_feasible && !hard_blocked))
++    const bool measured_edge_blocked=hard_blocked && measured_physical_violation(edge.properties);
++    // A driven edge remains stored topology. Fresh measured danger is not
++    // execution permission, including when older visits previously succeeded.
++    if (!measured_endpoint_blocked && !measured_edge_blocked &&
++        (traversed || (endpoints_feasible && !hard_blocked)))
+     {
+       double weight = edge.traversability[trav_class_idx_].traversability_cost;
+       if (!std::isfinite(weight) || weight < 0.0) continue;
+@@ -249,6 +263,7 @@
+           visited = true;
+     const auto* physical = profile_node_assessment(node, robot_profile_id_);
+     const bool fresh = assessment_fresh(physical, current_time, stale_observation_seconds_);
++    if (fresh && !physical->feasible && measured_physical_violation(node.properties)) continue;
+     if (!visited && fresh && (!physical->feasible || physical->dynamic_risk >= 1.0f)) continue;
+     const auto& p = node.pose.position;
+     const double gap = (Eigen::Vector3d(p.x, p.y, p.z) - goal).norm();
+@@ -285,6 +300,7 @@
+     const auto* physical = profile_node_assessment(node, robot_profile_id_);
+     const bool fresh = assessment_fresh(physical, current_time, stale_observation_seconds_);
+     const bool fresh_blocked = fresh && !physical->feasible;
++    if (fresh_blocked && measured_physical_violation(node.properties)) continue;
+     if (fresh_blocked && !visited) continue;
+     const auto* node_assessment = physical;
+     if (!visited && fresh && physical->dynamic_risk >= 1.0f) continue;
+@@ -394,7 +410,7 @@
+       for (auto id: local_scored_frontiers)
+       {
+         double frontier_cost = frontier_scores_[id].second.second;
+-        graph_.add_edge(virtual_goal, id, frontier_cost);
++        graph_.add_edge(id, virtual_goal, frontier_cost);
+         use_local_frontiers = true;
+       }
+     }
+@@ -409,7 +425,7 @@
+     for (auto& [id, score_pair] : frontier_scores_)
+     {
+       double frontier_cost = score_pair.second.second;
+-      graph_.add_edge(virtual_goal, id, frontier_cost);
++      graph_.add_edge(id, virtual_goal, frontier_cost);
+     }
+     latest_frontier_time_ = current_time;
+   }
+--- before/wildos_port/repro_check/src/nebula2-wildos/graphnav_planner/test/test_route_mechanism.cpp
++++ after/wildos_port/repro_check/src/nebula2-wildos/graphnav_planner/test/test_route_mechanism.cpp
+@@ -422,6 +422,11 @@
+   ASSERT_FALSE(p.route_complete());
+   ASSERT_FALSE(path.empty());
+   EXPECT_LT(path.back().x(), 5.);
++  // Replanning now takes the local-frontier continuity branch, whose terminal
++  // attachment must have the same direction as the initial global choice.
++  const auto continued=p.plan_to_goal(goal,.5,rclcpp::Time(101,0,RCL_ROS_TIME));
++  ASSERT_FALSE(continued.empty());
++  EXPECT_LT(continued.back().x(),5.);
+ }
+ 
+ TEST(RouteMechanism, SparseFrontierScoresDoNotDependOnNodeOrdering)
+@@ -465,6 +470,69 @@
+   Eigen::Vector3d goal(10., 0., 0.);
+   EXPECT_FALSE(p.plan_to_goal(goal, .5, rclcpp::Time(g->header.stamp)).empty());
+   EXPECT_TRUE(p.route_complete()); // Does not establish local vehicle-path clearance.
++}
++
++TEST(RouteMechanism, FreshMeasuredViolationOverridesDrivenTopologyPrior)
++{
++  auto g=graph({0.,10.});edge(*g,0,1,10.,true,true);
++  graphnav_msgs::msg::KeyValue witness;
++  witness.key="physical_violation_observed";witness.value={1.f};
++  g->edges[0].properties.push_back(witness);
++  auto p=planner();p.update_graph(g);Eigen::Vector3d goal(10.,0.,0.);
++  EXPECT_TRUE(p.plan_to_goal(goal,.5,rclcpp::Time(g->header.stamp)).empty());
++  g->edges[0].properties[0].value={0.f};
++  g->edges[0].robot_traversability[0].physical_traversability=1.f;
++  g->header.stamp.sec=101;g->edges[0].robot_traversability[0].observed_at.sec=101;
++  p.update_graph(g);
++  EXPECT_FALSE(p.plan_to_goal(goal,.5,rclcpp::Time(g->header.stamp)).empty());
++}
++
++TEST(RouteMechanism, FreshMeasuredNodeViolationCannotBeBypassedByVisitedFlag)
++{
++  auto g=graph({0.,10.});edge(*g,0,1,10.,false,true);
++  graphnav_msgs::msg::KeyValue witness;
++  witness.key="physical_violation_observed";witness.value={1.f};
++  g->nodes[1].properties.push_back(witness);
++  g->nodes[1].robot_traversability[0].feasible=false;
++  graphnav_msgs::msg::KeyValue visited;visited.key="visited";visited.value={1.f};
++  g->nodes[1].trav_properties[0].properties.push_back(visited);
++  auto p=planner();p.update_graph(g);Eigen::Vector3d goal(10.,0.,0.);
++  EXPECT_TRUE(p.plan_to_goal(goal,.5,rclcpp::Time(g->header.stamp)).empty());
++}
++
++TEST(RouteMechanism, InvalidOrExpiredViolationCannotCreateNewPhysicalAuthority)
++{
++  for (const int observed:{90,101}) {
++    auto g=graph({0.,10.});edge(*g,0,1,10.,true,true,observed);
++    graphnav_msgs::msg::KeyValue witness;witness.key="physical_violation_observed";witness.value={1.f};
++    g->edges[0].properties.push_back(witness);
++    auto p=planner();p.update_graph(g);Eigen::Vector3d goal(10.,0.,0.);
++    EXPECT_FALSE(p.plan_to_goal(goal,.5,rclcpp::Time(g->header.stamp)).empty());
++  }
++}
++
++TEST(RouteMechanism, DirectedConnectionDoesNotInventReverseReachability)
++{
++  auto g=graph({0.,10.});edge(*g,1,0,10.);
++  auto p=planner();p.update_graph(g);Eigen::Vector3d forward(10.,0.,0.);
++  EXPECT_TRUE(p.plan_to_goal(forward,.5,rclcpp::Time(g->header.stamp)).empty());
++  g->current_node_idx=1;p.update_graph(g);Eigen::Vector3d reverse(0.,0.,0.);
++  EXPECT_FALSE(p.plan_to_goal(reverse,.5,rclcpp::Time(g->header.stamp)).empty());
++}
++
++TEST(RouteMechanism, ReverseConnectionCannotReopenMeasuredBlockedDirection)
++{
++  for (bool reverse_order:{false,true}) {
++    auto g=graph({0.,10.});edge(*g,0,1,10.,true,true);
++    graphnav_msgs::msg::KeyValue witness;witness.key="physical_violation_observed";witness.value={1.f};
++    g->edges[0].properties.push_back(witness);
++    edge(*g,1,0,10.,false,false,100,0.f);
++    if (reverse_order) std::reverse(g->edges.begin(),g->edges.end());
++    auto p=planner();p.update_graph(g);Eigen::Vector3d forward(10.,0.,0.);
++    EXPECT_TRUE(p.plan_to_goal(forward,.5,rclcpp::Time(g->header.stamp)).empty());
++    g->current_node_idx=1;p.update_graph(g);Eigen::Vector3d retreat(0.,0.,0.);
++    EXPECT_FALSE(p.plan_to_goal(retreat,.5,rclcpp::Time(g->header.stamp)).empty());
++  }
+ }
+ 
+ TEST(RouteMechanism, RejectedLocalEdgeUsesAlternateGraphRoute)
+--- before/wildos_port/repro_check/src/nebula2-wildos/graphnav_planner/include/graphnav_planner/planner.hpp
++++ after/wildos_port/repro_check/src/nebula2-wildos/graphnav_planner/include/graphnav_planner/planner.hpp
+@@ -272,7 +272,9 @@
+   rclcpp::Logger logger_;
+   std::string trav_class_;
+ 
+-  graaf::undirected_graph<graphnav_msgs::msg::Node, double> graph_;
++  // Mapper edges and RobotEdgeTraversability are directed. Inventing the
++  // reverse connection can reopen a rejected direction through its peer edge.
++  graaf::directed_graph<graphnav_msgs::msg::Node, double> graph_;
+   std::vector<std::pair<Eigen::Vector2d, Eigen::Vector2d>> rejected_edges_;
+   graaf::vertex_id_t current_node_idx_;
+   size_t trav_class_idx_;

@@ -1,0 +1,50 @@
+planner_server:
+  ros__parameters:
+    expected_planner_frequency: 1.0
+    use_sim_time: false
+    planner_plugins: ["GridBased"]
+    GridBased:
+      plugin: "nav2_navfn_planner/NavfnPlanner"
+      tolerance: 1.0
+      use_astar: true
+
+global_costmap:
+  global_costmap:
+    ros__parameters:
+      update_frequency: 2.0
+      publish_frequency: 1.0
+      global_frame: map
+      robot_base_frame: base_link
+      use_sim_time: false
+      robot_radius: 1.2
+      resolution: 0.25
+      track_unknown_space: true
+      rolling_window: true
+      width: 80
+      height: 80
+      plugins: ["obstacle_layer", "inflation_layer"]
+      obstacle_layer:
+        plugin: "nav2_costmap_2d::ObstacleLayer"
+        enabled: true
+        # Points are height-filtered relative to base_link upstream; Nav2 sees
+        # their absolute odom z (about 52 m in Town).
+        min_obstacle_height: -1000.0
+        max_obstacle_height: 1000.0
+        observation_sources: cloud
+        cloud:
+          topic: /wildos/points
+          # cloud_filter height-clips in base_link; odom/map z is absolute.
+          max_obstacle_height: 1000.0
+          min_obstacle_height: -1000.0
+          data_type: "PointCloud2"
+          marking: true
+          clearing: true
+          raytrace_max_range: 30.0
+          raytrace_min_range: 0.0
+          obstacle_max_range: 25.0
+          obstacle_min_range: 0.0
+      inflation_layer:
+        plugin: "nav2_costmap_2d::InflationLayer"
+        cost_scaling_factor: 2.0
+        inflation_radius: 2.0
+      always_send_full_costmap: true

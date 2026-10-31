@@ -1,0 +1,31 @@
+{
+  "scope": "min(120s, actual search) receipt-time cropped odom; speed <0.1m/s near-stop; measured direction changes are not gearbox changes; status duration is not stopped duration",
+  "trial": "/home/ly/execution_continuity_review_20261022/v73_document_plan/full/trial_20261030_184621",
+  "coverage_s": 119.8463900639999,
+  "near_stop_percent": 19.683722958532517,
+  "longest_near_stop_s": 6.481327864999998,
+  "measured_motion_direction_changes": 32,
+  "odom_gaps_over_half_second": [
+    0.603390697
+  ],
+  "net_m": 87.46033042108,
+  "distance_m": 94.48009028590367,
+  "status_seconds": {
+    "awaiting_graph_route": 0.2886701540555805,
+    "execution_ready": 1.9728372190147638,
+    "planning": 25.920597965130582,
+    "planned": 0.698222367092967,
+    "following": 79.12896160781384,
+    "exploration_finishing_segment": 0.2869602970313281,
+    "continuous_direction_retired": 5.6255868300795555,
+    "exploration_retired": 3.297118055750616,
+    "awaiting_control_release": 0.7167079590726644,
+    "execution_recovered": 0.015325502026826143,
+    "continuous_motion_failed": 1.4015007860725746,
+    "segment_done": 0.031155220000073314,
+    "waiting_for_costmap_update": 0.17685719695873559,
+    "no_vehicle_path": 0.003904463956132531
+  },
+  "planning_calls": 30,
+  "background_calls": 18
+}

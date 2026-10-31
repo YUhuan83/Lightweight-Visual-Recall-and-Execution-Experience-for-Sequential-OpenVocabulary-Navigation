@@ -1,0 +1,1 @@
+49 offline checks pass; server 6/5/23 unit gates pass; scoring/sample/write/recall component chain verified in session161910. Full target timeout and 3 actual RPP reverse-guard aborts remain. No commit. See docs/SCORE_MEMORY_CONTRACT_REPAIR_20261015.md.

@@ -1,0 +1,11 @@
+<library path="wildos_ackermann_rpp">
+  <class name="wildos_ackermann_rpp/Controller" type="wildos_ackermann_rpp::Controller" base_class_type="nav2_core::Controller">
+    <description>Bound curvature before collision checking; retain Humble RPP speed regulation.</description>
+  </class>
+  <class name="wildos_ackermann_rpp/ContinuousGoalChecker" type="wildos_ackermann_rpp::ContinuousGoalChecker" base_class_type="nav2_core::GoalChecker">
+    <description>Position/yaw arrival gated by actual whole-path progress.</description>
+  </class>
+  <class name="wildos_ackermann_rpp/ContinuousStoppedGoalChecker" type="wildos_ackermann_rpp::ContinuousStoppedGoalChecker" base_class_type="nav2_core::GoalChecker">
+    <description>Stopped arrival gated by actual whole-path progress.</description>
+  </class>
+</library>

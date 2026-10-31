@@ -1,0 +1,41 @@
+--- 23675e28/wildos_port/repro_check/src/nebula2-wildos/graphnav_planner/test/test_route_mechanism.cpp
++++ 274c3ef2/wildos_port/repro_check/src/nebula2-wildos/graphnav_planner/test/test_route_mechanism.cpp
+@@ -11,6 +11,38 @@
+ 
+ using graphnav_planner::Planner;
+ using Graph = graphnav_msgs::msg::NavigationGraph;
++
++TEST(ExplorationTarget, ResolvedFrontierRequiresFreshNewerAuthoritativeState)
++{
++  graphnav_planner::ExplorationTarget target;
++  geometry_msgs::msg::PoseStamped goal; goal.header.frame_id = "map"; goal.header.stamp.sec = 10;
++  ASSERT_TRUE(target.begin("a",goal,0.));
++  auto source = goal.header;
++  EXPECT_FALSE(target.frontier_resolved(source,false,10000000000LL,5.)); // selection snapshot
++  source.stamp.sec = 11;
++  EXPECT_FALSE(target.frontier_resolved(source,std::nullopt,11000000000LL,5.)); // disappearance
++  source.stamp.sec = 12;
++  EXPECT_FALSE(target.frontier_resolved(source,true,12000000000LL,5.)); // score changes preserve owner
++  source.stamp.sec = 11;
++  EXPECT_FALSE(target.frontier_resolved(source,false,12000000000LL,5.)); // old response
++  source.stamp.sec = 12;
++  EXPECT_FALSE(target.frontier_resolved(source,false,12000000000LL,5.)); // duplicate acquisition
++  source.stamp.sec = 13; source.frame_id = "other";
++  EXPECT_FALSE(target.frontier_resolved(source,false,13000000000LL,5.));
++  source.frame_id = "map";
++  EXPECT_FALSE(target.frontier_resolved(source,false,19000000000LL,5.)); // stale
++  EXPECT_FALSE(target.frontier_resolved(source,false,12000000000LL,5.)); // future
++  EXPECT_FALSE(target.frontier_resolved(source,false,13000000000LL,0.));
++  EXPECT_TRUE(target.frontier_resolved(source,false,13000000000LL,5.));
++  EXPECT_FALSE(target.acknowledged()); // resolved exploration is not successful arrival
++  EXPECT_TRUE(target.active()); // caller owns retirement/cancellation
++  target.clear();
++  goal.header.stamp.sec = 20;
++  ASSERT_TRUE(target.begin("b",goal,0.));
++  EXPECT_FALSE(target.frontier_resolved(source,false,20000000000LL,5.));
++  source.stamp.sec = 21;
++  EXPECT_TRUE(target.frontier_resolved(source,false,21000000000LL,5.));
++}
+ 
+ TEST(ExplorationTarget, ScoreUpdatesCannotReplaceOwnedDestination)
+ {

@@ -1,0 +1,76 @@
+{
+  "status": "incomplete",
+  "review_note": "Displacement was not controlled-motion evidence: initial speed 6.14 m/s in R, requested gear=1 observed P. Headless rendering passed; motion did not.",
+  "sensor_passed": true,
+  "motion_passed": false,
+  "headless_requested": true,
+  "scope": "motion and sensors only; not semantic navigation",
+  "samples": [
+    {
+      "stage": "before",
+      "sim_time": 3.6645001740544103,
+      "pos": [
+        5289.977827301074,
+        -1138.3765828460455,
+        -545.0977124123965
+      ],
+      "speed": 6.138320469453017,
+      "electrics": {
+        "gear": "R",
+        "gear_index": -1.0,
+        "throttle": 1.0,
+        "brake": 0.0,
+        "parkingbrake": 0.0,
+        "rpm": 3803.6429389437208,
+        "wheelspeed": 12.774411392574088
+      }
+    },
+    {
+      "stage": "drive_00",
+      "sim_time": 3.7740001792553812,
+      "pos": [
+        5289.980781159102,
+        -1137.708733998239,
+        -545.0952024868457
+      ],
+      "speed": 5.933403767098877,
+      "electrics": {
+        "gear": "P",
+        "gear_index": 0.0,
+        "throttle": 0.2,
+        "brake": 0.0,
+        "parkingbrake": 0.0,
+        "rpm": 3989.523470510315,
+        "wheelspeed": 2.3918601703083824
+      }
+    },
+    {
+      "stage": "after",
+      "sim_time": 5.026500238745939,
+      "pos": [
+        5289.976031143877,
+        -1135.6774801515276,
+        -545.0905137604568
+      ],
+      "speed": 0.22197435907941326,
+      "electrics": {
+        "gear": "P",
+        "gear_index": 0.0,
+        "throttle": 0.0,
+        "brake": 1.0,
+        "parkingbrake": 1.0,
+        "rpm": 1660.7881873581794,
+        "wheelspeed": 0.026204070743616397
+      }
+    }
+  ],
+  "launch_command": "D:\\BEAMNG\\BeamNG.tech.v0.39.4.0\\Bin64\\BeamNG.tech.x64.exe -nosteam -tcom -tport 64321 -console -tcom-listen-ip 127.0.0.1 -headless -userpath D:\\BEAMNG\\rural-user",
+  "displacement_m": 2.6991128917339475,
+  "camera_size": [
+    640,
+    360
+  ],
+  "camera_std": 19.534823296982243,
+  "lidar_points": 16302,
+  "lidar_finite_fraction": 1.0
+}

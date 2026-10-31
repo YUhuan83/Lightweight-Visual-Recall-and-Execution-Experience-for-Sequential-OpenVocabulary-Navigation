@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='utf-8'?>
+<sdf version="1.8">
+  <model name="ph_dead_tree_trunk">
+    <static>true</static>
+    <link name="body">
+      <collision name="proxy0">
+        <pose>0.0 0.0 0.14521577768027782 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>3.051015019416809 0.27752751111984253 0.29043155536055565</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="scan">
+        <geometry>
+          <mesh>
+            <uri>model://ph_dead_tree_trunk/visual.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+  </model>
+</sdf>

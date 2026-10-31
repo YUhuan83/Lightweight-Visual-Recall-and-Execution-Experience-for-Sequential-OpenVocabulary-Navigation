@@ -1,0 +1,16 @@
+# This repository is a reviewed source snapshot, not a runtime workspace.
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+node_modules/
+.env
+.env.*
+*.pem
+*.key
+*.mp4
+*.mkv
+*.bag
+*.db3
+*.mcap

@@ -1,0 +1,126 @@
+{
+  "m_fanpalm_leaves": {
+    "name": "m_fanpalm_leaves",
+    "mapTo": "m_fanpalm_leaves",
+    "class": "Material",
+    "persistentId": "60bf62bf-86c3-4c16-99e9-5c5ba10ac8a5",
+    "Stages": [
+      {
+        "ambientOcclusionMap": "/assets/materials/tree/palm/m_fanpalm_leaves/t_fanpalm_leaves_ao.data.png",
+        "baseColorFactor": [
+          0.996078014,
+          0.996078014,
+          0.996078014,
+          1
+        ],
+        "baseColorMap": "/assets/materials/tree/palm/m_fanpalm_leaves/t_fanpalm_leaves_b.color.png",
+        "normalMap": "/assets/materials/tree/palm/m_fanpalm_leaves/t_fanpalm_leaves_nm.normal.png",
+        "opacityMap": "/assets/materials/tree/palm/m_fanpalm_leaves/t_fanpalm_leaves_o.data.png",
+        "roughnessFactor": 0.699999988,
+        "roughnessMap": "/assets/materials/tree/palm/m_fanpalm_leaves/t_fanpalm_leaves_r.data.png",
+        "specular": [
+          0.996078014,
+          0.996078014,
+          0.996078014,
+          1
+        ]
+      },
+      {
+        "baseColorFactor": null,
+        "roughnessFactor": null,
+        "specular": null
+      },
+      {
+        "baseColorFactor": null,
+        "roughnessFactor": null,
+        "specular": null
+      },
+      {
+        "baseColorFactor": null,
+        "roughnessFactor": null,
+        "specular": null
+      }
+    ],
+    "alphaRef": 80,
+    "alphaTest": true,
+    "annotation": "NATURE",
+    "doubleSided": true,
+    "invertBackFaceNormals": true,
+    "materialTag0": "beamng",
+    "materialTag1": "vegetation",
+    "materialTag2": "Natural",
+    "subSurface": true,
+    "subSurfaceIntensity": 1,
+    "version": 1.5
+  },
+  "m_fanpalm_leaves_02": {
+    "name": "m_fanpalm_leaves_02",
+    "mapTo": "m_fanpalm_leaves_02",
+    "class": "Material",
+    "Stages": [
+      {
+        "ambientOcclusionMap": "/assets/materials/tree/palm/m_fanpalm_leaves_02/t_fanpalm_leaves_02_o.data.png",
+        "baseColorMap": "/assets/materials/tree/palm/m_fanpalm_leaves_02/t_fanpalm_leaves_02_b.color.png",
+        "normalMap": "/assets/materials/tree/palm/m_fanpalm_leaves_02/t_fanpalm_leaves_02_nm.normal.png",
+        "opacityMap": "/assets/materials/tree/palm/m_fanpalm_leaves_02/t_fanpalm_leaves_02_o.data.png",
+        "roughnessMap": "/assets/materials/tree/palm/m_fanpalm_leaves_02/t_fanpalm_leaves_02_r.data.png"
+      },
+      {},
+      {},
+      {}
+    ],
+    "alphaRef": 70,
+    "alphaTest": true,
+    "doubleSided": true,
+    "invertBackFaceNormals": true,
+    "subSurface": true,
+    "version": 1.5
+  },
+  "m_palm_trunk": {
+    "name": "m_palm_trunk",
+    "mapTo": "m_palm_trunk",
+    "class": "Material",
+    "persistentId": "be07620b-94b5-4987-88b6-7b43b24f6fb6",
+    "Stages": [
+      {
+        "ambientOcclusionMap": "/assets/materials/tree/palm/m_palm_trunk/t_palm_trunk_ao.data.png",
+        "baseColorFactor": [
+          0.825949013,
+          0.825949013,
+          0.825949013,
+          1
+        ],
+        "baseColorMap": "/assets/materials/tree/palm/m_palm_trunk/t_palm_trunk_b.color.png",
+        "detailBaseColorMapStrength": 0.100000001,
+        "detailMap": "/assets/materials/tree/eucalyptus/m_eucalyptus_bark/t_eucalyptus_bark_b.color.png",
+        "detailNormalMap": "/assets/materials/tree/eucalyptus/m_eucalyptus_bark/t_eucalyptus_bark_nm.normal.png",
+        "detailNormalMapStrength": 2,
+        "normalMap": "/assets/materials/tree/palm/m_palm_trunk/t_palm_trunk_nm.normal.png",
+        "roughnessMap": "/assets/materials/tree/palm/m_palm_trunk/t_palm_trunk_r.data.png"
+      },
+      {
+        "baseColorFactor": null,
+        "detailBaseColorMapStrength": null,
+        "detailNormalMapStrength": null
+      },
+      {
+        "baseColorFactor": null,
+        "detailBaseColorMapStrength": null,
+        "detailNormalMapStrength": null
+      },
+      {
+        "baseColorFactor": null,
+        "detailBaseColorMapStrength": null,
+        "detailNormalMapStrength": null
+      }
+    ],
+    "annotation": "NATURE",
+    "doubleSided": true,
+    "groundType": "WOOD",
+    "materialTag0": "beamng",
+    "materialTag1": "vegetation",
+    "materialTag2": "Natural",
+    "translucentBlendOp": "None",
+    "version": 1.5
+  }
+}

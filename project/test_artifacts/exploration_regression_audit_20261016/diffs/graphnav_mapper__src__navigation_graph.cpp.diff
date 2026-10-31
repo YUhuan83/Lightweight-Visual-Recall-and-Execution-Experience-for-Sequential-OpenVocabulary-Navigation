@@ -1,0 +1,111 @@
+--- ffab44cb5f36e5508fbe29d3dc5bcd5fe69cb572/graphnav_mapper/src/navigation_graph.cpp
++++ current/graphnav_mapper/src/navigation_graph.cpp
+@@ -1,4 +1,6 @@
+ #include "graphnav_mapper/navigation_graph.hpp"
++#include <algorithm>
++#include <cmath>
+ #include <nanoflann.hpp>
+ #include <iostream>
+ 
+@@ -223,7 +225,8 @@
+   return pg->header.frame_id;
+ }
+ 
+-graphnav_msgs::msg::NavigationGraph NavigationGraph::to_msg(const rclcpp::Time& stamp, const UUID& current_node) const
++graphnav_msgs::msg::NavigationGraph NavigationGraph::to_msg(const rclcpp::Time& stamp, const UUID& current_node,
++                                                            const std::string& robot_profile_id) const
+ {
+   graphnav_msgs::msg::NavigationGraph msg;
+   msg.header.frame_id = *get_frame_id();
+@@ -266,6 +269,10 @@
+       node_msg.trav_properties[trav_class_idx].free_radius = trav_prop.free_radius;
+       node_msg.trav_properties[trav_class_idx].is_frontier = trav_prop.is_frontier;
+       node_msg.trav_properties[trav_class_idx].explored_radius = node.properties.explored_radius;
++      graphnav_msgs::msg::KeyValue visited;
++      visited.key = "visited";
++      visited.value = {trav_prop.visited ? 1.0f : 0.0f};
++      node_msg.trav_properties[trav_class_idx].properties.push_back(visited);
+       if (trav_prop.is_frontier)
+       {
+         for (const auto& point : trav_prop.frontier_points)
+@@ -278,7 +285,38 @@
+           node_msg.trav_properties[trav_class_idx].frontier_points.push_back(frontier_point);
+         }
+       }
+-    }
++      for (const auto& [key, value] : trav_prop.metadata)
++      {
++        graphnav_msgs::msg::KeyValue kv;
++        kv.key = key;
++        kv.value = value;
++        node_msg.trav_properties[trav_class_idx].properties.push_back(kv);
++      }
++    }
++    for (const auto& [key, value] : node.properties.metadata)
++    {
++      graphnav_msgs::msg::KeyValue kv;
++      kv.key = key;
++      kv.value = value;
++      node_msg.properties.push_back(kv);
++    }
++    graphnav_msgs::msg::RobotNodeTraversability robot_node;
++    robot_node.robot_profile_id = robot_profile_id;
++    const auto read_node_value = [&](const std::string& key, float fallback) {
++      auto it = node.properties.metadata.find(key);
++      return it != node.properties.metadata.end() && !it->second.empty() ? it->second.front() : fallback;
++    };
++    robot_node.maximum_uphill_slope = std::atan(read_node_value("slope", 0.0f));
++    robot_node.maximum_downhill_slope = robot_node.maximum_uphill_slope;
++    robot_node.maximum_cross_slope = robot_node.maximum_uphill_slope;
++    robot_node.maximum_step_height = read_node_value("step_height", 0.0f);
++    robot_node.roughness = read_node_value("roughness", 0.0f);
++    robot_node.physical_traversability = std::clamp(1.0f - read_node_value("physical_risk", 0.0f), 0.0f, 1.0f);
++    robot_node.minimum_clearance = read_node_value("minimum_clearance", 0.0f);
++    robot_node.feasible = read_node_value("physical_feasible", 1.0f) > 0.5f;
++    robot_node.confidence = read_node_value("physical_confidence", 0.0f);
++    robot_node.observed_at = rclcpp::Time(static_cast<int64_t>(node.properties.physical_observed_at_ns));
++    node_msg.robot_traversability.push_back(robot_node);
+     msg.nodes.push_back(node_msg);
+   }
+   for (const auto& [uuid, edge] : edges)
+@@ -297,7 +335,39 @@
+         edge_msg.traversability.resize(trav_class_idx + 1);
+       }
+       edge_msg.traversability[trav_class_idx].traversability_cost = trav_prop.cost;
+-    }
++      graphnav_msgs::msg::KeyValue traversed;
++      traversed.key = "traversed";
++      traversed.value = {trav_prop.traversed ? 1.0f : 0.0f};
++      edge_msg.traversability[trav_class_idx].properties.push_back(traversed);
++      for (const auto& [key, value] : trav_prop.metadata)
++      {
++        graphnav_msgs::msg::KeyValue kv;
++        kv.key = key;
++        kv.value = value;
++        edge_msg.traversability[trav_class_idx].properties.push_back(kv);
++      }
++    }
++    for (const auto& [key, value] : edge.properties.metadata)
++    {
++      graphnav_msgs::msg::KeyValue kv;
++      kv.key = key;
++      kv.value = value;
++      edge_msg.properties.push_back(kv);
++    }
++    graphnav_msgs::msg::RobotEdgeTraversability robot_edge;
++    robot_edge.robot_profile_id = robot_profile_id;
++    const auto read_edge_value = [&](const std::string& key, float fallback) {
++      auto it = edge.properties.metadata.find(key);
++      return it != edge.properties.metadata.end() && !it->second.empty() ? it->second.front() : fallback;
++    };
++    robot_edge.maximum_slope = read_edge_value("maximum_slope", 0.0f);
++    robot_edge.maximum_step_height = read_edge_value("maximum_step_height", 0.0f);
++    robot_edge.roughness = read_edge_value("roughness", 0.0f);
++    robot_edge.minimum_clearance = read_edge_value("minimum_clearance", 0.0f);
++    robot_edge.physical_traversability = read_edge_value("physical_feasible", 1.0f) > 0.5f ? 1.0f : 0.0f;
++    robot_edge.confidence = read_edge_value("physical_confidence", 0.0f);
++    robot_edge.observed_at = rclcpp::Time(static_cast<int64_t>(edge.properties.physical_observed_at_ns));
++    edge_msg.robot_traversability.push_back(robot_edge);
+     msg.edges.push_back(edge_msg);
+   }
+   msg.current_node_idx = node_indices.at(current_node);

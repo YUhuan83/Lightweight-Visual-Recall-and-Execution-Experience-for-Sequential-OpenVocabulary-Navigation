@@ -1,0 +1,11 @@
+--- before/tools/check_continuous_start_execution.py
++++ after/tools/check_continuous_start_execution.py
+@@ -76,7 +76,7 @@
+             node.destroy_client(c)
+         report['actual_parameters']=actual
+         assert not node.get_publishers_info_by_topic('/spot1/graphnav_planner/path'),'Competing route owner'
+-        for topic,count in [('/wildos/native_control',1),('/wildos/native_control_status',1),('/wildos/cmd_vel',2)]:
++        for topic,count in [('/wildos/native_control_command',1),('/wildos/native_control_status',1),('/wildos/cmd_vel',2)]:
+             assert len(node.get_publishers_info_by_topic(topic))==count,topic
+         assert node.spin(5,lambda:all(k in node.state for k in ('odom','grid','local','native')) and bool(node.frames))
+         install_fail_closed_reads(PrefixedLengthSocket)

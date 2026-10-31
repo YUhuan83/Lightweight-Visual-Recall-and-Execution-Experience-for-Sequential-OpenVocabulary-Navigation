@@ -1,0 +1,912 @@
+{
+  "schema": "wildos-lite-sim2d/1",
+  "steps": 67,
+  "found": true,
+  "final_distance_m": 5.47000000000002,
+  "phase_sequence": [
+    "SEARCHING",
+    "APPROACHING",
+    "FOUND"
+  ],
+  "target": [
+    48.0,
+    0.0
+  ],
+  "start": [
+    0.0,
+    0.0
+  ],
+  "obstacles": [
+    [
+      24.0,
+      6.5,
+      7.0,
+      7.0
+    ],
+    [
+      34.0,
+      -7.5,
+      7.0,
+      7.0
+    ],
+    [
+      13.0,
+      -11.0,
+      5.0,
+      5.0
+    ]
+  ],
+  "trace": [
+    {
+      "step": 0,
+      "x": 0.0,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "SEARCHING",
+      "goal_xy": [
+        16.0,
+        0.0
+      ],
+      "target_seen": false,
+      "distance_m": 48.0
+    },
+    {
+      "step": 1,
+      "x": 0.030000000000000006,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "SEARCHING",
+      "goal_xy": [
+        16.03,
+        0.0
+      ],
+      "target_seen": false,
+      "distance_m": 47.97
+    },
+    {
+      "step": 2,
+      "x": 0.09000000000000002,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "SEARCHING",
+      "goal_xy": [
+        16.09,
+        0.0
+      ],
+      "target_seen": false,
+      "distance_m": 47.91
+    },
+    {
+      "step": 3,
+      "x": 0.18000000000000005,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "SEARCHING",
+      "goal_xy": [
+        16.18,
+        0.0
+      ],
+      "target_seen": false,
+      "distance_m": 47.82
+    },
+    {
+      "step": 4,
+      "x": 0.30000000000000004,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "SEARCHING",
+      "goal_xy": [
+        16.3,
+        0.0
+      ],
+      "target_seen": false,
+      "distance_m": 47.7
+    },
+    {
+      "step": 5,
+      "x": 0.45000000000000007,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "SEARCHING",
+      "goal_xy": [
+        16.45,
+        0.0
+      ],
+      "target_seen": false,
+      "distance_m": 47.55
+    },
+    {
+      "step": 6,
+      "x": 0.6300000000000001,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "SEARCHING",
+      "goal_xy": [
+        16.63,
+        0.0
+      ],
+      "target_seen": false,
+      "distance_m": 47.37
+    },
+    {
+      "step": 7,
+      "x": 0.8400000000000002,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "SEARCHING",
+      "goal_xy": [
+        16.84,
+        0.0
+      ],
+      "target_seen": false,
+      "distance_m": 47.16
+    },
+    {
+      "step": 8,
+      "x": 1.0800000000000003,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "SEARCHING",
+      "goal_xy": [
+        17.080000000000002,
+        0.0
+      ],
+      "target_seen": false,
+      "distance_m": 46.92
+    },
+    {
+      "step": 9,
+      "x": 1.3500000000000003,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "SEARCHING",
+      "goal_xy": [
+        17.35,
+        0.0
+      ],
+      "target_seen": false,
+      "distance_m": 46.65
+    },
+    {
+      "step": 10,
+      "x": 1.6500000000000004,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "SEARCHING",
+      "goal_xy": [
+        17.65,
+        0.0
+      ],
+      "target_seen": false,
+      "distance_m": 46.35
+    },
+    {
+      "step": 11,
+      "x": 1.9800000000000004,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "SEARCHING",
+      "goal_xy": [
+        17.98,
+        0.0
+      ],
+      "target_seen": false,
+      "distance_m": 46.019999999999996
+    },
+    {
+      "step": 12,
+      "x": 2.3400000000000003,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "SEARCHING",
+      "goal_xy": [
+        18.34,
+        0.0
+      ],
+      "target_seen": false,
+      "distance_m": 45.66
+    },
+    {
+      "step": 13,
+      "x": 2.7300000000000004,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "SEARCHING",
+      "goal_xy": [
+        18.73,
+        0.0
+      ],
+      "target_seen": false,
+      "distance_m": 45.269999999999996
+    },
+    {
+      "step": 14,
+      "x": 3.1500000000000004,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "SEARCHING",
+      "goal_xy": [
+        19.15,
+        0.0
+      ],
+      "target_seen": false,
+      "distance_m": 44.85
+    },
+    {
+      "step": 15,
+      "x": 3.6000000000000005,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "SEARCHING",
+      "goal_xy": [
+        19.6,
+        0.0
+      ],
+      "target_seen": false,
+      "distance_m": 44.4
+    },
+    {
+      "step": 16,
+      "x": 4.08,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "SEARCHING",
+      "goal_xy": [
+        20.08,
+        0.0
+      ],
+      "target_seen": false,
+      "distance_m": 43.92
+    },
+    {
+      "step": 17,
+      "x": 4.59,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "SEARCHING",
+      "goal_xy": [
+        20.59,
+        0.0
+      ],
+      "target_seen": false,
+      "distance_m": 43.41
+    },
+    {
+      "step": 18,
+      "x": 5.13,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "SEARCHING",
+      "goal_xy": [
+        21.13,
+        0.0
+      ],
+      "target_seen": false,
+      "distance_m": 42.87
+    },
+    {
+      "step": 19,
+      "x": 5.699999999999999,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "SEARCHING",
+      "goal_xy": [
+        21.7,
+        0.0
+      ],
+      "target_seen": false,
+      "distance_m": 42.3
+    },
+    {
+      "step": 20,
+      "x": 6.299999999999999,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "SEARCHING",
+      "goal_xy": [
+        22.299999999999997,
+        0.0
+      ],
+      "target_seen": false,
+      "distance_m": 41.7
+    },
+    {
+      "step": 21,
+      "x": 6.929999999999999,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "SEARCHING",
+      "goal_xy": [
+        22.93,
+        0.0
+      ],
+      "target_seen": false,
+      "distance_m": 41.07
+    },
+    {
+      "step": 22,
+      "x": 7.589999999999999,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "SEARCHING",
+      "goal_xy": [
+        23.59,
+        0.0
+      ],
+      "target_seen": false,
+      "distance_m": 40.410000000000004
+    },
+    {
+      "step": 23,
+      "x": 8.28,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        24.28,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 39.72
+    },
+    {
+      "step": 24,
+      "x": 9.0,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        25.0,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 39.0
+    },
+    {
+      "step": 25,
+      "x": 9.75,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        25.75,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 38.25
+    },
+    {
+      "step": 26,
+      "x": 10.53,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        26.53,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 37.47
+    },
+    {
+      "step": 27,
+      "x": 11.33,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        27.33,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 36.67
+    },
+    {
+      "step": 28,
+      "x": 12.13,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        28.130000000000003,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 35.87
+    },
+    {
+      "step": 29,
+      "x": 12.930000000000001,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        28.93,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 35.07
+    },
+    {
+      "step": 30,
+      "x": 13.730000000000002,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        29.730000000000004,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 34.269999999999996
+    },
+    {
+      "step": 31,
+      "x": 14.530000000000003,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        30.53,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 33.47
+    },
+    {
+      "step": 32,
+      "x": 15.330000000000004,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        31.330000000000005,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 32.669999999999995
+    },
+    {
+      "step": 33,
+      "x": 16.130000000000003,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        32.13,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 31.869999999999997
+    },
+    {
+      "step": 34,
+      "x": 16.930000000000003,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        32.93000000000001,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 31.069999999999997
+    },
+    {
+      "step": 35,
+      "x": 17.730000000000004,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        33.730000000000004,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 30.269999999999996
+    },
+    {
+      "step": 36,
+      "x": 18.530000000000005,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        34.53,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 29.469999999999995
+    },
+    {
+      "step": 37,
+      "x": 19.330000000000005,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        35.330000000000005,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 28.669999999999995
+    },
+    {
+      "step": 38,
+      "x": 20.130000000000006,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        36.13000000000001,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 27.869999999999994
+    },
+    {
+      "step": 39,
+      "x": 20.930000000000007,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        36.93000000000001,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 27.069999999999993
+    },
+    {
+      "step": 40,
+      "x": 21.730000000000008,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        37.730000000000004,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 26.269999999999992
+    },
+    {
+      "step": 41,
+      "x": 22.53000000000001,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        38.53000000000001,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 25.46999999999999
+    },
+    {
+      "step": 42,
+      "x": 23.33000000000001,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        39.33000000000001,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 24.66999999999999
+    },
+    {
+      "step": 43,
+      "x": 24.13000000000001,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        40.13000000000001,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 23.86999999999999
+    },
+    {
+      "step": 44,
+      "x": 24.93000000000001,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        40.93000000000001,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 23.06999999999999
+    },
+    {
+      "step": 45,
+      "x": 25.73000000000001,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        41.73000000000001,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 22.26999999999999
+    },
+    {
+      "step": 46,
+      "x": 26.530000000000012,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        42.530000000000015,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 21.469999999999988
+    },
+    {
+      "step": 47,
+      "x": 27.330000000000013,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        43.33000000000001,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 20.669999999999987
+    },
+    {
+      "step": 48,
+      "x": 28.130000000000013,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        44.13000000000001,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 19.869999999999987
+    },
+    {
+      "step": 49,
+      "x": 28.930000000000014,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        44.930000000000014,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 19.069999999999986
+    },
+    {
+      "step": 50,
+      "x": 29.730000000000015,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        45.73000000000002,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 18.269999999999985
+    },
+    {
+      "step": 51,
+      "x": 30.530000000000015,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        46.530000000000015,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 17.469999999999985
+    },
+    {
+      "step": 52,
+      "x": 31.330000000000016,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        47.33000000000001,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 16.669999999999984
+    },
+    {
+      "step": 53,
+      "x": 32.13000000000002,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        48.13000000000002,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 15.869999999999983
+    },
+    {
+      "step": 54,
+      "x": 32.930000000000014,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        48.930000000000014,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 15.069999999999986
+    },
+    {
+      "step": 55,
+      "x": 33.73000000000001,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        49.73000000000001,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 14.269999999999989
+    },
+    {
+      "step": 56,
+      "x": 34.53000000000001,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        46.53000000000001,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 13.469999999999992
+    },
+    {
+      "step": 57,
+      "x": 35.330000000000005,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        47.330000000000005,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 12.669999999999995
+    },
+    {
+      "step": 58,
+      "x": 36.13,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        48.13,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 11.869999999999997
+    },
+    {
+      "step": 59,
+      "x": 36.93,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        48.93,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 11.07
+    },
+    {
+      "step": 60,
+      "x": 37.73,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        49.73,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 10.270000000000003
+    },
+    {
+      "step": 61,
+      "x": 38.529999999999994,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        47.529999999999994,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 9.470000000000006
+    },
+    {
+      "step": 62,
+      "x": 39.32999999999999,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        48.32999999999999,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 8.670000000000009
+    },
+    {
+      "step": 63,
+      "x": 40.12999999999999,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        49.12999999999999,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 7.870000000000012
+    },
+    {
+      "step": 64,
+      "x": 40.929999999999986,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        46.929999999999986,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 7.0700000000000145
+    },
+    {
+      "step": 65,
+      "x": 41.72999999999998,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "APPROACHING",
+      "goal_xy": [
+        47.72999999999998,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 6.270000000000017
+    },
+    {
+      "step": 66,
+      "x": 42.52999999999998,
+      "y": 0.0,
+      "yaw": 0.0,
+      "phase": "FOUND",
+      "goal_xy": [
+        48.52999999999998,
+        0.0
+      ],
+      "target_seen": true,
+      "distance_m": 5.47000000000002
+    }
+  ]
+}

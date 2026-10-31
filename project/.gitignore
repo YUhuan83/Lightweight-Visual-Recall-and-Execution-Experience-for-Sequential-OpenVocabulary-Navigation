@@ -1,0 +1,18 @@
+# Python and ROS build output
+__pycache__/
+*.py[cod]
+.pytest_cache/
+build/
+install/
+log/
+
+# Local dependency caches and virtual environments
+.venv/
+venv/
+.asset-tools/
+**/.deps/
+
+# Local captures, generated runtime state, and pasted conversation exports
+ses_*.json
+*.bag
+*.db3

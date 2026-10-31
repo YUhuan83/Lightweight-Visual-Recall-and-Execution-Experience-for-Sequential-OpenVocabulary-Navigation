@@ -1,0 +1,63 @@
+{
+  "duration_seconds": 12.0,
+  "topics": {
+    "image": {
+      "count": 59,
+      "median_hz": 5.016142789844111
+    },
+    "lidar": {
+      "count": 59,
+      "median_hz": 4.9599936207644735
+    },
+    "odom": {
+      "count": 59,
+      "median_hz": 5.004603648185053
+    },
+    "graph": {
+      "count": 24,
+      "median_hz": 2.0845188164617547
+    },
+    "scored_graph": {
+      "count": 24,
+      "median_hz": 1.9474765077883525
+    },
+    "path": {
+      "count": 23,
+      "median_hz": 1.6908966019866207
+    }
+  },
+  "details": {
+    "graph": {
+      "nodes": 163,
+      "edges": 1868,
+      "frame": "spot1/odom",
+      "frontiers": 53
+    },
+    "odom": {
+      "position": [
+        150.94077459865184,
+        -575.8721532474901,
+        41.4605307519696
+      ],
+      "frame": "spot1/odom"
+    },
+    "image": {
+      "width": 960,
+      "height": 640,
+      "encoding": "rgb8"
+    },
+    "lidar": {
+      "points": 29963,
+      "frame": "spot1/ouster/front/os_lidar"
+    },
+    "scored_graph": {
+      "nodes": 164,
+      "edges": 1882,
+      "frame": "spot1/odom",
+      "frontiers": 54
+    },
+    "path": {
+      "poses": 4
+    }
+  }
+}

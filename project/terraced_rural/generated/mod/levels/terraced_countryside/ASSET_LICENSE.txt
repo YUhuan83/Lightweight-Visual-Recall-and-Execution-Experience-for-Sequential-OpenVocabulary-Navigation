@@ -1,0 +1,3 @@
+Original procedural meshes, textures and layout: CC0 1.0.
+No stock art or vehicle assets are redistributed.
+Requires a separately licensed BeamNG installation and its common sky resources.

@@ -1,0 +1,11 @@
+--- before/tools/town_physical_single_target_trial.py
++++ after/tools/town_physical_single_target_trial.py
+@@ -87,7 +87,7 @@
+             '/spot1/remembered_object_candidates','/spot1/remembered_object_feedback',
+             '/wildos/memory_selection','/wildos/plan_status','/wildos/planned_path',
+             '/wildos/native_control_status','/wildos/control_status',
+-            '/wildos/cmd_vel','/wildos/native_control','/wildos/execution_feedback',
++            '/wildos/cmd_vel','/wildos/native_control','/wildos/native_control_command','/wildos/execution_feedback',
+             '/vehicles/ego/sensors/state','/tf',
+             '/global_costmap/costmap','/local_costmap/costmap','/received_global_plan','/plan',
+             '/spot1/odom','/spot1/measurement_timing','/spot1/local_terrain','/spot1/local_map',

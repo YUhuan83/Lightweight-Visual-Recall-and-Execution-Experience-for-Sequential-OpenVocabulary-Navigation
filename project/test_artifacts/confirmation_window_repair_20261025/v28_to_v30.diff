@@ -1,0 +1,469 @@
+--- v28/nav2_adapter/test/test_confirmation_profile_ros.py
++++ v30/nav2_adapter/test/test_confirmation_profile_ros.py
+@@ -0,0 +1,84 @@
++import ast,json
++from copy import deepcopy
++from pathlib import Path
++import unittest
++from unittest.mock import Mock
++from nav_msgs.msg import Odometry
++from std_msgs.msg import String
++from builtin_interfaces.msg import Time
++from test_goal_confirmation_ros import GoalConfirmationTests
++
++ROOT=Path(__file__).parents[2]
++
++class ConfirmationProfileTests(unittest.TestCase):
++    tearDown=GoalConfirmationTests.tearDown
++    update_odom=GoalConfirmationTests.update_odom
++    def setUp(self):
++        GoalConfirmationTests.setUp(self)
++        self.messages=json.loads((Path(__file__).parent/'fixtures/v29_r2_sparse_localizations.json').read_text())
++        self.node.on_query(String(data=self.messages[0][1]['query']))
++        self.node.publish_standoff=Mock(return_value='isolated_no_map')
++
++    def feed(self,index,*,shift=0.,age=None):
++        received,data=deepcopy(self.messages[index]);data['observation_stamp_ns']+=int(shift*1e9)
++        self.now=received+int(shift*1e9) if age is None else data['observation_stamp_ns']+int(age*1e9)
++        o=Odometry();o.header.frame_id='spot1/odom'
++        o.header.stamp=Time(sec=self.now//10**9,nanosec=self.now%10**9)
++        o.pose.pose.position.x,o.pose.pose.position.y,o.pose.pose.position.z=data['observer_position']
++        q=o.pose.pose.orientation;q.x,q.y,q.z,q.w=data['observer_orientation']
++        self.node.on_odom(o)
++        self.node.on_localization(String(data=json.dumps(data)))
++
++    def test_runtime_profile_gives_sparse_confirmation_sixty_second_history(self):
++        source=ROOT/'official_adapter/launch/official_graph_stack.launch.py'
++        tree=ast.parse(source.read_text(encoding='utf8'))
++        values=[value.value for node in ast.walk(tree) if isinstance(node,ast.Dict)
++                for key,value in zip(node.keys,node.values)
++                if isinstance(key,ast.Constant) and key.value=='confirmation_window_sec' and isinstance(value,ast.Constant)]
++        self.assertEqual(values,[60.])
++
++    def test_recorded_four_positions_confirm_without_lowering_support(self):
++        self.node.confirmation_window_sec=60.
++        for i in range(4):self.feed(i)
++        result=json.loads(self.node.confirmation_pub.publish.call_args.args[0].data)
++        self.assertTrue(result['search_confirmed']);self.assertEqual(result['inliers'],4)
++        self.assertLess(result['radius'],.05)
++        self.assertFalse(result['approach_goal_ready'])
++
++    def test_recorded_thirty_second_window_loses_the_first_frame(self):
++        self.node.confirmation_window_sec=30.
++        for i in range(4):self.feed(i)
++        self.assertEqual(len(self.node.observations),3)
++        self.node.confirmation_pub.publish.assert_not_called()
++
++    def test_three_frames_still_cannot_confirm(self):
++        self.node.confirmation_window_sec=60.
++        for i in range(3):self.feed(i)
++        self.node.confirmation_pub.publish.assert_not_called()
++
++    def test_expired_history_cannot_complete_on_a_new_single_frame(self):
++        self.node.confirmation_window_sec=60.
++        for i in range(3):self.feed(i)
++        span=(self.messages[3][1]['observation_stamp_ns']-self.messages[0][1]['observation_stamp_ns'])/1e9
++        self.feed(3,shift=61.-span)
++        self.node.confirmation_pub.publish.assert_not_called()
++
++    def test_latest_measurement_freshness_is_still_five_seconds(self):
++        self.node.confirmation_window_sec=60.
++        for i in range(3):self.feed(i)
++        self.feed(3,age=6.)
++        self.node.confirmation_pub.publish.assert_not_called()
++
++    def test_repeated_frame_is_not_additional_support(self):
++        self.node.confirmation_window_sec=60.
++        for _ in range(4):self.feed(0)
++        self.assertEqual(len(self.node.observations),1)
++        self.node.confirmation_pub.publish.assert_not_called()
++
++    def test_query_switch_still_discards_history(self):
++        self.node.confirmation_window_sec=60.
++        for i in range(3):self.feed(i)
++        self.node.on_query(String(data='gas station'))
++        self.feed(3)
++        self.assertFalse(self.node.observations)
++        self.node.confirmation_pub.publish.assert_not_called()
+--- v28/nav2_adapter/test/test_surface_association_ros.py
++++ v30/nav2_adapter/test/test_surface_association_ros.py
+@@ -90,7 +90,9 @@
+         self.assertFalse(result['association_validated'])
+         self.assertEqual(len(result['depth_candidates']), 2)
+         np.testing.assert_allclose([c['position'][2] for c in result['depth_candidates']],
+-                                   [2.3360903896, 19.697658], atol=1e-5)
++                                   [2.338356796656612, 19.697658], atol=1e-5)
++        for candidate in result['depth_candidates']:
++            self.assertLess(np.linalg.norm(sample['points_cam']-candidate['position'],axis=1).min(),1e-8)
+         # Higher geometric confidence must never override semantic ambiguity.
+         self.assertGreater(result['confidence'], .8)
+ 
+--- v28/official_adapter/launch/official_graph_stack.launch.py
++++ v30/official_adapter/launch/official_graph_stack.launch.py
+@@ -41,6 +41,7 @@
+                              LaunchConfiguration("vehicle_front_extent"), value_type=float),
+                          "standoff": 3.0, "min_update_distance": 1.0,
+                          "confirmation_frames": 5, "confirmation_radius": 1.5,
++                         "confirmation_window_sec": 60.0,
+                          "obstacle_margin": 2.0}],
+             output="screen",
+         ),
+--- v28/wildos_port/repro_check/src/nebula2-wildos/visual_navigation/test/test_depth_reference.py
++++ v30/wildos_port/repro_check/src/nebula2-wildos/visual_navigation/test/test_depth_reference.py
+@@ -0,0 +1,99 @@
++"""Actual depth callbacks: references select current returns, never invent range."""
++import ast
++from pathlib import Path
++from types import SimpleNamespace as S
++from unittest.mock import Mock
++import unittest
++import numpy as np
++from scipy.spatial.transform import Rotation
++from visual_navigation.explorfm_triangulation.localization_geometry import foreground_depth,triangulate_bearings,ground_like_surface
++
++class DepthReferenceTests(unittest.TestCase):
++    def setUp(self):
++        path=Path(__file__).parents[1]/'visual_navigation/explorfm_triangulation/obj_mask_triangulation.py'
++        tree=ast.parse(path.read_text(encoding='utf8'))
++        cls=next(n for n in tree.body if isinstance(n,ast.ClassDef) and n.name=='ObjectMaskTriangulator')
++        cls.bases=[];cls.body=[n for n in cls.body if isinstance(n,ast.FunctionDef) and n.name in
++            ('on_query','check_lidar_in_mask','process_observation','prune_views','stamp_ns','bearing_observation')]
++        env=dict(np=np,R=Rotation,foreground_depth=foreground_depth,triangulate_bearings=triangulate_bearings,
++                 ground_like_surface=ground_like_surface,
++                 point_cloud2=S(read_points=lambda msg,**_:msg.points),
++                 rclpy=S(time=S(Time=S(from_msg=lambda t:t))),Duration=lambda **_:None)
++        exec(compile(ast.fix_missing_locations(ast.Module(body=[cls],type_ignores=[])),str(path),'exec'),env)
++        self.n=n=env['ObjectMaskTriangulator']()
++        n.active_query='house';n.query_started_ns=n.last_observation_ns=0
++        n.observation_timeout=5.;n.min_lidar_points=20;n.sparse_lidar_points=8;n.min_view_distance=1.;n.max_views=12
++        n.views=[];n.bearing_views=[];n.prev_view_pos=None;n.depth_reference=None
++        n.global_frame='spot1/odom';n.lidar_tf_frame='world'
++        n.get_clock=lambda:S(now=lambda:S(nanoseconds=100*10**9))
++        n.get_logger=Mock();n.add_views=Mock()
++        n.publish_navigation_goal_and_marker=Mock();n.publish_goal_hypotheses=Mock();n.publish_localization_rejection=Mock()
++        n.tf_buffer=S(lookup_transform=lambda *_,**__:S(transform=S(rotation=S(x=0.,y=0.,z=0.,w=1.),translation=S(x=0.,y=0.,z=0.))))
++        self.points=np.array([[x,y,10.] for x in np.linspace(-1.,1.,9) for y in np.linspace(-1.,1.,9)])
++        self.cam=dict(object_mask=np.ones((100,100),bool),K=np.array([[100.,0.,50.],[0.,100.,50.],[0.,0.,1.]]),
++                      R_wc=np.eye(3),t_wc=np.zeros((3,1)),width=100)
++        n.extract_data_from_obj_mask_msg=lambda _:[self.cam]
++        self.set_input(99*10**9,self.points)
++
++    def set_input(self,t,points):
++        self.msg=S(query=self.n.active_query,header=S(stamp=S(sec=t//10**9,nanosec=t%10**9)),
++                   odom=S(pose=S(pose=S(position=S(x=0.,y=0.,z=0.)))))
++        self.cloud=S(points=points,header=self.msg.header)
++        self.n.msg_buffer=S(buffer=[1],pop_oldest_msg=lambda:(dict(obj_mask=self.msg,lidar=self.cloud),None,None),clear=Mock())
++
++    def test_fresh_reference_chooses_current_supported_return(self):
++        anchor=self.points[8].copy()
++        self.n.depth_reference=dict(position=anchor,stamp_ns=98*10**9)
++        self.n.process_observation()
++        np.testing.assert_array_equal(self.n.triangulated_position,anchor)
++        self.assertEqual(self.n.localization_quality['representative_kind'],'tracked_return')
++        self.assertEqual(self.n.depth_reference['stamp_ns'],99*10**9)
++
++    def test_expired_reference_does_not_bias_new_surface(self):
++        self.n.depth_reference=dict(position=self.points[8],stamp_ns=93*10**9)
++        self.n.process_observation()
++        self.assertEqual(self.n.localization_quality['representative_kind'],'medoid_return')
++
++    def test_empty_scan_does_not_replay_or_refresh_old_depth(self):
++        self.n.process_observation();anchor=self.n.depth_reference.copy()
++        self.set_input(99_500_000_000,np.empty((0,3)))
++        self.n.process_observation()
++        self.assertIsNone(self.n.triangulated_position)
++        self.assertFalse(self.n.found_lidar_in_mask)
++        self.assertEqual(self.n.depth_reference['stamp_ns'],anchor['stamp_ns'])
++
++    def test_new_query_clears_reference(self):
++        self.n.process_observation()
++        self.n.on_query(S(data='gas station'))
++        self.assertIsNone(self.n.depth_reference)
++
++    def test_repeated_query_keeps_current_reference(self):
++        self.n.process_observation();reference=self.n.depth_reference
++        self.n.on_query(S(data=' HOUSE '))
++        self.assertIs(self.n.depth_reference,reference)
++
++    def test_duplicate_mask_does_not_refresh_depth_timestamp(self):
++        self.n.process_observation();reference=self.n.depth_reference
++        self.n.process_observation()
++        self.assertIs(self.n.depth_reference,reference)
++
++    def test_ambiguous_current_surfaces_revoke_reference(self):
++        self.n.process_observation()
++        points=np.array([[x*z/100,y*z/100,z] for z in (8.,20.)
++                         for x in range(-10,0,2) for y in range(-10,0,2)])
++        points[25:,:2]*=-1
++        self.set_input(99_500_000_000,points)
++        self.n.process_observation()
++        self.assertIsNone(self.n.depth_reference)
++        self.n.publish_localization_rejection.assert_called_once_with('ambiguous_depth_surfaces')
++
++    def test_world_reference_uses_camera_acquisition_transform(self):
++        rotation=Rotation.from_euler('z',90,degrees=True).as_matrix()
++        origin=np.array([4.,-1.,0.]);anchor=rotation@self.points[8]+origin
++        self.cam['R_wc']=rotation;self.cam['t_wc']=origin.reshape(3,1)
++        self.n.depth_reference=dict(position=anchor,stamp_ns=98*10**9)
++        self.set_input(99*10**9,self.points@rotation.T+origin)
++        self.n.process_observation()
++        np.testing.assert_allclose(self.n.triangulated_position,anchor,atol=1e-10)
++
++if __name__=='__main__':unittest.main()
+--- v28/wildos_port/repro_check/src/nebula2-wildos/visual_navigation/test/test_localization_geometry.py
++++ v30/wildos_port/repro_check/src/nebula2-wildos/visual_navigation/test/test_localization_geometry.py
+@@ -108,7 +108,8 @@
+ 
+     def test_independent_bearings_recover_target(self):
+         target = np.array([10., 2., 3.])
+-        views = [dict(origin=o, ray=target-np.array(o)) for o in ([0., 0., 0.], [2., 0., 0.], [2., 1., 0.])]
++        views = [dict(origin=o, ray=target-np.array(o)) for o in
++                 ([0., 0., 0.], [2., 0., 0.], [2., 1., 0.], [0., 4., 0.])]
+         result = triangulate_bearings(views)
+         self.assertIsNotNone(result)
+         np.testing.assert_allclose(result['position'], target, atol=1e-7)
+--- v28/wildos_port/repro_check/src/nebula2-wildos/visual_navigation/test/test_range_consistency.py
++++ v30/wildos_port/repro_check/src/nebula2-wildos/visual_navigation/test/test_range_consistency.py
+@@ -0,0 +1,103 @@
++import json
++from pathlib import Path
++import unittest
++import numpy as np
++from visual_navigation.explorfm_triangulation.localization_geometry import foreground_depth,triangulate_bearings
++
++FIXTURES=Path(__file__).parent/'fixtures'
++
++class RangeConsistencyTests(unittest.TestCase):
++    def test_recorded_lidar_representative_projects_inside_its_own_mask(self):
++        with np.load(FIXTURES/'depth_fixture_1792915120137115425.npz') as f:
++            result=foreground_depth(f['points_cam'],f['k'],f['mask'])
++            self.assertIsNotNone(result)
++            p=result['position'];pixel=f['k']@p;u,v=(pixel[:2]/pixel[2]).astype(int)
++            self.assertTrue(f['mask'][v,u])
++
++    def test_representative_is_an_actual_supported_return(self):
++        with np.load(FIXTURES/'depth_fixture_1792915120137115425.npz') as f:
++            result=foreground_depth(f['points_cam'],f['k'],f['mask'])
++            self.assertLess(np.linalg.norm(f['points_cam']-result['position'],axis=1).min(),1e-10)
++
++    def test_recorded_multiview_solutions_do_not_hide_angular_uncertainty(self):
++        rows=json.loads((FIXTURES/'v28_localization_callback.json').read_text())
++        for row in rows:
++            if row['source']=='multiview':
++                with self.subTest(stamp=row['stamp_ns']):
++                    self.assertIsNone(triangulate_bearings(row['views']))
++
++    def test_zero_intersection_residual_does_not_mean_precise_range(self):
++        target=np.array([2.,20.,0.])
++        views=[dict(origin=o,ray=target-np.array(o),angular_tolerance=.04)
++               for o in ([0.,0.,0.],[2.,0.,0.])]
++        self.assertIsNone(triangulate_bearings(views))
++
++    def test_well_separated_views_keep_usable_geometry(self):
++        target=np.array([5.,5.,2.])
++        views=[dict(origin=o,ray=target-np.array(o),angular_tolerance=.04)
++               for o in ([0.,0.,0.],[2.,0.,0.],[0.,2.,0.])]
++        result=triangulate_bearings(views)
++        self.assertIsNotNone(result)
++        np.testing.assert_allclose(result['position'],target,atol=1e-8)
++
++    def test_exact_small_baseline_fixture_is_still_uncertain_with_angular_error(self):
++        target=np.array([10.,2.,3.])
++        views=[dict(origin=o,ray=target-np.array(o)) for o in
++               ([0.,0.,0.],[2.,0.,0.],[2.,1.,0.])]
++        self.assertIsNone(triangulate_bearings(views))
++
++    def test_invalid_angular_error_metadata_cannot_create_covariance(self):
++        target=np.array([5.,5.,2.])
++        for tolerance in (0.,float('nan'),float('inf'),np.pi/2):
++            with self.subTest(tolerance=tolerance):
++                views=[dict(origin=o,ray=target-np.array(o),angular_tolerance=tolerance)
++                       for o in ([0.,0.,0.],[2.,0.,0.],[0.,2.,0.])]
++                self.assertIsNone(triangulate_bearings(views))
++
++    def test_current_returns_can_retain_nearby_representative(self):
++        k=np.array([[100.,0.,50.],[0.,100.,50.],[0.,0.,1.]])
++        mask=np.ones((100,100),bool)
++        points=np.array([[x,y,10.] for x in np.linspace(-1.,1.,9) for y in np.linspace(-1.,1.,9)])
++        reference=points[8].copy()
++        result=foreground_depth(points,k,mask,reference_position=reference)
++        np.testing.assert_array_equal(result['position'],reference)
++        self.assertEqual(result['representative_kind'],'tracked_return')
++        self.assertGreaterEqual(result['points'],20)
++
++    def test_covariance_matches_actual_solver_angular_sensitivity(self):
++        # Independent finite differences of the position solver: covariance
++        # must describe that estimator, including unequal viewing distances.
++        from copy import deepcopy
++        target=np.array([5.,5.,1.])
++        views=[dict(origin=np.array(o),ray=target-np.array(o),angular_tolerance=.04)
++               for o in ([0.,0.,0.],[4.,0.,0.],[0.,4.,0.])]
++        result=triangulate_bearings(views)
++        self.assertIsNotNone(result)
++        expected=np.zeros((3,3));epsilon=1e-6
++        for i,view in enumerate(views):
++            ray=view['ray']/np.linalg.norm(view['ray'])
++            a=np.cross(ray,[0.,0.,1.]);a/=np.linalg.norm(a)
++            for tangent in (a,np.cross(ray,a)):
++                plus=deepcopy(views);minus=deepcopy(views)
++                plus[i]['ray']=ray*np.cos(epsilon)+tangent*np.sin(epsilon)
++                minus[i]['ray']=ray*np.cos(epsilon)-tangent*np.sin(epsilon)
++                derivative=(triangulate_bearings(plus)['position']-
++                            triangulate_bearings(minus)['position'])/(2*epsilon)
++                expected+=np.outer(derivative,derivative)*np.tan(.04)**2
++        np.testing.assert_allclose(result['covariance'],expected,rtol=1e-5,atol=1e-7)
++
++    def test_old_reference_cannot_create_range_without_current_returns(self):
++        k=np.array([[100.,0.,50.],[0.,100.,50.],[0.,0.,1.]])
++        self.assertIsNone(foreground_depth(np.empty((0,3)),k,np.ones((100,100)),reference_position=[0,0,10]))
++
++    def test_reference_does_not_hide_multiple_surfaces(self):
++        k=np.array([[100.,0.,50.],[0.,100.,50.],[0.,0.,1.]])
++        points=np.array([[x*z/100,y*z/100,z] for z in (8.,20.)
++            for x in range(-10,0,2) for y in range(-10,0,2)])
++        # Distinct pixel areas preserve both surfaces after nearest-return dedup.
++        points[25:,:2]*=-1
++        result=foreground_depth(points,k,np.ones((100,100)),reference_position=points[0])
++        self.assertFalse(result['association_validated'])
++        self.assertEqual(len(result['depth_candidates']),2)
++
++if __name__=='__main__':unittest.main()
+--- v28/wildos_port/repro_check/src/nebula2-wildos/visual_navigation/visual_navigation/explorfm_triangulation/localization_geometry.py
++++ v30/wildos_port/repro_check/src/nebula2-wildos/visual_navigation/visual_navigation/explorfm_triangulation/localization_geometry.py
+@@ -3,7 +3,8 @@
+ import numpy as np
+ 
+ 
+-def foreground_depth(points_cam, intrinsic, mask, dense_minimum=20, sparse_minimum=8):
++def foreground_depth(points_cam, intrinsic, mask, dense_minimum=20, sparse_minimum=8,
++                     *, reference_position=None, reference_radius=1.5):
+     """Return a depth proposal with explicit surface-association validity.
+ 
+     Project in camera optical coordinates. Per-pixel nearest returns suppress
+@@ -50,7 +51,8 @@
+                 and len(c) / len(points) >= (.2 if len(c) >= dense_minimum else .25)]
+     if not eligible:
+         return None
+-    candidates = [_surface_quality(points, pixels, cluster, dense_minimum, sparse_minimum)
++    candidates = [_surface_quality(points, pixels, cluster, dense_minimum, sparse_minimum,
++                                  reference_position, reference_radius)
+                   for cluster in eligible]
+     candidates = sorted((c for c in candidates if c is not None),
+                         key=lambda c: c['position'][2])
+@@ -68,7 +70,8 @@
+     return proposal
+ 
+ 
+-def _surface_quality(points, pixels, cluster, dense_minimum, sparse_minimum):
++def _surface_quality(points, pixels, cluster, dense_minimum, sparse_minimum,
++                     reference_position=None, reference_radius=1.5):
+     """Validate every surface before comparing association alternatives."""
+     chosen, projected = points[cluster], pixels[cluster]
+     centre = np.median(chosen, axis=0)
+@@ -92,7 +95,23 @@
+     centred = chosen - centre
+     _, singular, axes = np.linalg.svd(centred, full_matrices=False)
+     normal = axes[-1]
+-    return dict(position=centre, confidence=confidence, points=int(len(chosen)),
++    # Coordinate-wise medians need not be a measured point and can project
++    # outside a non-convex semantic mask. Always select a CURRENT supported
++    # return. A recent reference only stabilizes which point on an extended
++    # surface represents the object; it never supplies missing range evidence.
++    position = chosen[int(np.argmin(np.linalg.norm(chosen-centre, axis=1)))]
++    representative_kind = 'medoid_return'
++    if reference_position is not None:
++        reference = np.asarray(reference_position, dtype=float)
++        if (reference.shape == (3,) and np.all(np.isfinite(reference))
++                and math.isfinite(reference_radius) and reference_radius > 0):
++            distances = np.linalg.norm(chosen-reference, axis=1)
++            closest = int(np.argmin(distances))
++            if distances[closest] <= reference_radius:
++                position = chosen[closest]
++                representative_kind = 'tracked_return'
++    return dict(position=position, confidence=confidence, points=int(len(chosen)),
++                representative_kind=representative_kind,
+                 support=float(support), depth_sigma=depth_sigma,
+                 plane_normal=normal,
+                 plane_residual=float(np.sqrt(np.mean((centred @ normal) ** 2))),
+@@ -138,14 +157,24 @@
+     residual = np.linalg.norm(np.einsum('nij,nj->ni', matrices, vectors), axis=1)
+     errors = np.arctan2(residual, depths)
+     limits = np.asarray([v.get('angular_tolerance', .035) for v in views])
+-    if (np.any(depths <= 0) or np.any(depths > 100.) or np.any(errors > limits)
++    if (not np.all(np.isfinite(limits)) or np.any(limits <= 0) or np.any(limits >= math.pi/2)
++            or np.any(depths <= 0) or np.any(depths > 100.) or np.any(errors > limits)
+             or np.median(residual) > 1.5):
+         return None
+-    covariance = np.linalg.inv(matrix) * max(.01, float(np.mean(residual**2)))
++    # Near-intersecting rays can have zero residual while their range is
++    # poorly constrained. Propagate the existing angular error budget through
++    # each ray's depth instead of treating residual alone as measurement noise.
++    variances = np.maximum(.01, np.maximum((depths*np.tan(limits))**2, residual**2))
++    # The position above is unweighted least squares. Propagate noise through
++    # that SAME estimator; inverse weighted precision would describe a
++    # different estimator when cameras have unequal target ranges.
++    inverse = np.linalg.inv(matrix)
++    covariance = inverse @ np.sum(matrices*variances[:, None, None], axis=0) @ inverse.T
+     radius = float(np.sqrt(np.max(np.linalg.eigvalsh(covariance[:2, :2]))))
+     if radius > 3.:
+         return None
+     return dict(position=position, confidence=.65, covariance=covariance,
++                uncertainty_basis='angular_and_residual',
+                 association_validated=True, association_status='validated_bearings',
+                 radius=radius, parallax=max(math.acos(float(np.clip(rays[i] @ rays[j], -1., 1.)))
+                                           for i, j in pairs))
+--- v28/wildos_port/repro_check/src/nebula2-wildos/visual_navigation/visual_navigation/explorfm_triangulation/obj_mask_triangulation.py
++++ v30/wildos_port/repro_check/src/nebula2-wildos/visual_navigation/visual_navigation/explorfm_triangulation/obj_mask_triangulation.py
+@@ -110,6 +110,7 @@
+             raise ValueError("LiDAR confirmation requires at least 6 coherent returns")
+         self.bearing_views = []
+         self.localization_quality = None
++        self.depth_reference = None
+         self.query_started_ns = 0
+         self.last_observation_ns = 0
+         self.min_view_distance = config.min_view_distance
+@@ -229,6 +230,7 @@
+         self.last_observation_ns = 0
+         self.bearing_views.clear()
+         self.views.clear()
++        self.depth_reference = None
+         self.prev_view_pos = None
+         self.triangulated_position = None
+         self.found_lidar_in_mask = False
+@@ -303,6 +305,7 @@
+             # this ambiguous mask into a fresh multiview confirmation.
+             self.views.clear()
+             self.bearing_views.clear()
++            self.depth_reference = None
+             self.prev_view_pos = None
+             self.publish_localization_rejection('ambiguous_depth_surfaces')
+             return
+@@ -420,8 +423,16 @@
+             if camera_index != selected_camera:
+                 continue
+             camera = (world - cam['t_wc'].reshape(1, 3)) @ cam['R_wc']
++            reference = getattr(self, 'depth_reference', None)
++            observation_ns = self.stamp_ns(self.current_observation.header.stamp)
++            reference_camera = None
++            if (reference is not None and
++                    0 <= observation_ns-reference['stamp_ns'] <= self.observation_timeout*1e9):
++                reference_camera = cam['R_wc'].T @ (
++                    reference['position']-cam['t_wc'].ravel())
+             quality = foreground_depth(camera, cam['K'], cam['object_mask'],
+-                                       self.min_lidar_points, self.sparse_lidar_points)
++                                       self.min_lidar_points, self.sparse_lidar_points,
++                                       reference_position=reference_camera)
+             if quality is None:
+                 continue
+             for candidate in quality['depth_candidates']:
+@@ -444,6 +455,10 @@
+             self.localization_quality = quality
+             self.triangulated_position = quality['position']
+             self.found_lidar_in_mask = True
++            # Updated only by a fresh, supported LiDAR surface. Missing scans
++            # and bearing-only observations never extend this range reference.
++            self.depth_reference = dict(position=quality['position'].copy(),
++                stamp_ns=self.stamp_ns(self.current_observation.header.stamp))
+ 
+     def prune_views(self, stamp_ns):
+         # Observation freshness must also apply to the rays used to compute a

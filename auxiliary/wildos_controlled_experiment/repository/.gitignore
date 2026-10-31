@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+build/
+install/
+log/
+results/
+.runtime/
+test_artifacts/*
+!test_artifacts/server_validation_20261002/
+test_artifacts/server_validation_20261002/*
+!test_artifacts/server_validation_20261002/accepted_memory_prefix_snapshot.npz
+!test_artifacts/server_validation_20261002/prefix_replay.json
+!test_artifacts/server_validation_20261002/house_localization_replay.json

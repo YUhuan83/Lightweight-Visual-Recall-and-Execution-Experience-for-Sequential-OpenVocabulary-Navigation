@@ -1,0 +1,676 @@
+--- before/official_adapter/beamng_wildos_adapter/mapping.py
++++ after/official_adapter/beamng_wildos_adapter/mapping.py
+@@ -130,13 +130,15 @@
+ 
+ def reachable_ring_candidate(grid, resolution, origin_xy, target_local_xy,
+                              radius, safety_margin=1.5,
+-                             unknown_safety_margin=None, maintain_distance=False):
++                             unknown_safety_margin=None, maintain_distance=False,
++                             accept=None):
+     """Pick a collision-free point on a radius ring around a local target."""
+     grid = np.asarray(grid)
+     target = np.asarray(target_local_xy, dtype=float)
+     distance = float(np.linalg.norm(target))
+     if distance <= radius and not maintain_distance:
+-        return np.zeros(2, dtype=float)
++        candidate=np.zeros(2,dtype=float)
++        return candidate if accept is None or accept(candidate) else None
+     base = math.atan2(target[1], target[0])
+     offsets = [0, 15, -15, 30, -30, 45, -45, 60, -60, 75, -75, 90, -90,
+                105, -105, 120, -120, 135, -135, 150, -150, 165, -165, 180]
+@@ -145,10 +147,12 @@
+         candidate = target + radius * np.array([math.cos(angle), math.sin(angle)])
+         travel = float(np.linalg.norm(candidate))
+         if travel < 0.1:
+-            return candidate
++            if accept is None or accept(candidate):
++                return candidate
++            continue
+         safe = safe_travel_distance(
+             grid, resolution, origin_xy, candidate, travel, safety_margin,
+             unknown_safety_margin)
+-        if safe + 0.1 >= travel:
++        if safe + 0.1 >= travel and (accept is None or accept(candidate)):
+             return candidate
+     return None
+--- before/official_adapter/beamng_wildos_adapter/visible_approach.py
++++ after/official_adapter/beamng_wildos_adapter/visible_approach.py
+@@ -49,7 +49,8 @@
+     return math.atan2(ray[1], ray[0])
+ 
+ 
+-def observation_step(grid, resolution, origin, map_xy, map_yaw, bearing, maximum=8.):
++def observation_step(grid, resolution, origin, map_xy, map_yaw, bearing, maximum=8.,
++                     accept=None):
+     """Select measured free travel in a narrow cone; retain obstacle margins."""
+     if not all(map(math.isfinite, (*map_xy, map_yaw, bearing, resolution, maximum))) or resolution <= 0:
+         return None
+@@ -62,6 +63,17 @@
+                                      safety_margin=2., unknown_safety_margin=max(resolution, .5))
+         if travel < 2.:
+             continue
++        # Reuse this ray's measured free segment. If its endpoint cannot hold
++        # the real vehicle, look for a shorter pose before abandoning the ray.
++        if accept is not None:
++            while travel >= 2.:
++                point=(map_xy[0]+travel*math.cos(direction),
++                       map_xy[1]+travel*math.sin(direction))
++                if accept(point):
++                    break
++                travel-=resolution
++            if travel < 2.:
++                continue
+         # The whole segment was checked, including unknown cells. A wider turn
+         # must earn additional free progress before replacing the central ray.
+         merit = travel*math.cos(offset) - 2.*abs(offset)
+--- before/official_adapter/beamng_wildos_adapter/goal_standoff.py
++++ after/official_adapter/beamng_wildos_adapter/goal_standoff.py
+@@ -25,6 +25,8 @@
+ from wildos_nav2_adapter.arrival_criteria import STANDOFF_ARRIVAL_TOLERANCE_M
+ from rcl_interfaces.msg import SetParametersResult
+ from .visible_approach import visible_direction, observation_step
++from wildos_nav2_adapter.observation_pose import (
++    connected_free_cells, grid_cell, observation_pose_clear)
+ 
+ 
+ class GoalStandoff(Node):
+@@ -73,6 +75,11 @@
+         self.occupancy = None
+         self.odom_history = deque(maxlen=200)
+         self.occupancy_odom = None
++        self.vehicle_grid = None
++        self.vehicle_connectivity = None
++        self.rejected_observation_poses = deque(maxlen=16)
++        self.last_visible_goal = None
++        self.last_navigation_failure_ns = 0
+         self.last_goal = None
+         self.last_standoff_clamped = False
+         self.last_standoff_object_distance = None
+@@ -101,6 +108,8 @@
+         self.create_subscription(
+             Odometry, str(self.get_parameter("odom_topic").value), self.on_odom, 10)
+         self.create_subscription(OccupancyGrid, "/spot1/local_map", self.on_occupancy, 10)
++        self.create_subscription(OccupancyGrid, "/global_costmap/costmap", self.on_vehicle_grid, 10)
++        self.create_subscription(String, "/wildos/plan_status", self.on_navigation_plan_status, 10)
+         self.create_subscription(
+             String, str(self.get_parameter("query_topic").value), self.on_query, 10)
+         self.create_timer(.2, self.on_timer)
+@@ -167,10 +176,12 @@
+         point = observation_step(grid, float(info.resolution),
+             (info.origin.position.x, info.origin.position.y),
+             (map_pose.position.x, map_pose.position.y), map_yaw, evidence['bearing'],
+-            maximum=self.visible_observation_max_m)
++            maximum=self.visible_observation_max_m,
++            accept=self.observation_pose_filter(bearing=evidence['bearing']))
+         if point is None or math.hypot(point[0]-robot.x, point[1]-robot.y) < 2.:
+             return
+         self.visible_step_published_ns = now
++        self.last_visible_goal = tuple(point)
+         self.visible_approach_pub.publish(String(data=json.dumps({
+             'query': self.active_query, 'frame': 'spot1/odom',
+             'observation_stamp_ns': evidence['stamp'], 'point': list(point),
+@@ -224,11 +235,86 @@
+         self.occupancy = message
+         self.pair_occupancy_pose()
+ 
++    def on_vehicle_grid(self, message):
++        info=message.info
++        if (message.header.frame_id!='spot1/odom' or not self.fresh(message,3.)
++                or not math.isfinite(info.resolution) or info.resolution<=0
++                or info.width<=0 or info.height<=0
++                or len(message.data)!=info.width*info.height
++                or not self.valid_pose(info.origin)
++                or any(not -1<=v<=100 for v in message.data)
++                or (self.vehicle_grid is not None
++                    and self.stamp_ns(message)<=self.stamp_ns(self.vehicle_grid))):
++            return
++        self.vehicle_grid=message
++        self.vehicle_connectivity=None
++
++    def observation_pose_filter(self, *, target=None, bearing=None):
++        """Filter proposals; the bridge still requires a checked Smac path."""
++        now=time.monotonic()
++        self.rejected_observation_poses=deque(
++            (entry for entry in self.rejected_observation_poses if entry[2]>now),maxlen=16)
++        grid=self.vehicle_grid
++        ackermann=str(self.get_parameter('carrier_model').value).lower()!='ideal_point'
++        connected=None
++        if ackermann and grid is not None:
++            if self.odom is None or not self.fresh(grid,3.):
++                return lambda point: False
++            current=self.odom.pose.pose.position
++            key=(id(grid),grid_cell(grid,(current.x,current.y)))
++            if self.vehicle_connectivity is None or self.vehicle_connectivity[0]!=key:
++                self.vehicle_connectivity=(key,connected_free_cells(grid,(current.x,current.y)))
++            connected=self.vehicle_connectivity[1]
++
++        def accept(point):
++            if any(math.dist(point,p)<radius for p,radius,_ in self.rejected_observation_poses):
++                return False
++            heading=(math.atan2(target[1]-point[1],target[0]-point[0])
++                     if target is not None else bearing)
++            return (connected is None
++                    or observation_pose_clear(grid,connected,point,heading))
++        return accept
++
++    def on_navigation_plan_status(self, message):
++        try:
++            data=json.loads(message.data)
++            stamp=int(data['stamp_ns']);now=self.get_clock().now().nanoseconds
++            state=data.get('status')
++            if (data.get('query')!=self.active_query
++                    or stamp<self.query_started_ns or stamp<=self.last_navigation_failure_ns
++                    or not 0<=now-stamp<=2_000_000_000
++                    or state not in ('visible_target_no_vehicle_path','confirmed_approach_failed')
++                    or (state=='confirmed_approach_failed'
++                        and data.get('reason')!='no_vehicle_path')):
++                return
++            failed=tuple(map(float,data['goal']))
++            visible=state=='visible_target_no_vehicle_path'
++            previous=self.last_visible_goal if visible else self.last_goal
++            if (len(failed)!=2 or not all(map(math.isfinite,failed)) or previous is None
++                    or math.dist(previous,failed)>STANDOFF_ARRIVAL_TOLERANCE_M):
++                return
++        except (ValueError,TypeError,KeyError,OverflowError):
++            return
++        self.last_navigation_failure_ns=stamp
++        self.rejected_observation_poses.append(
++            (failed,2. if visible else 2*STANDOFF_ARRIVAL_TOLERANCE_M,time.monotonic()+15.))
++        if visible:
++            self.visible_step_published_ns=0
++            self.publish_visible_step()
++        elif self.active_approach is not None:
++            target,confirmation=self.active_approach
++            if (confirmation.get('query')==self.active_query
++                    and self.publish_standoff(target) is None and self.last_goal is not None):
++                self.publish_approach_refresh(confirmation)
++
+     def on_query(self, message):
+         query = " ".join(message.data.casefold().split())
+         if not query or query == self.active_query:
+             return
+         self.active_query = query
++        self.rejected_observation_poses.clear()
++        self.last_navigation_failure_ns=0
++        self.last_visible_goal=None
+         self.navigation_region_backoff.clear()
+         self.visible_target = None
+         self.visible_target_count = 0
+@@ -481,6 +567,9 @@
+                 or math.hypot(self.last_goal[0] - previous_goal[0],
+                               self.last_goal[1] - previous_goal[1]) < update_distance):
+             return
++        self.publish_approach_refresh(confirmation)
++
++    def publish_approach_refresh(self, confirmation):
+         now_ns = self.get_clock().now().nanoseconds
+         refresh = dict(confirmation,
+             approach_refresh=True,
+@@ -533,6 +622,7 @@
+             return 'invalid_standoff_distance'
+         x, y = standoff_xy((robot.x, robot.y), (stable[0], stable[1]), standoff,
+                           maintain_distance=True)
++        accept=self.observation_pose_filter(target=stable[:2])
+         clamped = clearance_adjusted
+         if (self.occupancy is not None and self.occupancy_odom is not None
+                 and self.fresh(self.occupancy, 3.)):
+@@ -555,7 +645,9 @@
+             candidate_local = reachable_ring_candidate(
+                 grid, float(info.resolution), origin, target_local[:2], standoff,
+                 float(self.get_parameter("obstacle_margin").value), unknown_margin,
+-                maintain_distance=True)
++                maintain_distance=True,
++                accept=lambda p: accept(tuple(np.asarray((map_robot.x,map_robot.y))
++                    +(rotation@np.array([p[0],p[1],0.]))[:2])))
+             if candidate_local is not None:
+                 candidate_world = rotation @ np.array(
+                     [candidate_local[0], candidate_local[1], 0.0])
+@@ -577,6 +669,9 @@
+                 y = map_robot.y + direction[1] * safe_travel
+                 clamped = True
+         candidate = (x, y)
++        if not accept(candidate):
++            self.last_goal=None
++            return 'no_reachable_standoff'
+         if math.hypot(stable[0]-x, stable[1]-y) < standoff - .05:
+             self.last_goal = None
+             return 'no_observable_standoff'
+--- before/nav2_adapter/wildos_nav2_adapter/graph_path_bridge.py
++++ after/nav2_adapter/wildos_nav2_adapter/graph_path_bridge.py
+@@ -1798,6 +1798,11 @@
+                     and self.fail_confirmed_approach('no_vehicle_path',
+                                                     reasons=list(self.failure_reasons))):
+                 return
++            if (self.visible_approach_active and self.failure_reasons and not any(
++                    r.startswith('planner_') or r=='path_frame_mismatch'
++                    for r in self.failure_reasons)):
++                self.release_visible_approach('visible_target_no_vehicle_path')
++                return
+             self.block_current_route()
+             self.reject_exploration_route()
+             self.status("no_vehicle_path",
+--- before/nav2_adapter/wildos_nav2_adapter/target_observation.py
++++ after/nav2_adapter/wildos_nav2_adapter/target_observation.py
+@@ -7,6 +7,7 @@
+ from .graph_route import distance
+ from .sensor_geometry import observation_clearance
+ from .arrival_criteria import STANDOFF_ARRIVAL_TOLERANCE_M
++from .observation_pose import connected_free_cells, observation_pose_clear
+ 
+ 
+ def live_observation_approaches(target, current, minimum_radius, limit=4):
+@@ -116,12 +117,17 @@
+             # more distant view of this same instance may be the useful one.
+             x, y = deferred['standoff']
+             options.insert(0, (x, y, math.atan2(target[1]-y, target[0]-x)))
++        connected=(connected_free_cells(self.grid,current)
++                   if self.carrier_model!='ideal_point' else None)
+         for x, y, heading in options:
+             key = (round(x, 1), round(y, 1))
+             if (key in self.observation_attempts or len(self.observation_attempts) >= 4
+                     or self.failed_confirmed_view((x, y))):
+                 continue
+             if self.pose_blockers(self.grid, (x, y), heading):
++                continue
++            if connected is not None and not observation_pose_clear(
++                    self.grid,connected,(x,y),heading):
+                 continue
+             self.observation_attempts.add(key)
+             pose = PoseStamped()
+--- before/tools/offline_callback_check.py
++++ after/tools/offline_callback_check.py
+@@ -21,7 +21,7 @@
+     output = ROOT / 'test_artifacts/offline_navigation'
+     output.mkdir(parents=True, exist_ok=True)
+     results = []
+-    for name in ('test_exploration_cost_ros', 'test_graph_path_bridge_routing', 'test_planning_phase_ros', 'test_cmd_vel_to_control_ros', 'test_controller_source_ros', 'test_goal_confirmation_ros',
++    for name in ('test_reachable_observation_ros', 'test_exploration_cost_ros', 'test_graph_path_bridge_routing', 'test_planning_phase_ros', 'test_cmd_vel_to_control_ros', 'test_controller_source_ros', 'test_goal_confirmation_ros',
+                  'test_recorded_memory_handoff_ros', 'test_execution_mechanism_ros', 'test_multi_goal_session_ros',
+                  'test_sensor_observation_lifecycle_ros', 'test_execution_transport_health_ros',
+                  'test_confirmed_recovery_ros',
+--- before/nav2_adapter/wildos_nav2_adapter/observation_pose.py
++++ after/nav2_adapter/wildos_nav2_adapter/observation_pose.py
+@@ -0,0 +1,45 @@
++"""Necessary vehicle-map checks for observation proposals; Smac decides reachability."""
++from collections import deque
++import math
++from .graph_route import footprint_blockers
++
++
++def grid_cell(grid, point):
++    info=grid.info
++    q=info.origin.orientation
++    heading=math.atan2(2*(q.w*q.z+q.x*q.y),1-2*(q.y*q.y+q.z*q.z))
++    dx=point[0]-info.origin.position.x;dy=point[1]-info.origin.position.y
++    x=math.floor((math.cos(heading)*dx+math.sin(heading)*dy)/info.resolution)
++    y=math.floor((-math.sin(heading)*dx+math.cos(heading)*dy)/info.resolution)
++    return (x,y) if 0<=x<info.width and 0<=y<info.height else None
++
++
++def connected_free_cells(grid, start):
++    """Known, non-inscribed centre cells connected to the actual vehicle.
++
++    Nav2 already inflates obstacles by its configured inscribed radius. This
++    is a necessary centre-space check, not another inflation or a car path.
++    """
++    cell=grid_cell(grid,start)
++    if cell is None:
++        return bytearray(len(grid.data))
++    width=grid.info.width;height=grid.info.height
++    free=bytearray(0<=v<99 for v in grid.data)
++    first=cell[1]*width+cell[0]
++    reached=bytearray(len(free))
++    if not free[first]:
++        return reached
++    queue=deque([first]);reached[first]=1
++    while queue:
++        index=queue.popleft();x=index%width;y=index//width
++        for neighbour,allowed in ((index-1,x>0),(index+1,x+1<width),
++                                  (index-width,y>0),(index+width,y+1<height)):
++            if allowed and free[neighbour] and not reached[neighbour]:
++                reached[neighbour]=1;queue.append(neighbour)
++    return reached
++
++
++def observation_pose_clear(grid, connected, point, heading):
++    cell=grid_cell(grid,point)
++    return (cell is not None and bool(connected[cell[1]*grid.info.width+cell[0]])
++            and not footprint_blockers(grid,point,heading,limit=1))
+--- before/nav2_adapter/test/test_reachable_observation_ros.py
++++ after/nav2_adapter/test/test_reachable_observation_ros.py
+@@ -0,0 +1,269 @@
++"""Observation proposals against vehicle maps; real callbacks, synthetic maps."""
++from copy import deepcopy
++import json
++import math
++import unittest
++from unittest.mock import Mock
++from concurrent.futures import Future
++from types import SimpleNamespace as S
++from geometry_msgs.msg import PoseStamped
++from std_msgs.msg import String
++from wildos_nav2_adapter.graph_route import footprint_blockers, cell_cost
++import test_visible_approach_ros as fixture
++import test_confirmed_recovery_ros as confirmed_fixture
++from test_graph_path_bridge_routing import route
++
++
++class ReachableObservationTests(unittest.TestCase):
++    @classmethod
++    def setUpClass(cls):
++        fixture.VisibleApproachTests.setUpClass()
++
++    @classmethod
++    def tearDownClass(cls):
++        fixture.VisibleApproachTests.tearDownClass()
++
++    def setUp(self):
++        self.fixture=fixture.VisibleApproachTests()
++        self.fixture.setUp()
++        self.node=self.fixture.perception
++        self.bridge=self.fixture.bridge
++        self.grid=deepcopy(self.node.occupancy)
++        self.grid.header.frame_id='spot1/odom'
++        self.grid.info.width=self.grid.info.height=160
++        self.grid.info.resolution=.25
++        self.grid.info.origin.position.x=self.grid.info.origin.position.y=-20.
++        self.grid.data=[0]*25600
++        # Old implementation ignored this map entirely.
++        self.node.vehicle_grid=self.grid
++
++    def tearDown(self):
++        self.fixture.tearDown()
++
++    def occupy(self,x,y):
++        ix=int((x+20)/.25);iy=int((y+20)/.25)
++        self.grid.data[iy*160+ix]=100
++
++    def wall(self):
++        for y in range(160):
++            self.grid.data[y*160+96]=100  # x=4m, outside current vehicle.
++
++    def test_free_center_with_colliding_body_selects_shorter_observation_step(self):
++        self.occupy(11.,0.)
++        self.assertEqual(cell_cost(self.grid,8.,0.),0)
++        self.assertTrue(footprint_blockers(self.grid,(8.,0.),0.))
++        data=json.loads(self.fixture.detect().data)
++        self.assertNotEqual(tuple(data['point']),(8.,0.))
++        self.assertFalse(footprint_blockers(self.grid,tuple(data['point']),0.))
++        self.assertFalse(data['search_confirmed'])
++
++    def test_disconnected_free_centers_do_not_become_observation_goals(self):
++        self.wall()
++        for _ in range(3):
++            self.fixture.now+=100_000_000
++            self.node.on_visible_target(self.fixture.mask())
++        self.node.visible_approach_pub.publish.assert_not_called()
++
++    def test_standoff_ring_skips_pose_that_cannot_hold_real_body(self):
++        self.occupy(13.,0.)
++        target=PoseStamped();target.pose.position.x=20.
++        self.assertIsNone(self.node.publish_standoff(target))
++        point=self.node.last_goal
++        self.assertNotEqual(point,(10.,0.))
++        heading=math.atan2(-point[1],20.-point[0])
++        self.assertFalse(footprint_blockers(self.grid,point,heading))
++        self.assertGreaterEqual(math.dist(point,(20.,0.)),10.-1e-6)
++
++    def test_standoff_ray_fallback_cannot_bypass_vehicle_reachability(self):
++        self.wall()
++        target=PoseStamped();target.pose.position.x=20.
++        self.assertEqual(self.node.publish_standoff(target),'no_reachable_standoff')
++        self.node.publisher.publish.assert_not_called()
++        self.assertIsNone(self.node.last_goal)
++
++    def test_exhausted_visible_vehicle_plans_release_without_waiting_for_timeout(self):
++        self.bridge.on_visible_approach(self.fixture.detect())
++        self.bridge.carrier_model='ackermann'
++        self.bridge.route=self.bridge.latest_route=route((0.,0.),(8.,0.))
++        self.bridge.route_endpoint=(8.,0.)
++        self.bridge.candidates=[];self.bridge.candidate_index=0
++        self.bridge.failure_reasons=['empty_path']
++        self.bridge.try_planning_escape=Mock(return_value=False)
++        self.bridge.try_candidate()
++        self.assertFalse(self.bridge.visible_approach_active)
++        self.assertEqual(self.bridge.last_status['status'],'visible_target_no_vehicle_path')
++        self.assertEqual(self.bridge.last_status['goal'],[8.,0.])
++        self.assertFalse(self.bridge.object_found)
++
++    def test_transport_failure_does_not_reject_observation_pose(self):
++        self.bridge.on_visible_approach(self.fixture.detect())
++        self.bridge.route=self.bridge.latest_route=route((0.,0.),(8.,0.))
++        self.bridge.route_endpoint=(8.,0.)
++        self.bridge.candidates=[];self.bridge.candidate_index=0
++        self.bridge.failure_reasons=['planner_timeout']
++        self.bridge.try_planning_escape=Mock(return_value=False)
++        self.bridge.try_candidate()
++        self.assertTrue(self.bridge.visible_approach_active)
++
++    def failure(self,goal,state='visible_target_no_vehicle_path',**changes):
++        data=dict(query=self.node.active_query,stamp_ns=self.fixture.now,
++                  status=state,goal=list(goal))
++        data.update(changes)
++        return String(data=json.dumps(data))
++
++    def test_navigation_failure_selects_another_visible_point_with_same_evidence(self):
++        data=json.loads(self.fixture.detect().data)
++        point=tuple(data['point']);self.node.visible_approach_pub.publish.reset_mock()
++        self.node.on_navigation_plan_status(self.failure(point))
++        self.node.visible_approach_pub.publish.assert_called_once()
++        alternative=json.loads(self.node.visible_approach_pub.publish.call_args.args[0].data)
++        self.assertGreaterEqual(math.dist(alternative['point'],point),2.)
++        self.assertEqual(alternative['observation_stamp_ns'],data['observation_stamp_ns'])
++        self.assertEqual(alternative['query'],data['query'])
++        self.assertFalse(alternative['search_confirmed'])
++        # A duplicate delivery cannot reject another point or trigger a new attempt.
++        self.node.on_navigation_plan_status(self.failure(point))
++        self.node.visible_approach_pub.publish.assert_called_once()
++
++    def test_stale_or_other_query_failure_cannot_reject_current_goal(self):
++        data=json.loads(self.fixture.detect().data);point=data['point']
++        self.node.on_navigation_plan_status(self.failure(point,query='other target'))
++        self.node.on_navigation_plan_status(self.failure(point,stamp_ns=self.fixture.now-3_000_000_000))
++        self.node.on_navigation_plan_status(self.failure((18.,0.)))
++        self.assertEqual(len(self.node.rejected_observation_poses),0)
++
++    def test_query_switch_discards_navigation_rejections(self):
++        point=json.loads(self.fixture.detect().data)['point']
++        self.node.on_navigation_plan_status(self.failure(point))
++        self.assertEqual(len(self.node.rejected_observation_poses),1)
++        self.fixture.query('bus stop')
++        self.assertEqual(len(self.node.rejected_observation_poses),0)
++        self.assertIsNone(self.node.last_visible_goal)
++
++    def test_confirmed_rejection_refreshes_standoff_without_fresh_confirmation(self):
++        target=PoseStamped();target.pose.position.x=20.
++        self.node.publish_standoff(target);previous=self.node.last_goal
++        base_stamp=self.fixture.now-12_000_000_000
++        confirmation=dict(query=self.node.active_query,observation_stamp_ns=base_stamp,
++            object_position=[20.,0.,2.],instance_id='same-object',radius=.5,
++            localization_valid=True,inliers=4,observations=5)
++        self.node.active_approach=(target,confirmation)
++        self.node.on_navigation_plan_status(self.failure(previous,
++            state='confirmed_approach_failed',reason='no_vehicle_path'))
++        self.assertGreater(math.dist(previous,self.node.last_goal),1.2)
++        refresh=json.loads(self.node.confirmation_pub.publish.call_args.args[0].data)
++        self.assertEqual(refresh['object_position'],confirmation['object_position'])
++        self.assertEqual(refresh['instance_id'],'same-object')
++        self.assertEqual(refresh['observation_stamp_ns'],base_stamp)
++        self.assertEqual(refresh['base_observation_stamp_ns'],base_stamp)
++        self.assertTrue(refresh['approach_refresh'])
++        self.assertEqual(refresh['standoff'],list(self.node.last_goal))
++
++    def test_stale_vehicle_map_does_not_authorize_new_observation(self):
++        self.grid.header.stamp.sec-=4
++        for _ in range(3):
++            self.fixture.now+=100_000_000
++            self.node.on_visible_target(self.fixture.mask())
++        self.node.visible_approach_pub.publish.assert_not_called()
++
++    def test_rotated_vehicle_map_keeps_world_pose_and_body_checks_aligned(self):
++        self.grid.info.origin.position.x=20.
++        self.grid.info.origin.orientation.z=math.sin(math.pi/4)
++        self.grid.info.origin.orientation.w=math.cos(math.pi/4)
++        # In a 90-degree map, world (11,0) has local (20,9).
++        self.grid.data[36*160+80]=100
++        data=json.loads(self.fixture.detect().data)
++        self.assertFalse(footprint_blockers(self.grid,tuple(data['point']),0.))
++        self.assertLess(data['point'][0],8.)
++
++    def test_actual_plan_failures_select_alternative_but_do_not_bypass_route_admission(self):
++        n=self.bridge
++        n.carrier_model='ackermann';n.follow_enabled=True
++        n.execution_transport_issue=Mock(return_value=None)
++        n.local_freshness_issue=Mock(return_value=None)
++        n.grid=self.grid;n.local_grid=deepcopy(self.grid)
++        import time
++        n.grid_arrived_at=time.monotonic()
++        n.plan_client=Mock();n.plan_client.send_goal_async.side_effect=lambda goal: Future()
++        n.follow_client=Mock();n.require_route_status=False
++        data=json.loads(self.fixture.detect().data)
++        n.on_visible_approach(String(data=json.dumps(data)))
++        graph=route((0.,0.),tuple(data['point']));graph.header.stamp=self.fixture.stamp()
++        n.on_route(graph)
++        first=n.plan_client.send_goal_async.call_args.args[0].goal.pose.position.x
++        old_epoch=n.epoch;old_index=n.candidate_index;old_serial=n.active_plan_serial
++        for _ in range(30):
++            if not n.visible_approach_active:
++                break
++            result=Future();result.set_result(S(status=6,result=S(path=type(graph)())))
++            n.on_plan_result(result,n.epoch,n.candidate_index,n.active_plan_serial)
++        self.assertFalse(n.visible_approach_active)
++        self.node.on_navigation_plan_status(n.status_pub.publish.call_args.args[0])
++        alternative=self.node.visible_approach_pub.publish.call_args.args[0]
++        n.on_visible_approach(alternative)
++        self.assertFalse(n.visible_approach_active)  # Existing reset/stop barrier.
++        n.query_reset_pending=False
++        n.on_visible_approach(alternative)
++        self.assertTrue(n.visible_approach_active)
++        self.assertNotEqual(n.expected,tuple(data['point']))
++        graph=route((0.,0.),n.expected);graph.header.stamp=self.fixture.stamp()
++        n.on_route(graph)
++        self.assertNotEqual(n.plan_client.send_goal_async.call_args.args[0].goal.pose.position.x,first)
++        # A late success for the failed pose must not authorize movement.
++        result=Future();result.set_result(S(status=4,result=S(path=graph)))
++        n.on_plan_result(result,old_epoch,old_index,old_serial)
++        n.follow_client.send_goal_async.assert_not_called()
++        self.assertFalse(n.object_found)
++
++    def test_confirmed_recovery_does_not_retry_views_across_disconnected_map(self):
++        test=confirmed_fixture.ConfirmedRecoveryTests();test.setUp()
++        try:
++            n=test.node
++            # Every existing same-instance observation candidate is beyond
++            # a closed wall. Their centre cells and final footprints are free.
++            column=88  # World x=8, map origin=-80 and resolution=1.
++            for row in range(160):n.grid.data[row*160+column]=100
++            n.relay_destination=Mock()
++            self.assertFalse(n.start_live_observation())
++            n.relay_destination.assert_not_called()
++            self.assertEqual(n.active_object_confirmation['instance_id'],'target-a')
++        finally:
++            test.tearDown()
++
++    def test_confirmed_failure_feedback_enters_existing_same_instance_handoff(self):
++        test=confirmed_fixture.ConfirmedRecoveryTests();test.setUp()
++        try:
++            n=test.node
++            self.fixture.query(n.query)
++            target=PoseStamped();target.pose.position.x=20.
++            confirmation=json.loads(test.fixture.confirmation(
++                n.query,[20.,0.,2.],[0.,0.,0.],[16.,0.]).data)
++            confirmation['instance_id']='target-a'
++            self.node.active_approach=(target,confirmation)
++            self.node.last_goal=(16.,0.)
++            test.exhaust_plans()
++            self.node.on_navigation_plan_status(n.status_pub.publish.call_args.args[0])
++            refresh=self.node.confirmation_pub.publish.call_args.args[0]
++            n.on_object_confirmation(refresh)
++            self.assertIsNotNone(n.deferred_confirmed_approach)
++            alternative=tuple(n.deferred_confirmed_approach['standoff'])
++            self.assertNotEqual(alternative,(16.,0.))
++            n.monitor_observation()
++            self.assertEqual(n.expected,alternative)
++            self.assertTrue(n.observation_active)
++            self.assertEqual(n.active_object_confirmation['instance_id'],'target-a')
++            self.assertFalse(n.object_found)
++            self.assertIsNone(n.instance_release_pending)
++            n.follow_client.send_goal_async.assert_not_called()
++        finally:
++            test.tearDown()
++
++    def test_unknown_vehicle_cells_are_not_free_observation_endpoints(self):
++        self.grid.data=[-1]*len(self.grid.data)
++        for _ in range(3):
++            self.fixture.now+=100_000_000
++            self.node.on_visible_target(self.fixture.mask())
++        self.node.visible_approach_pub.publish.assert_not_called()
++
++
++if __name__=='__main__':unittest.main()
+--- before/docs/REACHABLE_OBSERVATION_REPAIR_20261021.md
++++ after/docs/REACHABLE_OBSERVATION_REPAIR_20261021.md
+@@ -0,0 +1,63 @@
++# 观察位姿选择与规划失败交接（2026-10-21，离线候选）
++
++## 问题与范围
++
++针对212436、210759等轮次的观察点规划失败后重复等待。本次使用当前未提交工作区，
++不恢复旧版本，不修改Smac、反向惩罚、车体、速度、换挡、确认门槛或到达判据。
++服务器不可用，未连接、部署或启动仿真。
++
++原可见接近点和环形standoff只在 `/spot1/local_map` 上检查中心射线和余量，
++无法证明非对称车身能够占据终点，也未剔除Nav2地图上不连通的中心区域。
++已确认目标已有替代观察流程，但bearing-only目标耗尽规划候选后仍保留接近状态到超时。
++
++## 修改
++
++1. `nav2_adapter/.../observation_pose.py`：按Nav2栅格原点及旋转计算车辆所在的已观测自由
++   连通分量，中心格须为0–98，再检查既有SBR footprint/padding。
++   Nav2已有inscribed inflation，不再次膨胀地图。四邻域连通只作必要条件，
++   不作为Ackermann转弯可达性的证明；Smac和执行侧扫掠检查保留。
++2. `GoalStandoff`接收 `/global_costmap/costmap`；同一消息和车辆中心格缓存连通结果。
++   既有五条方位射线逐格缩短到至少2m，并复用既有24角度standoff环形候选，
++   跳过不满足车身/连通条件的点。最终射线回退也检查同一条件，不能绕过过滤。
++   已接收到车辆图后，过期图不能生成新位姿；尚未收到车辆图或ideal_point沿用旧提案行为，
++   下游规划准入仍然生效。因此不能将提案发布称作已经规划可达。
++3. bridge对bearing-only目标的明确几何/空路径失败立即释放接近状态，发出
++   `visible_target_no_vehicle_path`，复用原动作终态/停车/reset屏障；传输、协议、
++   地图新鲜度失败不作为目标位姿不可达证据。
++4. 选点端消费该状态及`confirmed_approach_failed/no_vehicle_path`，对匹配查询、
++   新鲜来源戳及当前目标位置的失败做15s有界避让（visible半径2m，确认位姿1.2m，
++   沿用原桥的相关尺度）。重复/旧/其他查询反馈无效；最多16项，切换查询清空。
++   可见目标用原mask戳重新提出别的位置；确认目标复用`approach_refresh`，原观测戳、
++   对象位置和instance_id不改。refresh仅为导航种子，不产生新的确认或到达证据。
++5. 既有`start_live_observation`在试替代确认视点时也应用相同连通/车身必要条件，
++   继续走已有GraphNav、Smac和失败后交接，未增加另一套动作所有者。
++
++## 反例与验证
++
++改前6项定向用例中5项失败、1项保护路径通过，零加载错误：自由中心但车身压障碍；
++不连通的自由终点；环形点车身碰撞；射线回退绕过车辆条件；无路仍等待超时。
++初稿修复后“不应发布”的夹具沿用detect返回值导致一次AttributeError，改为直接送mask，
++未改变生产逻辑迎合测试，日志保留。
++
++最终16项定向用例通过，含：上述反例、原戳/实例保留、失败位置切换、未知/过期/旋转地图、
++重复与跨查询反馈、传输失败不误伤、确认失败进入既有同实例恢复，以及实际生产
++on_plan_result回调失败→新提案→路线准入链。规划结果/服务/地图为合成输入，
++无实际Smac、ROS序列化/DDS或车辆，不能称作现场验收。
++
++完整接口替身回调678项，677通过、1失败、0错误。唯一失败
++`test_side_lookback_turns_back_once_near_large_structure`在本次改前源重载后同样失败。
++官方适配器纯函数32项通过。新测试加入`tools/offline_callback_check.py`。
++
++320×320全自由地图单次连通计算本机约47.25ms（102400格）；同消息/中心格缓存命中
++不重算。服务器运行负载、前后端消息时序和稀疏地图误筛仍待现场检验。
++
++## 证据与部署边界
++
++`test_artifacts/reachable_observation_repair_20261021/`保留改前字节/SHA、反例、
++定向与回归日志、既有失败复现、本次独立delta和源码清单。
++
++服务器恢复后需把全部增量（包括新增`observation_pose.py`）同步到隔离候选，
++同时构建`wildos_nav2_adapter`和`beamng_wildos_adapter`并重新冻结运行源清单。
++不能只复制goal_standoff.py到旧安装，否则新增依赖会缺失。
++先核实际ROS消息/订阅及失败反馈交接，再实测观察位姿、规划拒绝、近停和探索推进。
++当前没有Git commit，也未宣称末段可达性或走停整体解决。

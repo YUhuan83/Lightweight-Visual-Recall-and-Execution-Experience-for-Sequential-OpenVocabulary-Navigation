@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="29" failures="0" disabled="0" errors="0" time="0.016" timestamp="2026-10-27T22:05:05.980" name="AllTests">
+  <testsuite name="FrontierEndpoint" tests="6" failures="0" disabled="0" skipped="0" errors="0" time="0.006" timestamp="2026-10-27T22:05:05.980">
+    <testcase name="ScoredForwardExitMustNotBecomeBackwardCentroid" status="run" result="completed" time="0" timestamp="2026-10-27T22:05:05.980" classname="FrontierEndpoint" />
+    <testcase name="NoInventedPointBetweenDisjointExits" status="run" result="completed" time="0" timestamp="2026-10-27T22:05:05.981" classname="FrontierEndpoint" />
+    <testcase name="ReplanUsesCurrentDestinationAndPreservesPartialStatus" status="run" result="completed" time="0.001" timestamp="2026-10-27T22:05:05.982" classname="FrontierEndpoint" />
+    <testcase name="SingleExitAndInputPermutationHaveSameEndpoint" status="run" result="completed" time="0.001" timestamp="2026-10-27T22:05:05.983" classname="FrontierEndpoint" />
+    <testcase name="InvalidHeightCannotSupplyScoreForAnotherExit" status="run" result="completed" time="0" timestamp="2026-10-27T22:05:05.985" classname="FrontierEndpoint" />
+    <testcase name="InvalidOnlyFrontierCannotBecomeExecutableRoute" status="run" result="completed" time="0" timestamp="2026-10-27T22:05:05.986" classname="FrontierEndpoint" />
+  </testsuite>
+  <testsuite name="RouteMechanism" tests="17" failures="0" disabled="0" skipped="0" errors="0" time="0.01" timestamp="2026-10-27T22:05:05.986">
+    <testcase name="KnownRouteIsPreferredOverFrontierHeuristic" status="run" result="completed" time="0" timestamp="2026-10-27T22:05:05.986" classname="RouteMechanism" />
+    <testcase name="FrontierPrefixDoesNotContainUnseenFiftyMetreTail" status="run" result="completed" time="0.001" timestamp="2026-10-27T22:05:05.986" classname="RouteMechanism" />
+    <testcase name="SparseFrontierScoresDoNotDependOnNodeOrdering" status="run" result="completed" time="0.002" timestamp="2026-10-27T22:05:05.988" classname="RouteMechanism" />
+    <testcase name="FreshObservedBlockRemovesUntraversedConnection" status="run" result="completed" time="0" timestamp="2026-10-27T22:05:05.990" classname="RouteMechanism" />
+    <testcase name="DrivenConnectionIsRetainedAsPenalizedTopologyPrior" status="run" result="completed" time="0" timestamp="2026-10-27T22:05:05.991" classname="RouteMechanism" />
+    <testcase name="FreshMeasuredViolationOverridesDrivenTopologyPrior" status="run" result="completed" time="0" timestamp="2026-10-27T22:05:05.991" classname="RouteMechanism" />
+    <testcase name="FreshMeasuredNodeViolationCannotBeBypassedByVisitedFlag" status="run" result="completed" time="0" timestamp="2026-10-27T22:05:05.992" classname="RouteMechanism" />
+    <testcase name="InvalidOrExpiredViolationCannotCreateNewPhysicalAuthority" status="run" result="completed" time="0" timestamp="2026-10-27T22:05:05.992" classname="RouteMechanism" />
+    <testcase name="DirectedConnectionDoesNotInventReverseReachability" status="run" result="completed" time="0" timestamp="2026-10-27T22:05:05.992" classname="RouteMechanism" />
+    <testcase name="ReverseConnectionCannotReopenMeasuredBlockedDirection" status="run" result="completed" time="0.001" timestamp="2026-10-27T22:05:05.993" classname="RouteMechanism" />
+    <testcase name="RejectedLocalEdgeUsesAlternateGraphRoute" status="run" result="completed" time="0" timestamp="2026-10-27T22:05:05.994" classname="RouteMechanism" />
+    <testcase name="StaleAndUnknownBlocksCannotEraseKnownTopology" status="run" result="completed" time="0" timestamp="2026-10-27T22:05:05.994" classname="RouteMechanism" />
+    <testcase name="InvalidGraphWeightsAreRejected" status="run" result="completed" time="0.001" timestamp="2026-10-27T22:05:05.994" classname="RouteMechanism" />
+    <testcase name="EmptyGraphAndCoincidentGoalDoNotDereferenceMissingFrontier" status="run" result="completed" time="0" timestamp="2026-10-27T22:05:05.996" classname="RouteMechanism" />
+    <testcase name="InvalidAssessmentConfidenceCannotDeleteTopology" status="run" result="completed" time="0" timestamp="2026-10-27T22:05:05.996" classname="RouteMechanism" />
+    <testcase name="StaleDynamicRiskCannotRemoveGoalAttachment" status="run" result="completed" time="0" timestamp="2026-10-27T22:05:05.996" classname="RouteMechanism" />
+    <testcase name="InvalidFrontierPointDoesNotMakePrefixNonfinite" status="run" result="completed" time="0" timestamp="2026-10-27T22:05:05.996" classname="RouteMechanism" />
+  </testsuite>
+  <testsuite name="DestinationFence" tests="6" failures="0" disabled="0" skipped="0" errors="0" time="0" timestamp="2026-10-27T22:05:05.997">
+    <testcase name="FreshDestinationsRemainUsableAfterClear" status="run" result="completed" time="0" timestamp="2026-10-27T22:05:05.997" classname="DestinationFence" />
+    <testcase name="DuplicateOrReorderedGoalsCannotReplaceCurrentDestination" status="run" result="completed" time="0" timestamp="2026-10-27T22:05:05.997" classname="DestinationFence" />
+    <testcase name="FutureOrInvalidGoalsCannotPoisonNextValidGoal" status="run" result="completed" time="0" timestamp="2026-10-27T22:05:05.997" classname="DestinationFence" />
+    <testcase name="ReleaseRejectsEarlierAcceptedGoalButAllowsNewOne" status="run" result="completed" time="0" timestamp="2026-10-27T22:05:05.997" classname="DestinationFence" />
+    <testcase name="ClearIsAClockBoundaryAndFutureOldEpochIsRejected" status="run" result="completed" time="0" timestamp="2026-10-27T22:05:05.997" classname="DestinationFence" />
+    <testcase name="RepeatedClearCannotReopenPriorGoal" status="run" result="completed" time="0" timestamp="2026-10-27T22:05:05.997" classname="DestinationFence" />
+  </testsuite>
+</testsuites>

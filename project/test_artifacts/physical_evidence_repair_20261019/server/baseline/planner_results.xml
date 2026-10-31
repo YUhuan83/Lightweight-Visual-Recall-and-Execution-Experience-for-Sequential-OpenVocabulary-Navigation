@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="38" failures="2" disabled="0" errors="0" time="0.001" timestamp="2026-10-19T17:06:53" name="AllTests">
+  <testsuite name="ExplorationTarget" tests="4" failures="0" disabled="0" errors="0" time="0" timestamp="2026-10-19T17:06:53">
+    <testcase name="ResolvedFrontierRequiresFreshNewerAuthoritativeState" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="ExplorationTarget" />
+    <testcase name="ScoreUpdatesCannotReplaceOwnedDestination" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="ExplorationTarget" />
+    <testcase name="NeedsCorrelatedExecutionAckAndFreshSettledOdometry" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="ExplorationTarget" />
+    <testcase name="MissingHeadingStillRequiresExecutedSettledViewAndClearFencesAck" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="ExplorationTarget" />
+  </testsuite>
+  <testsuite name="ExplorationBackoff" tests="7" failures="0" disabled="0" errors="0" time="0.001" timestamp="2026-10-19T17:06:53">
+    <testcase name="RouteIdentityFencesDelayedRefusalFromAnotherDestination" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="ExplorationBackoff" />
+    <testcase name="MatchesIssuedRouteAndExpires" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="ExplorationBackoff" />
+    <testcase name="RefusalIsScopedToDestinationAndFailureStart" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="ExplorationBackoff" />
+    <testcase name="DistantVehiclePositionDoesNotBlacklistAnUnrelatedEdge" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="ExplorationBackoff" />
+    <testcase name="ExplicitGoalsAndQueryChangesRejectOldFeedback" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="ExplorationBackoff" />
+    <testcase name="RefusesStaleFutureOrUncorrelatedEndpoints" status="run" result="completed" time="0.001" timestamp="2026-10-19T17:06:53" classname="ExplorationBackoff" />
+    <testcase name="LocalAttemptDoesNotExcludeOtherDestinationsOrInferBlockedEdges" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="ExplorationBackoff" />
+  </testsuite>
+  <testsuite name="ExplorationObservation" tests="1" failures="0" disabled="0" errors="0" time="0" timestamp="2026-10-19T17:06:53">
+    <testcase name="SelectsFiniteTraversableHeadingAndRequiresSettledView" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="ExplorationObservation" />
+  </testsuite>
+  <testsuite name="GraphScoreOverlay" tests="3" failures="0" disabled="0" errors="0" time="0" timestamp="2026-10-19T17:06:53">
+    <testcase name="ExactSnapshotRetainsTopologyAndAppliesScores" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="GraphScoreOverlay" />
+    <testcase name="DifferentStampOrderingPoseAndFrameCannotMixIndices" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="GraphScoreOverlay" />
+    <testcase name="SnapshotStorageIsBounded" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="GraphScoreOverlay" />
+  </testsuite>
+  <testsuite name="ExplorationUtility" tests="2" failures="0" disabled="0" errors="0" time="0" timestamp="2026-10-19T17:06:53">
+    <testcase name="PrefersObservedTraversableFrontierToUnknownBrush" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="ExplorationUtility" />
+    <testcase name="UnknownFrontiersRemainSelectableAndInvalidInputsAreRejected" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="ExplorationUtility" />
+  </testsuite>
+  <testsuite name="RouteMechanism" tests="15" failures="2" disabled="0" errors="0" time="0" timestamp="2026-10-19T17:06:53">
+    <testcase name="KnownRouteIsPreferredOverFrontierHeuristic" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="RouteMechanism" />
+    <testcase name="FrontierPrefixDoesNotContainUnseenFiftyMetreTail" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="RouteMechanism" />
+    <testcase name="SparseFrontierScoresDoNotDependOnNodeOrdering" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="RouteMechanism" />
+    <testcase name="FreshObservedBlockRemovesUntraversedConnection" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="RouteMechanism" />
+    <testcase name="DrivenConnectionIsRetainedAsPenalizedTopologyPrior" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="RouteMechanism" />
+    <testcase name="FreshMeasuredViolationOverridesDrivenTopologyPrior" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="RouteMechanism">
+      <failure message="/home/ly/physical_evidence_repair_20261019/baseline/candidate/wildos_port/repro_check/src/nebula2-wildos/graphnav_planner/test/test_route_mechanism.cpp:477&#x0A;Value of: p.plan_to_goal(goal,.5,rclcpp::Time(g-&gt;header.stamp)).empty()&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/ly/physical_evidence_repair_20261019/baseline/candidate/wildos_port/repro_check/src/nebula2-wildos/graphnav_planner/test/test_route_mechanism.cpp:477
+Value of: p.plan_to_goal(goal,.5,rclcpp::Time(g->header.stamp)).empty()
+  Actual: false
+Expected: true]]></failure>
+    </testcase>
+    <testcase name="FreshMeasuredNodeViolationCannotBeBypassedByVisitedFlag" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="RouteMechanism">
+      <failure message="/home/ly/physical_evidence_repair_20261019/baseline/candidate/wildos_port/repro_check/src/nebula2-wildos/graphnav_planner/test/test_route_mechanism.cpp:495&#x0A;Value of: p.plan_to_goal(goal,.5,rclcpp::Time(g-&gt;header.stamp)).empty()&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[/home/ly/physical_evidence_repair_20261019/baseline/candidate/wildos_port/repro_check/src/nebula2-wildos/graphnav_planner/test/test_route_mechanism.cpp:495
+Value of: p.plan_to_goal(goal,.5,rclcpp::Time(g->header.stamp)).empty()
+  Actual: false
+Expected: true]]></failure>
+    </testcase>
+    <testcase name="InvalidOrExpiredViolationCannotCreateNewPhysicalAuthority" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="RouteMechanism" />
+    <testcase name="RejectedLocalEdgeUsesAlternateGraphRoute" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="RouteMechanism" />
+    <testcase name="StaleAndUnknownBlocksCannotEraseKnownTopology" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="RouteMechanism" />
+    <testcase name="InvalidGraphWeightsAreRejected" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="RouteMechanism" />
+    <testcase name="EmptyGraphAndCoincidentGoalDoNotDereferenceMissingFrontier" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="RouteMechanism" />
+    <testcase name="InvalidAssessmentConfidenceCannotDeleteTopology" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="RouteMechanism" />
+    <testcase name="StaleDynamicRiskCannotRemoveGoalAttachment" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="RouteMechanism" />
+    <testcase name="InvalidFrontierPointDoesNotMakePrefixNonfinite" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="RouteMechanism" />
+  </testsuite>
+  <testsuite name="DestinationFence" tests="6" failures="0" disabled="0" errors="0" time="0" timestamp="2026-10-19T17:06:53">
+    <testcase name="FreshDestinationsRemainUsableAfterClear" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="DestinationFence" />
+    <testcase name="DuplicateOrReorderedGoalsCannotReplaceCurrentDestination" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="DestinationFence" />
+    <testcase name="FutureOrInvalidGoalsCannotPoisonNextValidGoal" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="DestinationFence" />
+    <testcase name="ReleaseRejectsEarlierAcceptedGoalButAllowsNewOne" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="DestinationFence" />
+    <testcase name="ClearIsAClockBoundaryAndFutureOldEpochIsRejected" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="DestinationFence" />
+    <testcase name="RepeatedClearCannotReopenPriorGoal" status="run" result="completed" time="0" timestamp="2026-10-19T17:06:53" classname="DestinationFence" />
+  </testsuite>
+</testsuites>

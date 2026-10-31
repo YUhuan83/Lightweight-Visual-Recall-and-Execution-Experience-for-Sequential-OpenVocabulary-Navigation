@@ -1,0 +1,21 @@
+{
+  "host": "Windows CPython 3.13.9",
+  "command": "python -B -m unittest discover -s vision_offline -v",
+  "tests_run": 10,
+  "failures": 0,
+  "errors": 0,
+  "coverage": [
+    "Linux versus Windows markers",
+    "Python 3.10 versus host markers",
+    "Recursive extras",
+    "Unrequested extras excluded",
+    "Cycles and extra union",
+    "Version conflicts",
+    "CUDA local version matching",
+    "Linux cp310 and abi3 tags; Windows and cp311 rejected",
+    "URL credential redaction",
+    "Missing wheel and corrupted hash rejection"
+  ],
+  "linux_installation_tested": false,
+  "gpu_tested": false
+}

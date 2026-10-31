@@ -1,0 +1,57 @@
+{
+  "schema_version": "wildos-scenarios/1",
+  "status": "draft",
+  "map_id": null,
+  "map_revision": null,
+  "frame_id": null,
+  "vehicle_profile": null,
+  "layout_revision": null,
+  "acceptance_ref": null,
+  "tasks": [
+    {
+      "family": "long_range_search",
+      "task_id": "rural-search-v1",
+      "start_xyz": null,
+      "target_identity": "red water barrel",
+      "reachable_target_xyz": null,
+      "target_object_xyz": null,
+      "approximate_prior": {
+        "description": "Near a rural outbuilding, beyond the rough road; coarse search region only.",
+        "center_xyz": null,
+        "radius_m": null,
+        "source_ref": null
+      },
+      "protocol_revision": "draft-v1"
+    },
+    {
+      "family": "fence_approach",
+      "task_id": "rural-fence-v1",
+      "start_xyz": null,
+      "target_identity": "blue farm storage tank",
+      "reachable_target_xyz": null,
+      "target_object_xyz": null,
+      "approximate_prior": {
+        "description": "Near the fenced farm yard; gate location is not supplied.",
+        "center_xyz": null,
+        "radius_m": null,
+        "source_ref": null
+      },
+      "protocol_revision": "draft-v1"
+    },
+    {
+      "family": "dead_end",
+      "task_id": "rural-dead-end-v1",
+      "start_xyz": null,
+      "target_identity": "yellow utility trailer",
+      "reachable_target_xyz": null,
+      "target_object_xyz": null,
+      "approximate_prior": {
+        "description": "Beyond the forest-side farm road; branch connectivity is unknown.",
+        "center_xyz": null,
+        "radius_m": null,
+        "source_ref": null
+      },
+      "protocol_revision": "draft-v1"
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+Offline and isolated real ROS regression passed. Full vehicle green-house acceptance pending. No commit.

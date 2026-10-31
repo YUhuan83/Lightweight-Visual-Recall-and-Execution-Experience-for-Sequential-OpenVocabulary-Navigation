@@ -1,0 +1,290 @@
+[
+  {
+    "cycle": 0,
+    "pos": [
+      -2298.5301635563374,
+      1492.650359928608
+    ],
+    "target_text": "house",
+    "mask_pixels": 0,
+    "target_xy": null,
+    "goal": [
+      -2332.3202760744134,
+      1501.7733142755148
+    ],
+    "path": 11,
+    "distance_m": 34.99999999999983,
+    "traversability_range": [
+      0.009124755859375,
+      0.84814453125
+    ],
+    "frontier_range": [
+      0.0,
+      0.38818359375
+    ]
+  },
+  {
+    "cycle": 1,
+    "pos": [
+      -2273.8571789097623,
+      1506.2546714473283
+    ],
+    "target_text": "house",
+    "mask_pixels": 0,
+    "target_xy": null,
+    "goal": [
+      -2244.5866228848367,
+      1525.4441099485375
+    ],
+    "path": 2,
+    "distance_m": 34.99999999999995,
+    "traversability_range": [
+      5.960464477539063e-08,
+      0.8037109375
+    ],
+    "frontier_range": [
+      0.0,
+      0.439453125
+    ]
+  },
+  {
+    "cycle": 2,
+    "pos": [
+      -2273.862002281432,
+      1506.264760118288
+    ],
+    "target_text": "house",
+    "mask_pixels": 0,
+    "target_xy": null,
+    "goal": [
+      -2244.6436185964512,
+      1525.5335445853282
+    ],
+    "path": 3,
+    "distance_m": 35.00000000000004,
+    "traversability_range": [
+      0.0,
+      0.81787109375
+    ],
+    "frontier_range": [
+      0.0,
+      0.84130859375
+    ]
+  },
+  {
+    "cycle": 3,
+    "pos": [
+      -2273.8614172291855,
+      1506.265586715297
+    ],
+    "target_text": "house",
+    "mask_pixels": 0,
+    "target_xy": null,
+    "goal": [
+      -2244.6401351914274,
+      1525.5299755213243
+    ],
+    "path": 2,
+    "distance_m": 34.99999999999988,
+    "traversability_range": [
+      0.0,
+      0.83935546875
+    ],
+    "frontier_range": [
+      0.0,
+      0.82421875
+    ]
+  },
+  {
+    "cycle": 4,
+    "pos": [
+      -2273.8616723986124,
+      1506.2658368630873
+    ],
+    "target_text": "house",
+    "mask_pixels": 0,
+    "target_xy": null,
+    "goal": [
+      -2244.6409900747944,
+      1525.5311353173158
+    ],
+    "path": 3,
+    "distance_m": 34.99999999999983,
+    "traversability_range": [
+      0.0,
+      0.8203125
+    ],
+    "frontier_range": [
+      0.0,
+      0.82861328125
+    ]
+  },
+  {
+    "cycle": 5,
+    "pos": [
+      -2273.8616770784065,
+      1506.2661214033815
+    ],
+    "target_text": "house",
+    "mask_pixels": 0,
+    "target_xy": null,
+    "goal": [
+      -2244.64142184183,
+      1525.5320676274662
+    ],
+    "path": 2,
+    "distance_m": 35.000000000000064,
+    "traversability_range": [
+      0.0,
+      0.82275390625
+    ],
+    "frontier_range": [
+      0.0,
+      0.81103515625
+    ]
+  },
+  {
+    "cycle": 6,
+    "pos": [
+      -2273.861695447238,
+      1506.2662467553619
+    ],
+    "target_text": "house",
+    "mask_pixels": 0,
+    "target_xy": null,
+    "goal": [
+      -2244.6414831097586,
+      1525.5322580434465
+    ],
+    "path": 3,
+    "distance_m": 34.999999999999964,
+    "traversability_range": [
+      0.0,
+      0.81884765625
+    ],
+    "frontier_range": [
+      0.0,
+      0.833984375
+    ]
+  },
+  {
+    "cycle": 7,
+    "pos": [
+      -2273.8613825252833,
+      1506.2663297213294
+    ],
+    "target_text": "house",
+    "mask_pixels": 576,
+    "target_xy": null,
+    "goal": [
+      -2244.642759916602,
+      1525.5347518895153
+    ],
+    "path": 3,
+    "distance_m": 34.99999999999986,
+    "traversability_range": [
+      0.0,
+      0.84423828125
+    ],
+    "frontier_range": [
+      0.0,
+      0.85302734375
+    ]
+  },
+  {
+    "cycle": 8,
+    "pos": [
+      -2273.8611807681737,
+      1506.2663697408962
+    ],
+    "target_text": "house",
+    "mask_pixels": 0,
+    "target_xy": null,
+    "goal": [
+      -2244.6434743726486,
+      1525.5361811822386
+    ],
+    "path": 2,
+    "distance_m": 34.999999999999964,
+    "traversability_range": [
+      0.0,
+      0.84130859375
+    ],
+    "frontier_range": [
+      0.0,
+      0.8466796875
+    ]
+  },
+  {
+    "cycle": 9,
+    "pos": [
+      -2273.8657654970884,
+      1506.309659987106
+    ],
+    "target_text": "house",
+    "mask_pixels": 0,
+    "target_xy": null,
+    "goal": [
+      -2244.741172646118,
+      1525.719917359567
+    ],
+    "path": 3,
+    "distance_m": 34.99999999999985,
+    "traversability_range": [
+      5.960464477539063e-08,
+      0.8359375
+    ],
+    "frontier_range": [
+      0.0,
+      0.76806640625
+    ]
+  },
+  {
+    "cycle": 10,
+    "pos": [
+      -2273.8625308406627,
+      1506.3252947801957
+    ],
+    "target_text": "house",
+    "mask_pixels": 0,
+    "target_xy": null,
+    "goal": [
+      -2244.7273529311865,
+      1525.7196601522094
+    ],
+    "path": 3,
+    "distance_m": 34.99999999999988,
+    "traversability_range": [
+      5.960464477539063e-08,
+      0.8359375
+    ],
+    "frontier_range": [
+      0.0,
+      0.64453125
+    ]
+  },
+  {
+    "cycle": 11,
+    "pos": [
+      -2273.858319547042,
+      1506.312510157285
+    ],
+    "target_text": "house",
+    "mask_pixels": 0,
+    "target_xy": null,
+    "goal": [
+      -2244.6685540685944,
+      1525.624620122621
+    ],
+    "path": 3,
+    "distance_m": 34.999999999999964,
+    "traversability_range": [
+      0.0,
+      0.8154296875
+    ],
+    "frontier_range": [
+      0.0,
+      0.73681640625
+    ]
+  }
+]

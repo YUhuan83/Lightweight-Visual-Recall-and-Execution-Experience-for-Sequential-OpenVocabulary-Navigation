@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='utf-8'?>
+<sdf version="1.8">
+  <world name="asset_samples">
+    <plugin filename="ignition-gazebo-physics-system" name="ignition::gazebo::systems::Physics" />
+    <plugin filename="ignition-gazebo-user-commands-system" name="ignition::gazebo::systems::UserCommands" />
+    <plugin filename="ignition-gazebo-scene-broadcaster-system" name="ignition::gazebo::systems::SceneBroadcaster" />
+    <scene>
+      <ambient>.65 .65 .65 1</ambient>
+      <background>.65 .75 .85 1</background>
+      <shadows>false</shadows>
+    </scene>
+    <light name="sun" type="directional">
+      <direction>-.3 -.4 -1</direction>
+      <diffuse>.9 .9 .9 1</diffuse>
+      <cast_shadows>false</cast_shadows>
+    </light>
+    <model name="ground">
+      <static>true</static>
+      <link name="body">
+        <visual name="ground_visual">
+          <pose>0 0 -0.1 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>40 40 0.2</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.42 0.43 0.38 1</ambient>
+            <diffuse>0.42 0.43 0.38 1</diffuse>
+          </material>
+        </visual>
+        <collision name="ground_collision">
+          <pose>0 0 -0.1 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>40 40 0.2</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+    </model>
+    <include>
+      <uri>model://ph_rock_moss_set_01</uri>
+      <pose>-7 0 .02 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://ph_dead_tree_trunk</uri>
+      <pose>0 0 .02 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://ph_wooden_barrels_01</uri>
+      <pose>7 0 .02 0 0 0</pose>
+    </include>
+  </world>
+</sdf>

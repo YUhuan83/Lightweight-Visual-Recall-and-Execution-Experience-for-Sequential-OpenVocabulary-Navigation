@@ -1,0 +1,134 @@
+--- f9d1caa7/nav2_adapter/wildos_nav2_adapter/graph_path_bridge.py
++++ candidate/nav2_adapter/wildos_nav2_adapter/graph_path_bridge.py
+@@ -201,6 +201,7 @@
+         self.blocked_grid_hash = None
+         self.blocked_until = 0.0
+         self.recovery_attempts = 0
++        self.recovery_progress = None
+         self.last_plan_start = None
+         self.last_plan_endpoint = None
+         self.candidates = []
+@@ -551,6 +552,7 @@
+         self.extending_path = self.replacement_pending = False
+         self.prepared_extension = None
+         self.recovery_attempts = 0
++        self.recovery_progress = None
+         self.normal_best = None
+         self.stall_anchor = None
+         self.epoch += 1
+@@ -678,7 +680,7 @@
+             self.route_complete = self.latest_route_complete
+             self.route_endpoint = xy(newest.poses[-1].pose)
+             self.last_plan_start = self.last_plan_endpoint = None
+-            self.recovery_attempts = 0
++            self.sync_recovery_progress()
+             self.status("planner_timeout_using_latest_route",
+                         previous_candidate=old_index, goal=list(self.route_endpoint))
+             self.start_segment()
+@@ -1250,6 +1252,11 @@
+             self.route_diagnostic("route_deferred_while_planning_or_following",
+                                   stamp=stamp, age=round(age, 3))
+             return  # Finish the current short segment before selecting another.
++        self.sync_recovery_progress(message)
++        if self.recovery_attempts >= 3:
++            self.reject_exploration_route()
++            self.status('route_recovery_exhausted', retry_count=self.recovery_attempts)
++            return
+         if self.blocked_endpoint is not None and distance(endpoint, self.blocked_endpoint) < 4.0:
+             points = [xy(p.pose) for p in message.poses]
+             changed_route = (self.blocked_route is not None and
+@@ -1259,11 +1266,7 @@
+                            hash(tuple(self.grid.data)) != self.blocked_grid_hash)
+             if not changed_route and not changed_map:
+                 return
+-            if not changed_route and self.recovery_attempts >= 3:
+-                return
+-            if changed_route:
+-                self.recovery_attempts = 0
+-            else:
++            if not changed_route:
+                 self.recovery_attempts += 1
+             self.blocked_endpoint = None
+             self.last_plan_start = None
+@@ -1276,10 +1279,48 @@
+             return
+         self.route = message
+         self.route_complete = incoming_complete
+-        if self.route_endpoint is not None and distance(endpoint, self.route_endpoint) >= 4.0:
+-            self.recovery_attempts = 0
+         self.route_endpoint = endpoint
+         self.start_segment()
++
++    def sync_recovery_progress(self, route=None):
++        """Bind retry credit to the destination, never a changing graph prefix."""
++        route = self.route if route is None else route
++        if (self.odom is None or route is None or not route.poses
++                or self.input_freshness_issue() is not None):
++            return None
++        metadata = self.exploration_metadata(route)
++        if metadata is not None:
++            identity = ('exploration', metadata['exploration_id'])
++            goal = tuple(metadata['goal'])
++        else:
++            identity = ('memory' if self.memory_goal is not None else
++                        'object' if self.expected is not None else 'legacy',)
++            goal = self.expected or self.memory_goal or xy(route.poses[-1].pose)
++        scope = (self.query_generation, route.header.frame_id, identity)
++        previous = self.recovery_progress
++        if (previous is None or previous['scope'] != scope
++                or (metadata is None and distance(goal, previous['goal']) >= 4.)):
++            self.recovery_progress = dict(scope=scope, goal=tuple(goal),
++                credited_distance=distance(xy(self.odom.pose.pose), goal))
++            if previous is not None:
++                self.recovery_attempts = 0
++                self.blocked_endpoint = self.blocked_route = self.blocked_grid_hash = None
++                self.blocked_until = 0.
++                self.last_plan_start = self.last_plan_endpoint = None
++        return self.recovery_progress
++
++    def credit_recovery_progress(self):
++        # Only an accepted, independently checked action result calls this.
++        # Retreading a locally successful metre cannot credit it a second time.
++        if self.input_freshness_issue() is not None:
++            return
++        progress = self.sync_recovery_progress()
++        if progress is None:
++            return
++        remaining = distance(xy(self.odom.pose.pose), progress['goal'])
++        if remaining <= progress['credited_distance'] - 1.:
++            progress['credited_distance'] = remaining
++            self.recovery_attempts = 0
+ 
+     def exploration_metadata(self, route):
+         if (route is None or self.expected is not None or self.memory_goal is not None
+@@ -1378,6 +1419,7 @@
+             return
+         start = xy(self.odom.pose.pose)
+         endpoint = (self.expected if getattr(self, 'route_complete', True) else None) or self.exploration_destination() or xy(self.route.poses[-1].pose)
++        self.sync_recovery_progress()
+         self.last_plan_start = start
+         self.last_plan_endpoint = endpoint
+         observation_heading = self.exploration_observation_heading()
+@@ -1963,12 +2005,7 @@
+                                         heading_tolerance=.35):
+                     self.follow_failed("cusp_not_reached", goal=list(xy(cusp)))
+                     return
+-                if (self.route_endpoint is not None and self.motion_queue[0].poses
+-                        and distance(xy(self.odom.pose.pose),self.route_endpoint)
+-                        <=distance(xy(self.motion_queue[0].poses[0].pose),self.route_endpoint)-1.):
+-                    # A successful cusp is not itself route progress. Reset a
+-                    # recovery budget only after measurable advance toward it.
+-                    self.recovery_attempts=0
++                self.credit_recovery_progress()
+                 self.finish_execution_feedback(True, 'maneuver_completed')
+                 if self.retired_motion is not None:
+                     self.finish_retired_exploration_section(target)
+@@ -1988,7 +2025,7 @@
+             self.motion_queue = []
+             self.blocked_endpoint = None
+             self.status("segment_done", goal=list(target))
+-            self.recovery_attempts = 0
++            self.credit_recovery_progress()
+             if self.latest_route is not None:
+                 self.route = self.latest_route
+                 self.route_complete = self.latest_route_complete

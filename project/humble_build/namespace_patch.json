@@ -1,0 +1,12 @@
+{
+  "payload": "# Package marker for setuptools.find_packages().\n",
+  "directories": [
+    "visual_navigation/visual_navigation/explorfm_triangulation",
+    "visual_navigation/visual_navigation/geofrontier_nav",
+    "visual_navigation/visual_navigation/gps",
+    "visual_navigation/visual_navigation/imgfrontier_nav",
+    "visual_navigation/visual_navigation/lrn",
+    "visual_navigation/visual_navigation/utils",
+    "visual_navigation/visual_navigation/wildos"
+  ]
+}

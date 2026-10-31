@@ -1,0 +1,27 @@
+{
+  "format": 1,
+  "source_only": true,
+  "runtime_verified": false,
+  "files": {
+    "beamng_pointgoal.py": {
+      "bytes": 26476,
+      "sha256": "9358f6867a4f415994528b3eac9f5ec74ade7facf1b3a6e3ff6466c3c1e254f1"
+    },
+    "test_beamng_pointgoal.py": {
+      "bytes": 9681,
+      "sha256": "996e6dc0b10f24593de3239e80576b38512269e8739ba50d01fa10ada450cea5"
+    },
+    "README.md": {
+      "bytes": 8008,
+      "sha256": "7abd816eaaaa87d05ec810fea6b79a567ef17bf05ae3c40e056499305dd5f6ea"
+    },
+    "\u660e\u65e5\u9a8c\u6536.md": {
+      "bytes": 3926,
+      "sha256": "146d8441b654ae718a77b942b28de7557e34d8073efaed4f9cec454d8d28aaed"
+    },
+    "requirements.json": {
+      "bytes": 341,
+      "sha256": "9ebd153d4e91ae369c687d5c8b3f0a582cb5b56c71425349aa74353cfc897a3b"
+    }
+  }
+}

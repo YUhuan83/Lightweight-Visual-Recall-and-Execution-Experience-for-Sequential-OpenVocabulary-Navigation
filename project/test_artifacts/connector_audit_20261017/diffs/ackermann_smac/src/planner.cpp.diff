@@ -1,0 +1,61 @@
+--- before/ackermann_smac/src/planner.cpp
++++ after/ackermann_smac/src/planner.cpp
+@@ -2,6 +2,7 @@
+ #include "wildos_ackermann_smac/planner.hpp"
+ #include "wildos_ackermann_smac/path_contract.hpp"
+ #include <cmath>
++#include <algorithm>
+ #include <stdexcept>
+ #include "nav2_util/node_utils.hpp"
+ #include "nav2_core/exceptions.hpp"
+@@ -150,8 +151,11 @@
+     }
+     return true;
+   };
+-  auto enough_time = [&]() {
+-    return std::chrono::duration<double>(deadline - Clock::now()).count() >= _max_planning_time + .01;
++  auto enough_time = [&](bool optional = false) {
++    // Preserve first-search admission; reserve more time to recheck the retained
++    // full route when spending spare budget on another alternative.
++    return std::chrono::duration<double>(deadline - Clock::now()).count() >=
++      _max_planning_time + (optional ? .05 : .01);
+   };
+   auto native_plan = [&](const geometry_msgs::msg::PoseStamped & native_start) {
+     // Keep the raw result of this exact search. The native smoother modifies
+@@ -195,8 +199,11 @@
+     if (!validate(path)) { throw nav2_core::PlannerException("Native path expired or collides with current map"); }
+     return path;
+   }
++  // A short start connector can lead to an expensive suffix with many cusps.
++  // Compare feasible complete routes, bounded by the existing candidate/time caps.
++  std::vector<std::pair<double, nav_msgs::msg::Path>> feasible;
+   for (const auto & c : candidates.curves) {
+-    if (!enough_time()) { break; }
++    if (!enough_time(!feasible.empty())) { break; }
+     auto anchor = stamped(c.poses.back(), start.header);
+     nav_msgs::msg::Path suffix;
+     try { suffix = native_plan(anchor); }
+@@ -212,7 +219,22 @@
+     result.poses.insert(result.poses.end(), suffix.poses.begin() + 1, suffix.poses.end());
+     std::vector<Pose> combined;combined.reserve(result.poses.size());
+     for(const auto & p:result.poses) { combined.push_back(poseOf(p)); }
+-    if (curvatureFeasible(combined,resolution_,limits_.radius,limits_.bins) && validate(result)) { return result; }
++    if (curvatureFeasible(combined,resolution_,limits_.radius,limits_.bins) && validate(result)) {
++      const double cost = maneuverCost(combined);
++      if (std::isfinite(cost)) { feasible.emplace_back(cost, std::move(result)); }
++    }
++  }
++  std::stable_sort(feasible.begin(), feasible.end(), [](const auto & a, const auto & b) {
++    return a.first < b.first;
++  });
++  // Maps may change during subsequent searches. Never return a cached safety
++  // verdict; fall back to the next alternative if the cheapest is now blocked.
++  for (auto & candidate : feasible) {
++    if (validate(candidate.second)) {
++      RCLCPP_INFO(_logger, "continuous_complete_selected: cost=%.6f candidates=%zu",
++        candidate.first, feasible.size());
++      return candidate.second;
++    }
+   }
+   throw nav2_core::PlannerException("No safe bounded continuous-start plan");
+ }

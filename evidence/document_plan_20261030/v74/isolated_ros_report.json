@@ -1,0 +1,290 @@
+[
+  {
+    "module": "test_upstream_target_approach_ros",
+    "returncode": 0,
+    "tests": 20,
+    "passed": true
+  },
+  {
+    "module": "test_confirmed_graph_handoff_ros",
+    "returncode": 0,
+    "tests": 4,
+    "passed": true
+  },
+  {
+    "module": "test_confirmed_graph_destination_ros",
+    "returncode": 0,
+    "tests": 6,
+    "passed": true
+  },
+  {
+    "module": "test_approach_local_map_ros",
+    "returncode": 0,
+    "tests": 9,
+    "passed": true
+  },
+  {
+    "module": "test_continuous_action_handoff_ros",
+    "returncode": 0,
+    "tests": 5,
+    "passed": true
+  },
+  {
+    "module": "test_confirmed_continuation_ros",
+    "returncode": 0,
+    "tests": 13,
+    "passed": true
+  },
+  {
+    "module": "test_localization_range_ros",
+    "returncode": 0,
+    "tests": 7,
+    "passed": true
+  },
+  {
+    "module": "test_range_candidate_ros",
+    "returncode": 0,
+    "tests": 7,
+    "passed": true
+  },
+  {
+    "module": "test_scanline_depth",
+    "returncode": 0,
+    "tests": 7,
+    "passed": true
+  },
+  {
+    "module": "test_approach_feedback_ros",
+    "returncode": 0,
+    "tests": 5,
+    "passed": true
+  },
+  {
+    "module": "test_standoff_freshness_ros",
+    "returncode": 0,
+    "tests": 2,
+    "passed": true
+  },
+  {
+    "module": "test_instance_handoff_ros",
+    "returncode": 0,
+    "tests": 10,
+    "passed": true
+  },
+  {
+    "module": "test_abort_recovery_ros",
+    "returncode": 0,
+    "tests": 7,
+    "passed": true
+  },
+  {
+    "module": "test_retirement_boundary_ros",
+    "returncode": 0,
+    "tests": 8,
+    "passed": true
+  },
+  {
+    "module": "test_recovery_heading_ros",
+    "returncode": 0,
+    "tests": 4,
+    "passed": true
+  },
+  {
+    "module": "test_observation_session_ros",
+    "returncode": 0,
+    "tests": 5,
+    "passed": true
+  },
+  {
+    "module": "test_rolling_observation_ros",
+    "returncode": 0,
+    "tests": 6,
+    "passed": true
+  },
+  {
+    "module": "test_full_path_execution_ros",
+    "returncode": 0,
+    "tests": 15,
+    "passed": true
+  },
+  {
+    "module": "test_confirmed_vehicle_ros",
+    "returncode": 0,
+    "tests": 13,
+    "passed": true
+  },
+  {
+    "module": "test_vehicle_observation_ros",
+    "returncode": 0,
+    "tests": 17,
+    "passed": true
+  },
+  {
+    "module": "test_recorded_angular_uncertainty",
+    "returncode": 0,
+    "tests": 2,
+    "passed": true
+  },
+  {
+    "module": "test_confirmation_profile_ros",
+    "returncode": 0,
+    "tests": 8,
+    "passed": true
+  },
+  {
+    "module": "test_continuous_retry_admission_ros",
+    "returncode": 0,
+    "tests": 8,
+    "passed": true
+  },
+  {
+    "module": "test_confirmed_progress_ros",
+    "returncode": 0,
+    "tests": 9,
+    "passed": true
+  },
+  {
+    "module": "test_body_arrival_ros",
+    "returncode": 0,
+    "tests": 18,
+    "passed": true
+  },
+  {
+    "module": "test_execution_mechanism_ros",
+    "returncode": 0,
+    "tests": 43,
+    "passed": true
+  },
+  {
+    "module": "test_arrival_criteria",
+    "returncode": 0,
+    "tests": 9,
+    "passed": true
+  },
+  {
+    "module": "test_surface_association_ros",
+    "returncode": 0,
+    "tests": 15,
+    "passed": true
+  },
+  {
+    "module": "test_multi_goal_session_ros",
+    "returncode": 0,
+    "tests": 7,
+    "passed": true
+  },
+  {
+    "module": "test_physical_shift_profile_ros",
+    "returncode": 0,
+    "tests": 6,
+    "passed": true
+  },
+  {
+    "module": "test_continuous_process_roles",
+    "returncode": 0,
+    "tests": 4,
+    "passed": true
+  },
+  {
+    "module": "test_continuous_exploration_ros",
+    "returncode": 0,
+    "tests": 39,
+    "passed": true
+  },
+  {
+    "module": "test_far_ground_support",
+    "returncode": 0,
+    "tests": 7,
+    "passed": true
+  },
+  {
+    "module": "test_pointcloud",
+    "returncode": 0,
+    "tests": 23,
+    "passed": true
+  },
+  {
+    "module": "test_execution_continuity_review_ros",
+    "returncode": 0,
+    "tests": 11,
+    "passed": true
+  },
+  {
+    "module": "test_native_status_executor_ros",
+    "returncode": 0,
+    "tests": 5,
+    "passed": true
+  },
+  {
+    "module": "test_source_control_ros",
+    "returncode": 0,
+    "tests": 13,
+    "passed": true
+  },
+  {
+    "module": "test_graph_path_bridge_routing",
+    "returncode": 0,
+    "tests": 237,
+    "passed": true
+  },
+  {
+    "module": "test_planner_execution_ownership_ros",
+    "returncode": 0,
+    "tests": 25,
+    "passed": true
+  },
+  {
+    "module": "test_motion_intent_handoff_ros",
+    "returncode": 0,
+    "tests": 56,
+    "passed": true
+  },
+  {
+    "module": "test_committed_frontier_path_ros",
+    "returncode": 0,
+    "tests": 28,
+    "passed": true
+  },
+  {
+    "module": "test_exploration_cost_ros",
+    "returncode": 0,
+    "tests": 23,
+    "passed": true
+  },
+  {
+    "module": "test_reachable_observation_ros",
+    "returncode": 0,
+    "tests": 21,
+    "passed": true
+  },
+  {
+    "module": "test_planning_phase_ros",
+    "returncode": 0,
+    "tests": 4,
+    "passed": true
+  },
+  {
+    "module": "test_navigation_transactions_ros",
+    "returncode": 0,
+    "tests": 66,
+    "passed": true
+  },
+  {
+    "module": "test_visible_approach_ros",
+    "returncode": 0,
+    "tests": 32,
+    "passed": true
+  },
+  {
+    "module": "test_goal_confirmation_ros",
+    "returncode": 0,
+    "tests": 20,
+    "passed": true
+  },
+  {
+    "module": "test_curved_scan_ground",
+    "returncode": 0,
+    "tests": 5,
+    "passed": true
+  }
+]

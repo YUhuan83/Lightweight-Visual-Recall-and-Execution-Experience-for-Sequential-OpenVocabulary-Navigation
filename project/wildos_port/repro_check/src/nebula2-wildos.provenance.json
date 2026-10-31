@@ -1,0 +1,1170 @@
+{
+  "source": "C:\\Users\\Yu\\nebula2-wildos",
+  "source_head": "ffab44cb5f36e5508fbe29d3dc5bcd5fe69cb572",
+  "source_status": " M explorfm/explorfm_model.py\n M nvidia_radio/radio/siglip2_adaptor.py\n",
+  "source_dirty": true,
+  "source_files": {
+    ".gitattributes": {
+      "sha256": "bb9d38701ee3168df01f2a173bac36ec1a6917646e8bc0fc36f7a693ecf00991",
+      "mode": 438
+    },
+    ".gitignore": {
+      "sha256": "adc5254029ba05fbb1b995ed6986bcc3b88a8063b8a3bca66bffaa8db3e3e0ed",
+      "mode": 438
+    },
+    "LICENSE": {
+      "sha256": "1eb85fc97224598dad1852b5d6483bbcf0aa8608790dcc657a5a2a761ae9c8c6",
+      "mode": 438
+    },
+    "README.md": {
+      "sha256": "e68624cbca07553e03c2ffaf8da1b1bed9c9c047cf7f947e8739581de6c8cd8d",
+      "mode": 438
+    },
+    "explorfm/README.md": {
+      "sha256": "bb6dbe878b74ce98a35e4362fe0471d7aff53347c4b481844e6f29b551735010",
+      "mode": 438
+    },
+    "explorfm/__init__.py": {
+      "sha256": "2e9226e232a270b851b96a65091e3853b6b91d67f1a934cf0d581dedf4482636",
+      "mode": 438
+    },
+    "explorfm/explorfm.egg-info/SOURCES.txt": {
+      "sha256": "78e326512e88a31f48ef3b3e7659b607a00f9b9c9ef73241078be78ee9e97759",
+      "mode": 438
+    },
+    "explorfm/explorfm.egg-info/dependency_links.txt": {
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "mode": 438
+    },
+    "explorfm/explorfm.egg-info/requires.txt": {
+      "sha256": "8d8f292ccb5c43c1cff84ea024b1fb9b7e87b18a7d6bb2cb4a8ad12282c192e8",
+      "mode": 438
+    },
+    "explorfm/explorfm.egg-info/top_level.txt": {
+      "sha256": "bde97178e16d2a30252d952f56f6be3e0f1057b39c4184672bf4aa08e3394c95",
+      "mode": 438
+    },
+    "explorfm/explorfm_model.py": {
+      "sha256": "a58b43536590f5a5e04798e680274fd9bf12eb0ac61057cd65fd62b9427fe77a",
+      "mode": 438
+    },
+    "explorfm/explorfm_model_onnx.py": {
+      "sha256": "ceb990d1c49bc4f73b7619f0907056c6c18d1bebf39a09bf3332f737315be965",
+      "mode": 438
+    },
+    "explorfm/prototyping/__init__.py": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 438
+    },
+    "explorfm/prototyping/datasets/__init__.py": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 438
+    },
+    "explorfm/prototyping/datasets/nebula.py": {
+      "sha256": "cd3ce32ea0dbe1ea6596cf076aa0a468bebb8d710c31e85e080ee68c0540606e",
+      "mode": 438
+    },
+    "explorfm/prototyping/datasets/rugd.py": {
+      "sha256": "aa36a3ead8507eb4bdd84c241d531fbc58840e0c53ced02b5093b1eb8d40baee",
+      "mode": 438
+    },
+    "explorfm/prototyping/geofrontiers_scoring.py": {
+      "sha256": "ebf696b5d2df900822825429f7e28060553a0bc955657029c2bd86a6ae367db4",
+      "mode": 438
+    },
+    "explorfm/prototyping/rugd_ovts.py": {
+      "sha256": "6cb103660ae47ee32492667f14a6aa55f904ec18e60e72ffd563b0e33c2fdd50",
+      "mode": 438
+    },
+    "explorfm/prototyping/rugd_traversability_frontiers.py": {
+      "sha256": "b202cd38406966f5f1a48025974e54a534748a1da6dcb33e93b4dfe8d8b10a73",
+      "mode": 438
+    },
+    "explorfm/prototyping/test_naclip_ovss.py": {
+      "sha256": "5e9789269de52562f3b3dada3e34240addf4646e342f3eaa116b2b61946a6e2b",
+      "mode": 438
+    },
+    "explorfm/setup.py": {
+      "sha256": "a5dfa2913dd30d7520a53a77ca261e43c0f659ca6a0d27df63857b6963e60811",
+      "mode": 438
+    },
+    "gps_visualization/CMakeLists.txt": {
+      "sha256": "c08722ee230d00772af9dce8a884f5b26c25ca39d69114e3c25b9bab42ddbd2e",
+      "mode": 438
+    },
+    "gps_visualization/LICENSE": {
+      "sha256": "3ddf9be5c28fe27dad143a5dc76eea25222ad1dd68934a047064e56ed2fa40c5",
+      "mode": 438
+    },
+    "gps_visualization/msg/NavSatFixArray.msg": {
+      "sha256": "a75147accc3dd9af6b5a1eeafe1d966d9a2b4f16bb58de3b5f4a62afaed57928",
+      "mode": 438
+    },
+    "gps_visualization/package.xml": {
+      "sha256": "09382bd2e8ab97eb98ffdc1973fb6e62dcf50df29d0e640e4508020b706bb6a2",
+      "mode": 438
+    },
+    "gps_visualization/src/gps_path.cpp": {
+      "sha256": "aeeb126aacfff2b8021b4ecc76fc669ea4cd650f63eda30676e06bd4a2c75003",
+      "mode": 438
+    },
+    "graphnav_mapper/CMakeLists.txt": {
+      "sha256": "eef0ec7e94563ae21b0c61a2b1963a72f1b6d361e7cb9237b6716362e54240e1",
+      "mode": 438
+    },
+    "graphnav_mapper/include/graphnav_mapper/mapper.hpp": {
+      "sha256": "4cf002554cce5db043307d451adc60e06f7226e11504128abe3fd2450ec2f44e",
+      "mode": 438
+    },
+    "graphnav_mapper/include/graphnav_mapper/navigation_graph.hpp": {
+      "sha256": "659bc39ab821042f5b8621c22f28c13553a69501dc9e55c35878ae697ec7f382",
+      "mode": 438
+    },
+    "graphnav_mapper/include/graphnav_mapper/pose_graph.hpp": {
+      "sha256": "8255c534e344f53086f2baaa04191cc9d2af82eeea05d6a42a33c926ef681bc5",
+      "mode": 438
+    },
+    "graphnav_mapper/launch/graphnav_mapper.launch.yml": {
+      "sha256": "d4c0062b444c09a50e195544c65f0a30116e56ce042f1f760f6ab1fa88aad414",
+      "mode": 438
+    },
+    "graphnav_mapper/package.xml": {
+      "sha256": "8c0b27e7ba53d9d46a7081e19bf902aa0b910b55c11060d00a8070bddc468176",
+      "mode": 438
+    },
+    "graphnav_mapper/scripts/dummy_pose_graph_publisher.py": {
+      "sha256": "231009d9de2c89fabf07c26c7a9f06ed790c505d07ea6f631cc6b04abc5e2c1c",
+      "mode": 438
+    },
+    "graphnav_mapper/src/mapper.cpp": {
+      "sha256": "a5ee785dd8270d00d60d026f24fb6639b4f5ce60b9f97bb7d2c0fe00c2df05c9",
+      "mode": 438
+    },
+    "graphnav_mapper/src/mapper_node.cpp": {
+      "sha256": "86aa415244bb9bca1f1be0637bffff82d090a91e20d474977b0d29120f082518",
+      "mode": 438
+    },
+    "graphnav_mapper/src/navigation_graph.cpp": {
+      "sha256": "4c7c9753f947f69793a5f7d138df9f6f8059d8a21b415509741db6c0221927aa",
+      "mode": 438
+    },
+    "graphnav_mapper/test/test_mapper.cpp": {
+      "sha256": "f841bb76d85d2211edec4419f3eeae5b5129fe9d20672a01fa562cb08017bd4d",
+      "mode": 438
+    },
+    "graphnav_msgs/CMakeLists.txt": {
+      "sha256": "a4ecaf284d77f5b12121603a6fe65e97901e268aad7e3b8b0d16723fc681a582",
+      "mode": 438
+    },
+    "graphnav_msgs/LICENSE": {
+      "sha256": "3ddf9be5c28fe27dad143a5dc76eea25222ad1dd68934a047064e56ed2fa40c5",
+      "mode": 438
+    },
+    "graphnav_msgs/msg/Edge.msg": {
+      "sha256": "d53543458e05f7cca406c39271286ab4c1b85dc8f73a18b74e447016b987cbe6",
+      "mode": 438
+    },
+    "graphnav_msgs/msg/EdgeTraversability.msg": {
+      "sha256": "38a7037556f3bb583960b08ff3a194e565e7a24d8785da407a62d78e1f864793",
+      "mode": 438
+    },
+    "graphnav_msgs/msg/KeyValue.msg": {
+      "sha256": "28d2e6ede78a68261ed881f2836f2a9301936287ec7ee001865dba125cff16c9",
+      "mode": 438
+    },
+    "graphnav_msgs/msg/NavigationGraph.msg": {
+      "sha256": "ac6a71605c1b1951d76b4163f92cf4d7bacca6f11239e8eaef0d74856b4e1976",
+      "mode": 438
+    },
+    "graphnav_msgs/msg/Node.msg": {
+      "sha256": "5fe73787caa9461b28f55294fb6db8a2b42878c7757068979c261fee7656bdd3",
+      "mode": 438
+    },
+    "graphnav_msgs/msg/NodeTraversabilityProperties.msg": {
+      "sha256": "42b3db7e9dacbb58bb41ca10280ccc933fb3dfabb0e9e67c677c36606c9173ae",
+      "mode": 438
+    },
+    "graphnav_msgs/msg/UUID.msg": {
+      "sha256": "51b01bf286aff7081bcc9d2c728d7c5738b464fef1a1d44828510ebd78b8b2cb",
+      "mode": 438
+    },
+    "graphnav_msgs/package.xml": {
+      "sha256": "ef55a1abc270f1d5f69229cec7402ce3993ec8c995497d68be23dc89a75eb8d9",
+      "mode": 438
+    },
+    "graphnav_planner/CMakeLists.txt": {
+      "sha256": "adfc1aa4603ceda64fd128e294554468cb4d64d081f9863ec494a347da0e81d3",
+      "mode": 438
+    },
+    "graphnav_planner/LICENSE": {
+      "sha256": "3ddf9be5c28fe27dad143a5dc76eea25222ad1dd68934a047064e56ed2fa40c5",
+      "mode": 438
+    },
+    "graphnav_planner/include/graphnav_planner/planner.hpp": {
+      "sha256": "b4fdfbb19d03f209ecf1270a6246356f6748230b6f4d8b0a7b38211d5dd6922f",
+      "mode": 438
+    },
+    "graphnav_planner/launch/graphnav_planner.launch.yml": {
+      "sha256": "14c646ad8520cefd441d4cc7aab55c604074435961543ce01854f780558bd9f3",
+      "mode": 438
+    },
+    "graphnav_planner/package.xml": {
+      "sha256": "a3c2dd2e9be3adf7accda8727d4ac85d4cdaeb3d9e4937dd7f1a9450b35649a8",
+      "mode": 438
+    },
+    "graphnav_planner/src/path_follower_node.cpp": {
+      "sha256": "475438b8fd8c69d0636026fac9c19297bd68121ca166f3f3b9451282c616f17c",
+      "mode": 438
+    },
+    "graphnav_planner/src/planner.cpp": {
+      "sha256": "aa2a4a1f4b646f5a223ee21d79e265180939258f523702cc0661e5221e542183",
+      "mode": 438
+    },
+    "graphnav_planner/src/planner_node.cpp": {
+      "sha256": "ecdee6440ac79af143bc8dcce22a821857868ab0edfc330252a8782a02804b35",
+      "mode": 438
+    },
+    "nvidia_radio/.gitignore": {
+      "sha256": "6c69c24d1e9ff258ac68cc87edca3a3d41d007bfe70bb751218e55f9980871ab",
+      "mode": 438
+    },
+    "nvidia_radio/LICENSE": {
+      "sha256": "7fdb80c2f76be95e1ebbcb83f63b0bbaa48309d5bb3a5fb7512df6ce1b3fe13e",
+      "mode": 438
+    },
+    "nvidia_radio/RADIOv2.5_tech_report.md": {
+      "sha256": "00363017fed0800e41d2ceeb6062cd59436af87ff96eba3c3a00c4ec94bfeeb1",
+      "mode": 438
+    },
+    "nvidia_radio/README.md": {
+      "sha256": "3268bbd56ce82aefdec66a966e3fa9dd4a256da8e9613a669e460301efa89fa3",
+      "mode": 438
+    },
+    "nvidia_radio/__init__.py": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 438
+    },
+    "nvidia_radio/examples/README.md": {
+      "sha256": "84473cbc8f39dd47bf1bba7a54e83118ccb0401952a01ce9023e51c0fc274075",
+      "mode": 438
+    },
+    "nvidia_radio/examples/cca_compare_models.py": {
+      "sha256": "a69c0e054fae9a42d2311db01e4e2d1105b5b099c827184a92f1dc32aa2c34a6",
+      "mode": 438
+    },
+    "nvidia_radio/examples/common/__init__.py": {
+      "sha256": "e72011d4c007ae1f9134cdda4a30c8ccb4a798029c8fdc828c56ac4b4d4aa403",
+      "mode": 438
+    },
+    "nvidia_radio/examples/common/hadamard.py": {
+      "sha256": "18eea895d976a2f77d97c11880d4e46ed77bc844feebed604db75ff580db3835",
+      "mode": 438
+    },
+    "nvidia_radio/examples/common/model_loader.py": {
+      "sha256": "423ca75647226420e7b376d0d58161cc68ec81a4c2fafc8bd761ed7074df97d6",
+      "mode": 438
+    },
+    "nvidia_radio/examples/common/phi_s.py": {
+      "sha256": "5f5f47e4ae0568c0b463f9293e42b650aecfc16b656ec4f25fd1423323e061c9",
+      "mode": 438
+    },
+    "nvidia_radio/examples/common/rand_augment.py": {
+      "sha256": "7219c8ff7214ca545e270c0b3f6ce98c3f926d00431f53b2808655872d98096c",
+      "mode": 438
+    },
+    "nvidia_radio/examples/common/resize_transform.py": {
+      "sha256": "dcd261e67d0ba86ea4b5485c865db76884bac36226074e0b98137b9ffdae8dcf",
+      "mode": 438
+    },
+    "nvidia_radio/examples/common/utils.py": {
+      "sha256": "a609e63c5644494e653f15f33c8cfadd24f4d18eaf19114eebee9b7f0b575d23",
+      "mode": 438
+    },
+    "nvidia_radio/examples/count_params.py": {
+      "sha256": "78007dcbfb73638c8b5231eb5b3345a0517079a169904c9cc00f235a9e9f9eec",
+      "mode": 438
+    },
+    "nvidia_radio/examples/feature_distribution.py": {
+      "sha256": "9b2751c484a28ebc7f9057f57e888f6ca2a01cbaba7cb9ab76d56a87dd13316f",
+      "mode": 438
+    },
+    "nvidia_radio/examples/knn_classification.py": {
+      "sha256": "2fd68fa34dc8c2f9288e0d5b735eaa8abfa2fea361a426e462d16dc71103adb0",
+      "mode": 438
+    },
+    "nvidia_radio/examples/mode_switching.py": {
+      "sha256": "c9951b0c16c7de49283711cfa720caaf6a3070732cc8a8305920af0193130c51",
+      "mode": 438
+    },
+    "nvidia_radio/examples/model_stats.py": {
+      "sha256": "6c399cec8f66f6c3e034264aba1b332a014fae44beb94e4f7f60753799553760",
+      "mode": 438
+    },
+    "nvidia_radio/examples/position_predictor.py": {
+      "sha256": "2fd2f535f9f7c9944a564b9a3d3535e82d70af92c424a124d8ffc8b15bcd36e0",
+      "mode": 438
+    },
+    "nvidia_radio/examples/requirements.txt": {
+      "sha256": "98e6b9cb4237fab77b9c93fe03189821eea1ffd3a1fa33e867d128954f0c59da",
+      "mode": 438
+    },
+    "nvidia_radio/examples/ssl_metrics.py": {
+      "sha256": "b381be1cd1a5f4d7c6d6a51b553802fb6ecf3f810592b32cbbd39d1649319146",
+      "mode": 438
+    },
+    "nvidia_radio/examples/visualize_features.py": {
+      "sha256": "a7c4aada38646aa765262a74656fec1577e231fa201150501cb9c5212daac5dc",
+      "mode": 438
+    },
+    "nvidia_radio/examples/visualize_video_features.py": {
+      "sha256": "4d425d12872024da6bfea109844d1fd9ed36e370829b06e17ad727573296f77c",
+      "mode": 438
+    },
+    "nvidia_radio/examples/zero_shot_imagenet.py": {
+      "sha256": "a17e7caf20ff39800b823e337acb39e193cb2db8d18403b7335b12195a978990",
+      "mode": 438
+    },
+    "nvidia_radio/hf_hub.py": {
+      "sha256": "45826ee62cb6f729c2e20d7693b39d3e2bf0f2d18e1a2bda64c32a0c67652c5a",
+      "mode": 438
+    },
+    "nvidia_radio/hubconf.py": {
+      "sha256": "e65e2c26bdfa48e61677684a14bb8e50697ff5c6f04207b5291c95e8fbc89519",
+      "mode": 438
+    },
+    "nvidia_radio/mmseg/README.md": {
+      "sha256": "c5b8312c8c004f8489c925a409a9c9a7cd1dee20f7e7d828580f78029bb2d31a",
+      "mode": 438
+    },
+    "nvidia_radio/mmseg/configs/_base_/datasets/ade20k.py": {
+      "sha256": "da623b9aec16f9ddd0efca3c2732b8a2d047585a94392125b90208a139ead374",
+      "mode": 438
+    },
+    "nvidia_radio/mmseg/configs/_base_/default_runtime.py": {
+      "sha256": "c64ac1d35fe8fd6dabe73bf9337b2ce1876b43626b2d5e823adfd9e601551907",
+      "mode": 438
+    },
+    "nvidia_radio/mmseg/configs/_base_/schedules/schedule_80k.py": {
+      "sha256": "deb5923f985665a931643f1320337abbfb0389b4ffd29afa11c2151336ede26e",
+      "mode": 438
+    },
+    "nvidia_radio/mmseg/configs/radio/eradio_linear_8xb2-80k_ade20k-512x512.py": {
+      "sha256": "d493b195f4667714ccdf4cb44aa95ee9eefe13c8f5f3322d2a01fe84561d86ac",
+      "mode": 438
+    },
+    "nvidia_radio/mmseg/configs/radio/radio_linear_8xb2-80k_ade20k-512x512.py": {
+      "sha256": "858b6db97097f8ab6ef46c6f5311b600a5bdab73957f915291ff5258f315d5de",
+      "mode": 438
+    },
+    "nvidia_radio/mmseg/linear_head.py": {
+      "sha256": "937cdab9898ca1faf0133ebb61bcd4dac132c834515353f3dd0ff2bae3c112fe",
+      "mode": 438
+    },
+    "nvidia_radio/mmseg/radio.py": {
+      "sha256": "92f9bf7375edf40f8249a3d3588a40347b3550e3354c3631d5cae3120e499e69",
+      "mode": 438
+    },
+    "nvidia_radio/mmseg/requirements.txt": {
+      "sha256": "340186a62bc2d0ccc11bf4054f697f388b360858b7d42ce9b65682fc363647a9",
+      "mode": 438
+    },
+    "nvidia_radio/mmseg/train.py": {
+      "sha256": "2a85f14b55a3125b7e7c57c4edbcb27410b5b87a02d8bb2d2754b4bdcdced8d0",
+      "mode": 438
+    },
+    "nvidia_radio/nvidia_radio.egg-info/SOURCES.txt": {
+      "sha256": "ebfc408099566cafaf1e1a37ac665935f65f0108adf9eee2c0f1564e7fe6274b",
+      "mode": 438
+    },
+    "nvidia_radio/nvidia_radio.egg-info/dependency_links.txt": {
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "mode": 438
+    },
+    "nvidia_radio/nvidia_radio.egg-info/top_level.txt": {
+      "sha256": "8d8f292ccb5c43c1cff84ea024b1fb9b7e87b18a7d6bb2cb4a8ad12282c192e8",
+      "mode": 438
+    },
+    "nvidia_radio/radio/__init__.py": {
+      "sha256": "84f68f6232e2abd5bddb3d3cd9fbb403f98488e114666048bb65b9f056e0f0a1",
+      "mode": 438
+    },
+    "nvidia_radio/radio/adaptor_base.py": {
+      "sha256": "0a59a456b40a71e6072142d4c4f01fc733f531635579c519eaed3ab5c4a17f2b",
+      "mode": 438
+    },
+    "nvidia_radio/radio/adaptor_generic.py": {
+      "sha256": "db4e2bcb18ff6d25080b281b197264bda497e186d951f7fa0bc524f0c4d1eab0",
+      "mode": 438
+    },
+    "nvidia_radio/radio/adaptor_mlp.py": {
+      "sha256": "d11183d19344ac8cfad3c69bb8c0949910761b85c7fcfdb4bef9d8e3d4309a29",
+      "mode": 438
+    },
+    "nvidia_radio/radio/adaptor_registry.py": {
+      "sha256": "9a25bae4d397ed5eaf92f45c1417e9bd8ed0192e713e53d17bf585bad5dd5f5c",
+      "mode": 438
+    },
+    "nvidia_radio/radio/block.py": {
+      "sha256": "98e3f69f49dc6cb5fa2344bc4957a310b107b3527280a11af277eb1ab7b814d6",
+      "mode": 438
+    },
+    "nvidia_radio/radio/cls_token.py": {
+      "sha256": "403a22b0fce377fc53d2d95bf7ad6715d74099538f1e69a5399208f0b70a679c",
+      "mode": 438
+    },
+    "nvidia_radio/radio/common.py": {
+      "sha256": "cbb18c8b97ee8e36bd6e387f234b006ec8b9b7d59e73a267f469d7aa3936da1b",
+      "mode": 438
+    },
+    "nvidia_radio/radio/conv.py": {
+      "sha256": "ebcbdc8bd0ae7ea79f18bd1f0d2839ecdfc88d8cf047dacdc38679c51f45691d",
+      "mode": 438
+    },
+    "nvidia_radio/radio/dinov2_arch.py": {
+      "sha256": "e0a41be63b63df78f7a68563099b9bf6d73c0c5a2569d55c9a52e870dbd1dfa9",
+      "mode": 438
+    },
+    "nvidia_radio/radio/dual_hybrid_vit.py": {
+      "sha256": "8d6ad024631474fe0f8b774d08a3c248d726b0c072191c599221ecf86d3cedfc",
+      "mode": 438
+    },
+    "nvidia_radio/radio/enable_cpe_support.py": {
+      "sha256": "2fe33a3e1eb46229729a7af825bfadadb50935256c63338d3296515c74e76368",
+      "mode": 438
+    },
+    "nvidia_radio/radio/enable_damp.py": {
+      "sha256": "60d5535dea137bdc2c51479ab62ab611b8db11d109c6d6ed99660fab6b790b9d",
+      "mode": 438
+    },
+    "nvidia_radio/radio/enable_spectral_reparam.py": {
+      "sha256": "3cb93687e31a01677888db26ae108b9f72cb0c310baadd8216338c94df2149ee",
+      "mode": 438
+    },
+    "nvidia_radio/radio/eradio_model.py": {
+      "sha256": "c8fbfb0d6653d20cba252ccc5e8cf48a0b651efd83d68c413b8d99ff04228c3f",
+      "mode": 438
+    },
+    "nvidia_radio/radio/extra_models.py": {
+      "sha256": "98dcac8be207ccef3890e4fd7e9a8341b04b54c718097a4841106d7017a7bb14",
+      "mode": 438
+    },
+    "nvidia_radio/radio/extra_timm_models.py": {
+      "sha256": "7d1f259d322d4501890ed596a398ea9b351f043f07b74348d0a12cb39da0aac5",
+      "mode": 438
+    },
+    "nvidia_radio/radio/feature_normalizer.py": {
+      "sha256": "96df1f26bef5a74234a16b818e2b1af9fc330259d4d2be834c324e4f99501276",
+      "mode": 438
+    },
+    "nvidia_radio/radio/forward_intermediates.py": {
+      "sha256": "eb66803efa791693066ef23bcf8096edd745a02bc6586306b8cd57549a2cf8dd",
+      "mode": 438
+    },
+    "nvidia_radio/radio/hf_model.py": {
+      "sha256": "08aec2163ba2970493a5c2ff051be664e84e271ffdfe92f38a1fbdb34b11f680",
+      "mode": 438
+    },
+    "nvidia_radio/radio/input_conditioner.py": {
+      "sha256": "054fc3615c82cfa4ca9697d91d14c8ac0ae153d84202a1f9eba726247a4da359",
+      "mode": 438
+    },
+    "nvidia_radio/radio/naclip.py": {
+      "sha256": "71142fd351aa38aac389ac90e9a139c417a241b6d8b9cb861654a94e7bc894d5",
+      "mode": 438
+    },
+    "nvidia_radio/radio/open_clip_adaptor.py": {
+      "sha256": "907f2eac33a556cd6a7bbdef2bbad46871d6279b0dfd13a9ed22dfefb6d455dc",
+      "mode": 438
+    },
+    "nvidia_radio/radio/pamr.py": {
+      "sha256": "85a5bbbe2181b96d9820938581078f1be0e7e9b9d47003b8dd212007c9bce294",
+      "mode": 438
+    },
+    "nvidia_radio/radio/radio_model.py": {
+      "sha256": "4a9168d8e6b535ff49a1c8573dca3a8cdc345a5fca5a13d4910b68b8bd2b6246",
+      "mode": 438
+    },
+    "nvidia_radio/radio/siglip2_adaptor.py": {
+      "sha256": "697f45f9af95ec285f8953bd2cfdd51d2f66941d5cdee1b8664a98dfa08d7c94",
+      "mode": 438
+    },
+    "nvidia_radio/radio/utils.py": {
+      "sha256": "e06482f2183489d787de451bc38f351f57f67a12f064222449ae6acf05b366a6",
+      "mode": 438
+    },
+    "nvidia_radio/radio/vision_transformer_xpos.py": {
+      "sha256": "431b3258391fceab424eabe841da45509626cfb69e8344e7c00b58d4cea65cca",
+      "mode": 438
+    },
+    "nvidia_radio/radio/vit_patch_generator.py": {
+      "sha256": "5053d0e05aef9ecaaf3a48177e0451df95452f9e4c47587c5c66a82f2b89ce8a",
+      "mode": 438
+    },
+    "nvidia_radio/radio/vitdet.py": {
+      "sha256": "2394309e77a74cb4279c2340acdf9ce40573420d6724e32885f08255789de48d",
+      "mode": 438
+    },
+    "nvidia_radio/setup.py": {
+      "sha256": "e97406522582b51bf1593f5d9ecae42ec44f79949b4cbb750e47f13c075993c7",
+      "mode": 438
+    },
+    "nvidia_radio/test_hf.py": {
+      "sha256": "a7116cf82ea7a917d0e8288d0b54cc379f191d91dcda0266b0cbe94070fef981",
+      "mode": 438
+    },
+    "nvidia_radio/test_hubconf.py": {
+      "sha256": "932efe67fd2f8c242c85606776a9ed5b6ff875edb398496098f481892b42599e",
+      "mode": 438
+    },
+    "nvidia_radio/tools/compute_distributions.sh": {
+      "sha256": "548c20d251860cb94515115625d5c92e50ffccf7cb6cdac4f92e7ef8fddca8a5",
+      "mode": 438
+    },
+    "nvidia_radio/tools/compute_summary_metrics.sh": {
+      "sha256": "98d1b2413a72a30c0216da4bfa345c592865d3791b0ab93db178833c8b4ce96e",
+      "mode": 438
+    },
+    "nvidia_radio/tools/im_join.py": {
+      "sha256": "71f266da298b25c576c614c800d40e215659fe1db564daf3aa7d40660d99ea4a",
+      "mode": 438
+    },
+    "nvidia_radio/tools/photo_strip.py": {
+      "sha256": "d4f6b526af33649538995a42a6ce54daac5cd20dc878a53d74a431455ad3b745",
+      "mode": 438
+    },
+    "nvidia_radio/tools/run_all_ssl.sh": {
+      "sha256": "96636ff36f35d75aa1a6e2214f75fae579f5c29f6a2c252bc5d9932ae21828ed",
+      "mode": 438
+    },
+    "nvidia_radio/tools/visualize_all.sh": {
+      "sha256": "963968acb5000a24537aa0a83ad39934c7c8813f435c971a2484bec362c4dceb",
+      "mode": 438
+    },
+    "nvidia_radio/tools/zero_shot_all.sh": {
+      "sha256": "cb534fbdd19b64c4059974feb737228e53f3bdc7aaacdb9b73215f92484bff69",
+      "mode": 438
+    },
+    "object_search_msgs/CMakeLists.txt": {
+      "sha256": "7a6b49bb751eb14d0e5617463ebf494cdb6fae234f46bff370a9dbab1df96882",
+      "mode": 438
+    },
+    "object_search_msgs/LICENSE": {
+      "sha256": "3ddf9be5c28fe27dad143a5dc76eea25222ad1dd68934a047064e56ed2fa40c5",
+      "mode": 438
+    },
+    "object_search_msgs/msg/ObjectMaskWithTf.msg": {
+      "sha256": "076bc01fc83dda0bf4db40d6e9ae9a9e09df0252ecebc73fe67b80a118544de8",
+      "mode": 438
+    },
+    "object_search_msgs/package.xml": {
+      "sha256": "5ddda83e7b4cbf5a1701e96c81afc5e21431dd8d44bd2095859e78efe7b64082",
+      "mode": 438
+    },
+    "pose_graph_msgs/CMakeLists.txt": {
+      "sha256": "b9e452a383cab162122866c72b83fe85f0c389346192712d4f5d2fc1fb30e28b",
+      "mode": 438
+    },
+    "pose_graph_msgs/msg/Edge.msg": {
+      "sha256": "b09f641e8c21dcb04eccb49498037fb6c703baeacb8fcdd9e4630f3d26aa7720",
+      "mode": 438
+    },
+    "pose_graph_msgs/msg/Node.msg": {
+      "sha256": "7119a659ea8ee2cc12129486939447131a8ee9207e1a9e3238310395b7effdd9",
+      "mode": 438
+    },
+    "pose_graph_msgs/msg/NodeReference.msg": {
+      "sha256": "533600a9c94e0960b040a334640ad5fbb09a1c1cf691f02a2cfc4132e5b65739",
+      "mode": 438
+    },
+    "pose_graph_msgs/msg/PoseGraph.msg": {
+      "sha256": "c9eba7d10f2b1e0201c72954e2316c21f8aec264166144eae7b5f8ca7ce6bce2",
+      "mode": 438
+    },
+    "pose_graph_msgs/msg/UUID.msg": {
+      "sha256": "51b01bf286aff7081bcc9d2c728d7c5738b464fef1a1d44828510ebd78b8b2cb",
+      "mode": 438
+    },
+    "pose_graph_msgs/package.xml": {
+      "sha256": "5fca59a8a75dd782693864a795c0b0ccdc326e07a6a0c94e4bec1c6add048e64",
+      "mode": 438
+    },
+    "requirements.txt": {
+      "sha256": "e7754031506b2a7b8502bb9e8206a161b3a9279304e0ab397a6b96e1796b6be6",
+      "mode": 438
+    },
+    "thirdparty/graaf_vendor/CMakeLists.txt": {
+      "sha256": "df4778e72a725f39654707a09b952bb411976f3f56a4335bbebc863be536bea4",
+      "mode": 438
+    },
+    "thirdparty/graaf_vendor/package.xml": {
+      "sha256": "2bf47290ff0fa218552e5239d3b50ba98dbedd75d754891ad29d44530da2cbe8",
+      "mode": 438
+    },
+    "triangulation3d/.gitignore": {
+      "sha256": "c96817fbc814506e57deeb702fe8ca1faec74ea07a0aec835a400135d3028326",
+      "mode": 438
+    },
+    "triangulation3d/README.md": {
+      "sha256": "31fc030a8a35f86b03e38cd74291d86499aca31689c410b2fab31f6e0e4b408a",
+      "mode": 438
+    },
+    "triangulation3d/package.xml": {
+      "sha256": "793f47c9d8fdd847db3b69861584b861f7be45ee4e209844f6a4d68bf4c00797",
+      "mode": 438
+    },
+    "triangulation3d/resource/triangulation3d": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 438
+    },
+    "triangulation3d/setup.cfg": {
+      "sha256": "28b838c5a71dbc8a499dbacc21d76e6a5ed54ae4afe2da6eacdbc7cde9647fe1",
+      "mode": 438
+    },
+    "triangulation3d/setup.py": {
+      "sha256": "9cd63f9b7a4be7f445d500c15ab34678213b5303da498c3610ca78e611a3eeeb",
+      "mode": 438
+    },
+    "triangulation3d/test/test_copyright.py": {
+      "sha256": "574bf3e769dc4c89d867a094ee02ea939a834f93f6acfe28b8b0e586e065f358",
+      "mode": 438
+    },
+    "triangulation3d/test/test_flake8.py": {
+      "sha256": "0d9705658b073e95c71dc4173f1cbe4633250dc7bd83527dd1e5c26e899c0e6b",
+      "mode": 438
+    },
+    "triangulation3d/test/test_pep257.py": {
+      "sha256": "2c2a8f9ac19efb12c18d02272706533bdaa47512d5b349143272ddfe3fed904b",
+      "mode": 438
+    },
+    "triangulation3d/triangulation3d/__init__.py": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 438
+    },
+    "triangulation3d/triangulation3d/bbox_generator.py": {
+      "sha256": "4914ef60556b6d805103b0d70d0875ae2413adf0591e98b0e18b319e38173451",
+      "mode": 438
+    },
+    "triangulation3d/triangulation3d/camera_data.py": {
+      "sha256": "d81c8c1913817b38b9f4b536e75b0efa8b11325300740ca9857260529cfea97d",
+      "mode": 438
+    },
+    "triangulation3d/triangulation3d/multicam_visualizer.py": {
+      "sha256": "eb2e196ecddcbb9edbe96ec3ecc8efd78933cca0a53f512e2a9df047ff8be7dc",
+      "mode": 438
+    },
+    "triangulation3d/triangulation3d/particle_generator.py": {
+      "sha256": "4b1e920403364420a1bad80de6fcc69566c1d73560df23056baeefb51dae929a",
+      "mode": 438
+    },
+    "triangulation3d/triangulation3d/pcl_utils.py": {
+      "sha256": "d8af62056496e4b039f75b3efb7f88c062fdae5887bbbf60e466d399707f69cd",
+      "mode": 438
+    },
+    "triangulation3d/triangulation3d/quantitative_metrics.py": {
+      "sha256": "a73ca2c027740e1a8993f344e4afa528c1f26ed9c8b0ba37339672dd9208545a",
+      "mode": 438
+    },
+    "triangulation3d/triangulation3d/random_cam_initializer.py": {
+      "sha256": "a87c6c7fe595fd52edbdaeede88a7835747c43f748d4235b869891e61f67a32c",
+      "mode": 438
+    },
+    "triangulation3d/triangulation3d/teleop_triangulation.py": {
+      "sha256": "44d915f1b9287b5c8da9a3fdae89c92991fdd3168f9261c4d909daa437a485b0",
+      "mode": 438
+    },
+    "triangulation3d/triangulation3d/teleop_twist_keyboard.py": {
+      "sha256": "d0d1837e31935fe8e8d898a07cd43fd23747a6281849ba59088708bc7335f7e3",
+      "mode": 438
+    },
+    "triangulation3d/triangulation3d/triangulator.py": {
+      "sha256": "a51768cc78d84e7bb430d3ade8afa0b38f38a26e295149832e1781d45d07a536",
+      "mode": 438
+    },
+    "visual_navigation/LICENSE": {
+      "sha256": "3ddf9be5c28fe27dad143a5dc76eea25222ad1dd68934a047064e56ed2fa40c5",
+      "mode": 438
+    },
+    "visual_navigation/README.md": {
+      "sha256": "071b19d9053f0128a5bd046a32d1c96b3c466ad3c76215a39d0b2ab36013f0bd",
+      "mode": 438
+    },
+    "visual_navigation/configs/explorfm_triangulator_conf.yaml": {
+      "sha256": "09d317dcb42ca05ba9706b00e5876d9c49f0684405d042e50731b6687a5edb52",
+      "mode": 438
+    },
+    "visual_navigation/configs/geofrontier_nav_conf.yaml": {
+      "sha256": "821d061d45044ae01292501bab1b5e258ef85749c308553e23453b7479b17536",
+      "mode": 438
+    },
+    "visual_navigation/configs/imgfrontier_nav_conf.yaml": {
+      "sha256": "0e818e8c0815adac22959bcdfd6781bcce87956e031e1b93801054ea6141a8ab",
+      "mode": 438
+    },
+    "visual_navigation/configs/lrn_nav_conf.yaml": {
+      "sha256": "687a72a4d1a48c20a92e705121c3f3da184d065acc608793750ffc3e744f7fcc",
+      "mode": 438
+    },
+    "visual_navigation/configs/triangulation3d_objsearch_conf.yaml": {
+      "sha256": "ef8893eb29f40ba3b54907aa99bfc85b0ac0528ff7d7fb716824995db4e3cb9a",
+      "mode": 438
+    },
+    "visual_navigation/configs/wildos_nav_conf.yaml": {
+      "sha256": "7af9bccefe98373da35382546126e7a6b9587dd410e4d196bdf3f166723c2d83",
+      "mode": 438
+    },
+    "visual_navigation/launch/explorfm_triangulation_launch.py": {
+      "sha256": "a02feda3844f4d9b1a77f0b450c948ba8c771135456319cb62eb7e92570601af",
+      "mode": 438
+    },
+    "visual_navigation/launch/imgfrontier_nav_launch.py": {
+      "sha256": "7d40243ceae33cb9b6c9660b49f7de1a90b4734075192757074b9c7f9cf73f69",
+      "mode": 438
+    },
+    "visual_navigation/launch/lrn_launch.py": {
+      "sha256": "39cb2af5b49b96765f10dd54407a293544d624dfe2b10bd1c9f6f98b0858b376",
+      "mode": 438
+    },
+    "visual_navigation/launch/save_gps_launch.py": {
+      "sha256": "28fed67614888b6ebd404fe4911688ae5d8cc8920eaee5460d2e19ff5ec87c28",
+      "mode": 438
+    },
+    "visual_navigation/launch/wildos_launch.py": {
+      "sha256": "c6e3b88fb0104b1a9d85c65281cf38b1f8cf727058ec2572a1d024dc9cba7da2",
+      "mode": 438
+    },
+    "visual_navigation/package.xml": {
+      "sha256": "1974fe8e0ac5314aae8aab23092a8479bcba5ec63ff1024041547aa93e4fef14",
+      "mode": 438
+    },
+    "visual_navigation/resource/visual_navigation": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 438
+    },
+    "visual_navigation/setup.cfg": {
+      "sha256": "4dbeb2476b11a3af3b9e947636ef445843ef8683d0259fe942be4d9b06c7ddfc",
+      "mode": 438
+    },
+    "visual_navigation/setup.py": {
+      "sha256": "ac59a588d88ad35f0e4bd0d35455a69ff22ba6888e78c060d3843101d9569515",
+      "mode": 438
+    },
+    "visual_navigation/test/test_copyright.py": {
+      "sha256": "574bf3e769dc4c89d867a094ee02ea939a834f93f6acfe28b8b0e586e065f358",
+      "mode": 438
+    },
+    "visual_navigation/test/test_flake8.py": {
+      "sha256": "0d9705658b073e95c71dc4173f1cbe4633250dc7bd83527dd1e5c26e899c0e6b",
+      "mode": 438
+    },
+    "visual_navigation/test/test_pep257.py": {
+      "sha256": "2c2a8f9ac19efb12c18d02272706533bdaa47512d5b349143272ddfe3fed904b",
+      "mode": 438
+    },
+    "visual_navigation/visual_navigation/__init__.py": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 438
+    },
+    "visual_navigation/visual_navigation/explorfm_triangulation/explorfm_triangulator.py": {
+      "sha256": "9bf802bc44da6ed7a114f6e3633e2b6555d5d00d46307ccb0bf497b62848a719",
+      "mode": 438
+    },
+    "visual_navigation/visual_navigation/explorfm_triangulation/obj_mask_triangulation.py": {
+      "sha256": "257ca26e278b9a99d7551921557ebbc70177f939a049d6245f7b68b41045021e",
+      "mode": 438
+    },
+    "visual_navigation/visual_navigation/explorfm_triangulation/triangulator_viz.py": {
+      "sha256": "da941077867f291ef95e7a92318bc76890a10fb9cb574c0d765dccf96c10e897",
+      "mode": 438
+    },
+    "visual_navigation/visual_navigation/geofrontier_nav/geofrontier_to_image.py": {
+      "sha256": "a780f51cfec69d4ebd3b85ac2d82451f3fee3362a1b280143cffa281de3c3457",
+      "mode": 438
+    },
+    "visual_navigation/visual_navigation/geofrontier_nav/nav.py": {
+      "sha256": "641cf05cd5457a19542f47edb8d7ee4b52a87b40fe880b23e18690cb7c2d5ee9",
+      "mode": 438
+    },
+    "visual_navigation/visual_navigation/geofrontier_nav/viz.py": {
+      "sha256": "e4a7047fe54a51cc45418e464f1e24a65de39d3a9d73813e61fbe3f0470134c8",
+      "mode": 438
+    },
+    "visual_navigation/visual_navigation/gps/gps_viz.py": {
+      "sha256": "18f0a5ffa377e651d29510a062478cff48dd65737694527d69c6749035463668",
+      "mode": 438
+    },
+    "visual_navigation/visual_navigation/gps/save_gps_path.py": {
+      "sha256": "3716a6d5e2363cd6621e6883dfa5d42d0622db37f16532e3d60b75a6acf6224f",
+      "mode": 438
+    },
+    "visual_navigation/visual_navigation/gps/save_metrics.py": {
+      "sha256": "b71b313ed75b95f7f86ac13b693a96dde5e1a74fd0d49f4ed45f2638b70404ec",
+      "mode": 438
+    },
+    "visual_navigation/visual_navigation/imgfrontier_nav/nav.py": {
+      "sha256": "a912176c71cbd8ee7e5d3ec9fa0e9050418607e2db12dbaf6335dc0c14481a44",
+      "mode": 438
+    },
+    "visual_navigation/visual_navigation/imgfrontier_nav/viz.py": {
+      "sha256": "f18743460354204fcd76012e650507470d8a0d337735364e9c314c9e6d2d6914",
+      "mode": 438
+    },
+    "visual_navigation/visual_navigation/imgfrontier_nav/viz_net.py": {
+      "sha256": "01d3ad481d2f049d28bc52dda05406b42f6d5a32e6e26ba6414c1962de240ea1",
+      "mode": 438
+    },
+    "visual_navigation/visual_navigation/lrn/nav.py": {
+      "sha256": "d5e3c734ac0eb8a34566f91306f2bac9ea0d02ef8f1beb491c9071c23eaf7d14",
+      "mode": 438
+    },
+    "visual_navigation/visual_navigation/lrn/scoring.py": {
+      "sha256": "7bbfe07e0db830dc4e305fb76084b5dce471a7925bd43c572df04a80a162036c",
+      "mode": 438
+    },
+    "visual_navigation/visual_navigation/lrn/viz.py": {
+      "sha256": "13f813a556dbc303206b4f41af090b9ed73f302f5c2c8616c4ccbe086f2bf5c2",
+      "mode": 438
+    },
+    "visual_navigation/visual_navigation/utils/buffer.py": {
+      "sha256": "47d7d728e7a8f7be1b5ab65d3d376adaa745f227fc14807ecde4650bfd1ae50e",
+      "mode": 438
+    },
+    "visual_navigation/visual_navigation/utils/goal_navigator.py": {
+      "sha256": "cea0c2c9e122cf5095cc72283c4a2ba512bd56f17d6587603a6bae6f6b39d007",
+      "mode": 438
+    },
+    "visual_navigation/visual_navigation/utils/object_search_utils.py": {
+      "sha256": "d63913b94f838b0795dc62c0b83acf99132560c687919ec7be8c74a0af00ea83",
+      "mode": 438
+    },
+    "visual_navigation/visual_navigation/utils/scoring.py": {
+      "sha256": "feb418f161868e497cd9c7b061c8b35c82abc3847e56d972d3f30a9632cebad3",
+      "mode": 438
+    },
+    "visual_navigation/visual_navigation/utils/tf_lookup_sub.py": {
+      "sha256": "ae300571e8236df8a95a0faffd20ba643de3d5297a0a1ea411348fc381328be5",
+      "mode": 438
+    },
+    "visual_navigation/visual_navigation/utils/viz.py": {
+      "sha256": "d12a8a6aeecaac96ff1217f771765e6a9cdf269105acfc9b9c7b975c6bd91f5d",
+      "mode": 438
+    },
+    "visual_navigation/visual_navigation/wildos/goalagnostic_scoring.py": {
+      "sha256": "3e6e6c5601881cc6114cacf1681f44444ba930cf2d5d1ba688855513c067154e",
+      "mode": 438
+    },
+    "visual_navigation/visual_navigation/wildos/nav.py": {
+      "sha256": "514ab37a3445c8e1bab8f8d9af0d6cdafa384614d917f677424d07007b83f4b4",
+      "mode": 438
+    },
+    "visual_navigation/visual_navigation/wildos/viz.py": {
+      "sha256": "8b81ffd305cd41339ef7a220410437d52f1b051f8fc3465cc097e63b43f4ca15",
+      "mode": 438
+    }
+  },
+  "skipped": [
+    [
+      ".git",
+      "not selected top level"
+    ],
+    [
+      ".venv",
+      "not selected top level"
+    ],
+    [
+      "assets",
+      "not selected top level"
+    ],
+    [
+      "ckpts",
+      "not selected top level"
+    ],
+    [
+      "explorfm/__pycache__",
+      "excluded directory/file"
+    ],
+    [
+      "explorfm/explorfm.egg-info/not-zip-safe",
+      "not selected source type"
+    ],
+    [
+      "explorfm/explorfm.egg-info/PKG-INFO",
+      "not selected source type"
+    ],
+    [
+      "explorfm/prototyping/assets",
+      "excluded directory/file"
+    ],
+    [
+      "explorfm_trainer",
+      "not selected top level"
+    ],
+    [
+      "nvidia_radio/__pycache__",
+      "excluded directory/file"
+    ],
+    [
+      "nvidia_radio/assets",
+      "excluded directory/file"
+    ],
+    [
+      "nvidia_radio/CODEOWNERS",
+      "not selected source type"
+    ],
+    [
+      "nvidia_radio/examples/Dockerfile",
+      "not selected source type"
+    ],
+    [
+      "nvidia_radio/mmseg/Dockerfile",
+      "not selected source type"
+    ],
+    [
+      "nvidia_radio/model_results.csv",
+      "not selected source type"
+    ],
+    [
+      "nvidia_radio/notebooks",
+      "excluded directory/file"
+    ],
+    [
+      "nvidia_radio/nvidia_radio.egg-info/not-zip-safe",
+      "not selected source type"
+    ],
+    [
+      "nvidia_radio/nvidia_radio.egg-info/PKG-INFO",
+      "not selected source type"
+    ],
+    [
+      "nvidia_radio/OpenSans-VariableFont_wdth,wght.ttf",
+      "not selected source type"
+    ],
+    [
+      "nvidia_radio/radio/__pycache__",
+      "excluded directory/file"
+    ],
+    [
+      "triangulation3d/assets",
+      "excluded directory/file"
+    ]
+  ],
+  "output_files": {
+    ".gitattributes": "bb9d38701ee3168df01f2a173bac36ec1a6917646e8bc0fc36f7a693ecf00991",
+    ".gitignore": "adc5254029ba05fbb1b995ed6986bcc3b88a8063b8a3bca66bffaa8db3e3e0ed",
+    "explorfm/__init__.py": "2e9226e232a270b851b96a65091e3853b6b91d67f1a934cf0d581dedf4482636",
+    "explorfm/explorfm.egg-info/dependency_links.txt": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "explorfm/explorfm.egg-info/requires.txt": "8d8f292ccb5c43c1cff84ea024b1fb9b7e87b18a7d6bb2cb4a8ad12282c192e8",
+    "explorfm/explorfm.egg-info/SOURCES.txt": "78e326512e88a31f48ef3b3e7659b607a00f9b9c9ef73241078be78ee9e97759",
+    "explorfm/explorfm.egg-info/top_level.txt": "bde97178e16d2a30252d952f56f6be3e0f1057b39c4184672bf4aa08e3394c95",
+    "explorfm/explorfm_model.py": "a58b43536590f5a5e04798e680274fd9bf12eb0ac61057cd65fd62b9427fe77a",
+    "explorfm/explorfm_model_onnx.py": "ceb990d1c49bc4f73b7619f0907056c6c18d1bebf39a09bf3332f737315be965",
+    "explorfm/prototyping/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "explorfm/prototyping/datasets/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "explorfm/prototyping/datasets/nebula.py": "cd3ce32ea0dbe1ea6596cf076aa0a468bebb8d710c31e85e080ee68c0540606e",
+    "explorfm/prototyping/datasets/rugd.py": "aa36a3ead8507eb4bdd84c241d531fbc58840e0c53ced02b5093b1eb8d40baee",
+    "explorfm/prototyping/geofrontiers_scoring.py": "ebf696b5d2df900822825429f7e28060553a0bc955657029c2bd86a6ae367db4",
+    "explorfm/prototyping/rugd_ovts.py": "6cb103660ae47ee32492667f14a6aa55f904ec18e60e72ffd563b0e33c2fdd50",
+    "explorfm/prototyping/rugd_traversability_frontiers.py": "b202cd38406966f5f1a48025974e54a534748a1da6dcb33e93b4dfe8d8b10a73",
+    "explorfm/prototyping/test_naclip_ovss.py": "5e9789269de52562f3b3dada3e34240addf4646e342f3eaa116b2b61946a6e2b",
+    "explorfm/README.md": "bb6dbe878b74ce98a35e4362fe0471d7aff53347c4b481844e6f29b551735010",
+    "explorfm/setup.py": "a5dfa2913dd30d7520a53a77ca261e43c0f659ca6a0d27df63857b6963e60811",
+    "gps_visualization/CMakeLists.txt": "c08722ee230d00772af9dce8a884f5b26c25ca39d69114e3c25b9bab42ddbd2e",
+    "gps_visualization/LICENSE": "3ddf9be5c28fe27dad143a5dc76eea25222ad1dd68934a047064e56ed2fa40c5",
+    "gps_visualization/msg/NavSatFixArray.msg": "a75147accc3dd9af6b5a1eeafe1d966d9a2b4f16bb58de3b5f4a62afaed57928",
+    "gps_visualization/package.xml": "09382bd2e8ab97eb98ffdc1973fb6e62dcf50df29d0e640e4508020b706bb6a2",
+    "gps_visualization/src/gps_path.cpp": "aeeb126aacfff2b8021b4ecc76fc669ea4cd650f63eda30676e06bd4a2c75003",
+    "graphnav_mapper/CMakeLists.txt": "d643f5f718d952cc54602760783f87e29c57ccf161f808e9120c9a1abd4ee79e",
+    "graphnav_mapper/include/graphnav_mapper/mapper.hpp": "4cf002554cce5db043307d451adc60e06f7226e11504128abe3fd2450ec2f44e",
+    "graphnav_mapper/include/graphnav_mapper/navigation_graph.hpp": "659bc39ab821042f5b8621c22f28c13553a69501dc9e55c35878ae697ec7f382",
+    "graphnav_mapper/include/graphnav_mapper/pose_graph.hpp": "8255c534e344f53086f2baaa04191cc9d2af82eeea05d6a42a33c926ef681bc5",
+    "graphnav_mapper/launch/graphnav_mapper.launch.yml": "d4c0062b444c09a50e195544c65f0a30116e56ce042f1f760f6ab1fa88aad414",
+    "graphnav_mapper/package.xml": "8c0b27e7ba53d9d46a7081e19bf902aa0b910b55c11060d00a8070bddc468176",
+    "graphnav_mapper/scripts/dummy_pose_graph_publisher.py": "231009d9de2c89fabf07c26c7a9f06ed790c505d07ea6f631cc6b04abc5e2c1c",
+    "graphnav_mapper/src/mapper.cpp": "a5ee785dd8270d00d60d026f24fb6639b4f5ce60b9f97bb7d2c0fe00c2df05c9",
+    "graphnav_mapper/src/mapper_node.cpp": "86aa415244bb9bca1f1be0637bffff82d090a91e20d474977b0d29120f082518",
+    "graphnav_mapper/src/navigation_graph.cpp": "4c7c9753f947f69793a5f7d138df9f6f8059d8a21b415509741db6c0221927aa",
+    "graphnav_mapper/test/test_mapper.cpp": "f841bb76d85d2211edec4419f3eeae5b5129fe9d20672a01fa562cb08017bd4d",
+    "graphnav_msgs/CMakeLists.txt": "a4ecaf284d77f5b12121603a6fe65e97901e268aad7e3b8b0d16723fc681a582",
+    "graphnav_msgs/LICENSE": "3ddf9be5c28fe27dad143a5dc76eea25222ad1dd68934a047064e56ed2fa40c5",
+    "graphnav_msgs/msg/Edge.msg": "d53543458e05f7cca406c39271286ab4c1b85dc8f73a18b74e447016b987cbe6",
+    "graphnav_msgs/msg/EdgeTraversability.msg": "38a7037556f3bb583960b08ff3a194e565e7a24d8785da407a62d78e1f864793",
+    "graphnav_msgs/msg/KeyValue.msg": "28d2e6ede78a68261ed881f2836f2a9301936287ec7ee001865dba125cff16c9",
+    "graphnav_msgs/msg/NavigationGraph.msg": "ac6a71605c1b1951d76b4163f92cf4d7bacca6f11239e8eaef0d74856b4e1976",
+    "graphnav_msgs/msg/Node.msg": "5fe73787caa9461b28f55294fb6db8a2b42878c7757068979c261fee7656bdd3",
+    "graphnav_msgs/msg/NodeTraversabilityProperties.msg": "42b3db7e9dacbb58bb41ca10280ccc933fb3dfabb0e9e67c677c36606c9173ae",
+    "graphnav_msgs/msg/UUID.msg": "51b01bf286aff7081bcc9d2c728d7c5738b464fef1a1d44828510ebd78b8b2cb",
+    "graphnav_msgs/package.xml": "ef55a1abc270f1d5f69229cec7402ce3993ec8c995497d68be23dc89a75eb8d9",
+    "graphnav_planner/CMakeLists.txt": "adfc1aa4603ceda64fd128e294554468cb4d64d081f9863ec494a347da0e81d3",
+    "graphnav_planner/include/graphnav_planner/planner.hpp": "b4fdfbb19d03f209ecf1270a6246356f6748230b6f4d8b0a7b38211d5dd6922f",
+    "graphnav_planner/launch/graphnav_planner.launch.yml": "14c646ad8520cefd441d4cc7aab55c604074435961543ce01854f780558bd9f3",
+    "graphnav_planner/LICENSE": "3ddf9be5c28fe27dad143a5dc76eea25222ad1dd68934a047064e56ed2fa40c5",
+    "graphnav_planner/package.xml": "a3c2dd2e9be3adf7accda8727d4ac85d4cdaeb3d9e4937dd7f1a9450b35649a8",
+    "graphnav_planner/src/path_follower_node.cpp": "475438b8fd8c69d0636026fac9c19297bd68121ca166f3f3b9451282c616f17c",
+    "graphnav_planner/src/planner.cpp": "aa2a4a1f4b646f5a223ee21d79e265180939258f523702cc0661e5221e542183",
+    "graphnav_planner/src/planner_node.cpp": "ecdee6440ac79af143bc8dcce22a821857868ab0edfc330252a8782a02804b35",
+    "LICENSE": "1eb85fc97224598dad1852b5d6483bbcf0aa8608790dcc657a5a2a761ae9c8c6",
+    "nvidia_radio/.gitignore": "6c69c24d1e9ff258ac68cc87edca3a3d41d007bfe70bb751218e55f9980871ab",
+    "nvidia_radio/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "nvidia_radio/examples/cca_compare_models.py": "a69c0e054fae9a42d2311db01e4e2d1105b5b099c827184a92f1dc32aa2c34a6",
+    "nvidia_radio/examples/common/__init__.py": "e72011d4c007ae1f9134cdda4a30c8ccb4a798029c8fdc828c56ac4b4d4aa403",
+    "nvidia_radio/examples/common/hadamard.py": "18eea895d976a2f77d97c11880d4e46ed77bc844feebed604db75ff580db3835",
+    "nvidia_radio/examples/common/model_loader.py": "423ca75647226420e7b376d0d58161cc68ec81a4c2fafc8bd761ed7074df97d6",
+    "nvidia_radio/examples/common/phi_s.py": "5f5f47e4ae0568c0b463f9293e42b650aecfc16b656ec4f25fd1423323e061c9",
+    "nvidia_radio/examples/common/rand_augment.py": "7219c8ff7214ca545e270c0b3f6ce98c3f926d00431f53b2808655872d98096c",
+    "nvidia_radio/examples/common/resize_transform.py": "dcd261e67d0ba86ea4b5485c865db76884bac36226074e0b98137b9ffdae8dcf",
+    "nvidia_radio/examples/common/utils.py": "a609e63c5644494e653f15f33c8cfadd24f4d18eaf19114eebee9b7f0b575d23",
+    "nvidia_radio/examples/count_params.py": "78007dcbfb73638c8b5231eb5b3345a0517079a169904c9cc00f235a9e9f9eec",
+    "nvidia_radio/examples/feature_distribution.py": "9b2751c484a28ebc7f9057f57e888f6ca2a01cbaba7cb9ab76d56a87dd13316f",
+    "nvidia_radio/examples/knn_classification.py": "2fd68fa34dc8c2f9288e0d5b735eaa8abfa2fea361a426e462d16dc71103adb0",
+    "nvidia_radio/examples/mode_switching.py": "c9951b0c16c7de49283711cfa720caaf6a3070732cc8a8305920af0193130c51",
+    "nvidia_radio/examples/model_stats.py": "6c399cec8f66f6c3e034264aba1b332a014fae44beb94e4f7f60753799553760",
+    "nvidia_radio/examples/position_predictor.py": "2fd2f535f9f7c9944a564b9a3d3535e82d70af92c424a124d8ffc8b15bcd36e0",
+    "nvidia_radio/examples/README.md": "84473cbc8f39dd47bf1bba7a54e83118ccb0401952a01ce9023e51c0fc274075",
+    "nvidia_radio/examples/requirements.txt": "98e6b9cb4237fab77b9c93fe03189821eea1ffd3a1fa33e867d128954f0c59da",
+    "nvidia_radio/examples/ssl_metrics.py": "b381be1cd1a5f4d7c6d6a51b553802fb6ecf3f810592b32cbbd39d1649319146",
+    "nvidia_radio/examples/visualize_features.py": "a7c4aada38646aa765262a74656fec1577e231fa201150501cb9c5212daac5dc",
+    "nvidia_radio/examples/visualize_video_features.py": "4d425d12872024da6bfea109844d1fd9ed36e370829b06e17ad727573296f77c",
+    "nvidia_radio/examples/zero_shot_imagenet.py": "a17e7caf20ff39800b823e337acb39e193cb2db8d18403b7335b12195a978990",
+    "nvidia_radio/hf_hub.py": "45826ee62cb6f729c2e20d7693b39d3e2bf0f2d18e1a2bda64c32a0c67652c5a",
+    "nvidia_radio/hubconf.py": "e65e2c26bdfa48e61677684a14bb8e50697ff5c6f04207b5291c95e8fbc89519",
+    "nvidia_radio/LICENSE": "7fdb80c2f76be95e1ebbcb83f63b0bbaa48309d5bb3a5fb7512df6ce1b3fe13e",
+    "nvidia_radio/mmseg/configs/_base_/datasets/ade20k.py": "da623b9aec16f9ddd0efca3c2732b8a2d047585a94392125b90208a139ead374",
+    "nvidia_radio/mmseg/configs/_base_/default_runtime.py": "c64ac1d35fe8fd6dabe73bf9337b2ce1876b43626b2d5e823adfd9e601551907",
+    "nvidia_radio/mmseg/configs/_base_/schedules/schedule_80k.py": "deb5923f985665a931643f1320337abbfb0389b4ffd29afa11c2151336ede26e",
+    "nvidia_radio/mmseg/configs/radio/eradio_linear_8xb2-80k_ade20k-512x512.py": "d493b195f4667714ccdf4cb44aa95ee9eefe13c8f5f3322d2a01fe84561d86ac",
+    "nvidia_radio/mmseg/configs/radio/radio_linear_8xb2-80k_ade20k-512x512.py": "858b6db97097f8ab6ef46c6f5311b600a5bdab73957f915291ff5258f315d5de",
+    "nvidia_radio/mmseg/linear_head.py": "937cdab9898ca1faf0133ebb61bcd4dac132c834515353f3dd0ff2bae3c112fe",
+    "nvidia_radio/mmseg/radio.py": "92f9bf7375edf40f8249a3d3588a40347b3550e3354c3631d5cae3120e499e69",
+    "nvidia_radio/mmseg/README.md": "c5b8312c8c004f8489c925a409a9c9a7cd1dee20f7e7d828580f78029bb2d31a",
+    "nvidia_radio/mmseg/requirements.txt": "340186a62bc2d0ccc11bf4054f697f388b360858b7d42ce9b65682fc363647a9",
+    "nvidia_radio/mmseg/train.py": "2a85f14b55a3125b7e7c57c4edbcb27410b5b87a02d8bb2d2754b4bdcdced8d0",
+    "nvidia_radio/nvidia_radio.egg-info/dependency_links.txt": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "nvidia_radio/nvidia_radio.egg-info/SOURCES.txt": "ebfc408099566cafaf1e1a37ac665935f65f0108adf9eee2c0f1564e7fe6274b",
+    "nvidia_radio/nvidia_radio.egg-info/top_level.txt": "8d8f292ccb5c43c1cff84ea024b1fb9b7e87b18a7d6bb2cb4a8ad12282c192e8",
+    "nvidia_radio/radio/__init__.py": "84f68f6232e2abd5bddb3d3cd9fbb403f98488e114666048bb65b9f056e0f0a1",
+    "nvidia_radio/radio/adaptor_base.py": "0a59a456b40a71e6072142d4c4f01fc733f531635579c519eaed3ab5c4a17f2b",
+    "nvidia_radio/radio/adaptor_generic.py": "db4e2bcb18ff6d25080b281b197264bda497e186d951f7fa0bc524f0c4d1eab0",
+    "nvidia_radio/radio/adaptor_mlp.py": "d11183d19344ac8cfad3c69bb8c0949910761b85c7fcfdb4bef9d8e3d4309a29",
+    "nvidia_radio/radio/adaptor_registry.py": "9a25bae4d397ed5eaf92f45c1417e9bd8ed0192e713e53d17bf585bad5dd5f5c",
+    "nvidia_radio/radio/block.py": "98e3f69f49dc6cb5fa2344bc4957a310b107b3527280a11af277eb1ab7b814d6",
+    "nvidia_radio/radio/cls_token.py": "403a22b0fce377fc53d2d95bf7ad6715d74099538f1e69a5399208f0b70a679c",
+    "nvidia_radio/radio/common.py": "cbb18c8b97ee8e36bd6e387f234b006ec8b9b7d59e73a267f469d7aa3936da1b",
+    "nvidia_radio/radio/conv.py": "ebcbdc8bd0ae7ea79f18bd1f0d2839ecdfc88d8cf047dacdc38679c51f45691d",
+    "nvidia_radio/radio/dinov2_arch.py": "e0a41be63b63df78f7a68563099b9bf6d73c0c5a2569d55c9a52e870dbd1dfa9",
+    "nvidia_radio/radio/dual_hybrid_vit.py": "8d6ad024631474fe0f8b774d08a3c248d726b0c072191c599221ecf86d3cedfc",
+    "nvidia_radio/radio/enable_cpe_support.py": "2fe33a3e1eb46229729a7af825bfadadb50935256c63338d3296515c74e76368",
+    "nvidia_radio/radio/enable_damp.py": "60d5535dea137bdc2c51479ab62ab611b8db11d109c6d6ed99660fab6b790b9d",
+    "nvidia_radio/radio/enable_spectral_reparam.py": "3cb93687e31a01677888db26ae108b9f72cb0c310baadd8216338c94df2149ee",
+    "nvidia_radio/radio/eradio_model.py": "c8fbfb0d6653d20cba252ccc5e8cf48a0b651efd83d68c413b8d99ff04228c3f",
+    "nvidia_radio/radio/extra_models.py": "98dcac8be207ccef3890e4fd7e9a8341b04b54c718097a4841106d7017a7bb14",
+    "nvidia_radio/radio/extra_timm_models.py": "7d1f259d322d4501890ed596a398ea9b351f043f07b74348d0a12cb39da0aac5",
+    "nvidia_radio/radio/feature_normalizer.py": "96df1f26bef5a74234a16b818e2b1af9fc330259d4d2be834c324e4f99501276",
+    "nvidia_radio/radio/forward_intermediates.py": "eb66803efa791693066ef23bcf8096edd745a02bc6586306b8cd57549a2cf8dd",
+    "nvidia_radio/radio/hf_model.py": "08aec2163ba2970493a5c2ff051be664e84e271ffdfe92f38a1fbdb34b11f680",
+    "nvidia_radio/radio/input_conditioner.py": "054fc3615c82cfa4ca9697d91d14c8ac0ae153d84202a1f9eba726247a4da359",
+    "nvidia_radio/radio/naclip.py": "71142fd351aa38aac389ac90e9a139c417a241b6d8b9cb861654a94e7bc894d5",
+    "nvidia_radio/radio/open_clip_adaptor.py": "907f2eac33a556cd6a7bbdef2bbad46871d6279b0dfd13a9ed22dfefb6d455dc",
+    "nvidia_radio/radio/pamr.py": "85a5bbbe2181b96d9820938581078f1be0e7e9b9d47003b8dd212007c9bce294",
+    "nvidia_radio/radio/radio_model.py": "4a9168d8e6b535ff49a1c8573dca3a8cdc345a5fca5a13d4910b68b8bd2b6246",
+    "nvidia_radio/radio/siglip2_adaptor.py": "4064efd22c5be9b3b45604df8577bbe06fef336745da7be898d55ef5a00cabde",
+    "nvidia_radio/radio/utils.py": "e06482f2183489d787de451bc38f351f57f67a12f064222449ae6acf05b366a6",
+    "nvidia_radio/radio/vision_transformer_xpos.py": "431b3258391fceab424eabe841da45509626cfb69e8344e7c00b58d4cea65cca",
+    "nvidia_radio/radio/vit_patch_generator.py": "5053d0e05aef9ecaaf3a48177e0451df95452f9e4c47587c5c66a82f2b89ce8a",
+    "nvidia_radio/radio/vitdet.py": "2394309e77a74cb4279c2340acdf9ce40573420d6724e32885f08255789de48d",
+    "nvidia_radio/RADIOv2.5_tech_report.md": "00363017fed0800e41d2ceeb6062cd59436af87ff96eba3c3a00c4ec94bfeeb1",
+    "nvidia_radio/README.md": "3268bbd56ce82aefdec66a966e3fa9dd4a256da8e9613a669e460301efa89fa3",
+    "nvidia_radio/setup.py": "e97406522582b51bf1593f5d9ecae42ec44f79949b4cbb750e47f13c075993c7",
+    "nvidia_radio/test_hf.py": "a7116cf82ea7a917d0e8288d0b54cc379f191d91dcda0266b0cbe94070fef981",
+    "nvidia_radio/test_hubconf.py": "932efe67fd2f8c242c85606776a9ed5b6ff875edb398496098f481892b42599e",
+    "nvidia_radio/tools/compute_distributions.sh": "548c20d251860cb94515115625d5c92e50ffccf7cb6cdac4f92e7ef8fddca8a5",
+    "nvidia_radio/tools/compute_summary_metrics.sh": "98d1b2413a72a30c0216da4bfa345c592865d3791b0ab93db178833c8b4ce96e",
+    "nvidia_radio/tools/im_join.py": "71f266da298b25c576c614c800d40e215659fe1db564daf3aa7d40660d99ea4a",
+    "nvidia_radio/tools/photo_strip.py": "d4f6b526af33649538995a42a6ce54daac5cd20dc878a53d74a431455ad3b745",
+    "nvidia_radio/tools/run_all_ssl.sh": "96636ff36f35d75aa1a6e2214f75fae579f5c29f6a2c252bc5d9932ae21828ed",
+    "nvidia_radio/tools/visualize_all.sh": "963968acb5000a24537aa0a83ad39934c7c8813f435c971a2484bec362c4dceb",
+    "nvidia_radio/tools/zero_shot_all.sh": "cb534fbdd19b64c4059974feb737228e53f3bdc7aaacdb9b73215f92484bff69",
+    "object_search_msgs/CMakeLists.txt": "7a6b49bb751eb14d0e5617463ebf494cdb6fae234f46bff370a9dbab1df96882",
+    "object_search_msgs/LICENSE": "3ddf9be5c28fe27dad143a5dc76eea25222ad1dd68934a047064e56ed2fa40c5",
+    "object_search_msgs/msg/ObjectMaskWithTf.msg": "076bc01fc83dda0bf4db40d6e9ae9a9e09df0252ecebc73fe67b80a118544de8",
+    "object_search_msgs/package.xml": "5ddda83e7b4cbf5a1701e96c81afc5e21431dd8d44bd2095859e78efe7b64082",
+    "pose_graph_msgs/CMakeLists.txt": "b9e452a383cab162122866c72b83fe85f0c389346192712d4f5d2fc1fb30e28b",
+    "pose_graph_msgs/msg/Edge.msg": "b09f641e8c21dcb04eccb49498037fb6c703baeacb8fcdd9e4630f3d26aa7720",
+    "pose_graph_msgs/msg/Node.msg": "7119a659ea8ee2cc12129486939447131a8ee9207e1a9e3238310395b7effdd9",
+    "pose_graph_msgs/msg/NodeReference.msg": "533600a9c94e0960b040a334640ad5fbb09a1c1cf691f02a2cfc4132e5b65739",
+    "pose_graph_msgs/msg/PoseGraph.msg": "c9eba7d10f2b1e0201c72954e2316c21f8aec264166144eae7b5f8ca7ce6bce2",
+    "pose_graph_msgs/msg/UUID.msg": "51b01bf286aff7081bcc9d2c728d7c5738b464fef1a1d44828510ebd78b8b2cb",
+    "pose_graph_msgs/package.xml": "5fca59a8a75dd782693864a795c0b0ccdc326e07a6a0c94e4bec1c6add048e64",
+    "README.md": "e68624cbca07553e03c2ffaf8da1b1bed9c9c047cf7f947e8739581de6c8cd8d",
+    "requirements.txt": "e7754031506b2a7b8502bb9e8206a161b3a9279304e0ab397a6b96e1796b6be6",
+    "thirdparty/graaf_vendor/CMakeLists.txt": "df4778e72a725f39654707a09b952bb411976f3f56a4335bbebc863be536bea4",
+    "thirdparty/graaf_vendor/package.xml": "2bf47290ff0fa218552e5239d3b50ba98dbedd75d754891ad29d44530da2cbe8",
+    "triangulation3d/.gitignore": "c96817fbc814506e57deeb702fe8ca1faec74ea07a0aec835a400135d3028326",
+    "triangulation3d/package.xml": "793f47c9d8fdd847db3b69861584b861f7be45ee4e209844f6a4d68bf4c00797",
+    "triangulation3d/README.md": "31fc030a8a35f86b03e38cd74291d86499aca31689c410b2fab31f6e0e4b408a",
+    "triangulation3d/resource/triangulation3d": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "triangulation3d/setup.cfg": "28b838c5a71dbc8a499dbacc21d76e6a5ed54ae4afe2da6eacdbc7cde9647fe1",
+    "triangulation3d/setup.py": "9cd63f9b7a4be7f445d500c15ab34678213b5303da498c3610ca78e611a3eeeb",
+    "triangulation3d/test/test_copyright.py": "574bf3e769dc4c89d867a094ee02ea939a834f93f6acfe28b8b0e586e065f358",
+    "triangulation3d/test/test_flake8.py": "0d9705658b073e95c71dc4173f1cbe4633250dc7bd83527dd1e5c26e899c0e6b",
+    "triangulation3d/test/test_pep257.py": "2c2a8f9ac19efb12c18d02272706533bdaa47512d5b349143272ddfe3fed904b",
+    "triangulation3d/triangulation3d/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "triangulation3d/triangulation3d/bbox_generator.py": "4914ef60556b6d805103b0d70d0875ae2413adf0591e98b0e18b319e38173451",
+    "triangulation3d/triangulation3d/camera_data.py": "d81c8c1913817b38b9f4b536e75b0efa8b11325300740ca9857260529cfea97d",
+    "triangulation3d/triangulation3d/multicam_visualizer.py": "eb2e196ecddcbb9edbe96ec3ecc8efd78933cca0a53f512e2a9df047ff8be7dc",
+    "triangulation3d/triangulation3d/particle_generator.py": "4b1e920403364420a1bad80de6fcc69566c1d73560df23056baeefb51dae929a",
+    "triangulation3d/triangulation3d/pcl_utils.py": "d8af62056496e4b039f75b3efb7f88c062fdae5887bbbf60e466d399707f69cd",
+    "triangulation3d/triangulation3d/quantitative_metrics.py": "a73ca2c027740e1a8993f344e4afa528c1f26ed9c8b0ba37339672dd9208545a",
+    "triangulation3d/triangulation3d/random_cam_initializer.py": "a87c6c7fe595fd52edbdaeede88a7835747c43f748d4235b869891e61f67a32c",
+    "triangulation3d/triangulation3d/teleop_triangulation.py": "44d915f1b9287b5c8da9a3fdae89c92991fdd3168f9261c4d909daa437a485b0",
+    "triangulation3d/triangulation3d/teleop_twist_keyboard.py": "d0d1837e31935fe8e8d898a07cd43fd23747a6281849ba59088708bc7335f7e3",
+    "triangulation3d/triangulation3d/triangulator.py": "a51768cc78d84e7bb430d3ade8afa0b38f38a26e295149832e1781d45d07a536",
+    "visual_navigation/configs/explorfm_triangulator_conf.yaml": "09d317dcb42ca05ba9706b00e5876d9c49f0684405d042e50731b6687a5edb52",
+    "visual_navigation/configs/geofrontier_nav_conf.yaml": "821d061d45044ae01292501bab1b5e258ef85749c308553e23453b7479b17536",
+    "visual_navigation/configs/imgfrontier_nav_conf.yaml": "0e818e8c0815adac22959bcdfd6781bcce87956e031e1b93801054ea6141a8ab",
+    "visual_navigation/configs/isolated_objsearch.yaml": "339aaef8710d3110ab812ab6000479a7ce80ea0112b6aee7ad93463ef7f9ddcf",
+    "visual_navigation/configs/isolated_wildos.yaml": "d6589683c9a8dfcd4e68882ae100bf952f2ea5ccf07f56e198eaf447b0f111ff",
+    "visual_navigation/configs/lrn_nav_conf.yaml": "687a72a4d1a48c20a92e705121c3f3da184d065acc608793750ffc3e744f7fcc",
+    "visual_navigation/configs/triangulation3d_objsearch_conf.yaml": "ef8893eb29f40ba3b54907aa99bfc85b0ac0528ff7d7fb716824995db4e3cb9a",
+    "visual_navigation/configs/wildos_nav_conf.yaml": "7af9bccefe98373da35382546126e7a6b9587dd410e4d196bdf3f166723c2d83",
+    "visual_navigation/launch/explorfm_triangulation_launch.py": "c30a08342d3ceed67e37676e1cc228f3e9aa4acd5f16de636b488dd85e15202e",
+    "visual_navigation/launch/imgfrontier_nav_launch.py": "7d40243ceae33cb9b6c9660b49f7de1a90b4734075192757074b9c7f9cf73f69",
+    "visual_navigation/launch/lrn_launch.py": "39cb2af5b49b96765f10dd54407a293544d624dfe2b10bd1c9f6f98b0858b376",
+    "visual_navigation/launch/save_gps_launch.py": "28fed67614888b6ebd404fe4911688ae5d8cc8920eaee5460d2e19ff5ec87c28",
+    "visual_navigation/launch/wildos_launch.py": "3685745dce99e7218cfdfdf3d1dff01bad4dbef1136379ac0d27754e239a6f99",
+    "visual_navigation/LICENSE": "3ddf9be5c28fe27dad143a5dc76eea25222ad1dd68934a047064e56ed2fa40c5",
+    "visual_navigation/package.xml": "1974fe8e0ac5314aae8aab23092a8479bcba5ec63ff1024041547aa93e4fef14",
+    "visual_navigation/README.md": "071b19d9053f0128a5bd046a32d1c96b3c466ad3c76215a39d0b2ab36013f0bd",
+    "visual_navigation/resource/visual_navigation": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "visual_navigation/setup.cfg": "4dbeb2476b11a3af3b9e947636ef445843ef8683d0259fe942be4d9b06c7ddfc",
+    "visual_navigation/setup.py": "ac59a588d88ad35f0e4bd0d35455a69ff22ba6888e78c060d3843101d9569515",
+    "visual_navigation/test/test_copyright.py": "574bf3e769dc4c89d867a094ee02ea939a834f93f6acfe28b8b0e586e065f358",
+    "visual_navigation/test/test_flake8.py": "0d9705658b073e95c71dc4173f1cbe4633250dc7bd83527dd1e5c26e899c0e6b",
+    "visual_navigation/test/test_pep257.py": "2c2a8f9ac19efb12c18d02272706533bdaa47512d5b349143272ddfe3fed904b",
+    "visual_navigation/visual_navigation/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "visual_navigation/visual_navigation/explorfm_triangulation/explorfm_triangulator.py": "178e2e591ffb72cc003967f7d9500b2d172cd0ed5b5fc0e6afd2327032df4c00",
+    "visual_navigation/visual_navigation/explorfm_triangulation/obj_mask_triangulation.py": "09a75e84714c731f24fb00100f91e004751dc0e48d388de3dd888d9ad9b40a3c",
+    "visual_navigation/visual_navigation/explorfm_triangulation/triangulator_viz.py": "da941077867f291ef95e7a92318bc76890a10fb9cb574c0d765dccf96c10e897",
+    "visual_navigation/visual_navigation/geofrontier_nav/geofrontier_to_image.py": "a780f51cfec69d4ebd3b85ac2d82451f3fee3362a1b280143cffa281de3c3457",
+    "visual_navigation/visual_navigation/geofrontier_nav/nav.py": "641cf05cd5457a19542f47edb8d7ee4b52a87b40fe880b23e18690cb7c2d5ee9",
+    "visual_navigation/visual_navigation/geofrontier_nav/viz.py": "e4a7047fe54a51cc45418e464f1e24a65de39d3a9d73813e61fbe3f0470134c8",
+    "visual_navigation/visual_navigation/gps/gps_viz.py": "18f0a5ffa377e651d29510a062478cff48dd65737694527d69c6749035463668",
+    "visual_navigation/visual_navigation/gps/save_gps_path.py": "3716a6d5e2363cd6621e6883dfa5d42d0622db37f16532e3d60b75a6acf6224f",
+    "visual_navigation/visual_navigation/gps/save_metrics.py": "b71b313ed75b95f7f86ac13b693a96dde5e1a74fd0d49f4ed45f2638b70404ec",
+    "visual_navigation/visual_navigation/imgfrontier_nav/nav.py": "a912176c71cbd8ee7e5d3ec9fa0e9050418607e2db12dbaf6335dc0c14481a44",
+    "visual_navigation/visual_navigation/imgfrontier_nav/viz.py": "f18743460354204fcd76012e650507470d8a0d337735364e9c314c9e6d2d6914",
+    "visual_navigation/visual_navigation/imgfrontier_nav/viz_net.py": "01d3ad481d2f049d28bc52dda05406b42f6d5a32e6e26ba6414c1962de240ea1",
+    "visual_navigation/visual_navigation/lrn/nav.py": "d5e3c734ac0eb8a34566f91306f2bac9ea0d02ef8f1beb491c9071c23eaf7d14",
+    "visual_navigation/visual_navigation/lrn/scoring.py": "7bbfe07e0db830dc4e305fb76084b5dce471a7925bd43c572df04a80a162036c",
+    "visual_navigation/visual_navigation/lrn/viz.py": "13f813a556dbc303206b4f41af090b9ed73f302f5c2c8616c4ccbe086f2bf5c2",
+    "visual_navigation/visual_navigation/utils/buffer.py": "47d7d728e7a8f7be1b5ab65d3d376adaa745f227fc14807ecde4650bfd1ae50e",
+    "visual_navigation/visual_navigation/utils/goal_navigator.py": "cea0c2c9e122cf5095cc72283c4a2ba512bd56f17d6587603a6bae6f6b39d007",
+    "visual_navigation/visual_navigation/utils/local_models.py": "edd1a7c7d5b308a239efd2141a4cba188dd5da7c2ae80fa6cd9be7ddd9665e86",
+    "visual_navigation/visual_navigation/utils/object_search_utils.py": "d63913b94f838b0795dc62c0b83acf99132560c687919ec7be8c74a0af00ea83",
+    "visual_navigation/visual_navigation/utils/scoring.py": "feb418f161868e497cd9c7b061c8b35c82abc3847e56d972d3f30a9632cebad3",
+    "visual_navigation/visual_navigation/utils/tf_lookup_sub.py": "ae300571e8236df8a95a0faffd20ba643de3d5297a0a1ea411348fc381328be5",
+    "visual_navigation/visual_navigation/utils/viz.py": "d12a8a6aeecaac96ff1217f771765e6a9cdf269105acfc9b9c7b975c6bd91f5d",
+    "visual_navigation/visual_navigation/wildos/goalagnostic_scoring.py": "3e6e6c5601881cc6114cacf1681f44444ba930cf2d5d1ba688855513c067154e",
+    "visual_navigation/visual_navigation/wildos/nav.py": "3fde523152c76193c1cecb8c7d9e04b6af5d26750dfd26690794fdb17b29182a",
+    "visual_navigation/visual_navigation/wildos/viz.py": "8b81ffd305cd41339ef7a220410437d52f1b051f8fc3465cc097e63b43f4ca15"
+  },
+  "patched": true
+}

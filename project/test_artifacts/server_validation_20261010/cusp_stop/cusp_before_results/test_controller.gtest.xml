@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="6" failures="1" disabled="0" errors="0" time="0.127" timestamp="2026-10-10T18:09:58" name="AllTests">
+  <testsuite name="ActualPlugin" tests="6" failures="1" disabled="0" errors="0" time="0.123" timestamp="2026-10-10T18:09:58">
+    <testcase name="BothDirectionsPublishTheArcTheyCanExecute" status="run" result="completed" time="0.027" timestamp="2026-10-10T18:09:58" classname="wildos_ackermann_rpp.ActualPlugin" />
+    <testcase name="CollisionIsCheckedOnTheBoundedArc" status="run" result="completed" time="0.021" timestamp="2026-10-10T18:09:59" classname="wildos_ackermann_rpp.ActualPlugin" />
+    <testcase name="RadiusIsFrozenAcrossDynamicParameterUpdates" status="run" result="completed" time="0.021" timestamp="2026-10-10T18:09:59" classname="wildos_ackermann_rpp.ActualPlugin" />
+    <testcase name="CuspBrakesInBothDirectionsAndRequiresMeasuredStop" status="run" result="completed" time="0.019" timestamp="2026-10-10T18:09:59" classname="wildos_ackermann_rpp.ActualPlugin">
+      <failure message="/home/ly/town_memory_validation_20261009/physical_profile_fix/candidate/ackermann_rpp/test/test_controller.cpp:159&#x0A;Expected equality of these values:&#x0A;  fixed.twist.linear.x&#x0A;    Which is: -1&#x0A;  0.&#x0A;    Which is: 0" type=""><![CDATA[/home/ly/town_memory_validation_20261009/physical_profile_fix/candidate/ackermann_rpp/test/test_controller.cpp:159
+Expected equality of these values:
+  fixed.twist.linear.x
+    Which is: -1
+  0.
+    Which is: 0]]></failure>
+      <failure message="/home/ly/town_memory_validation_20261009/physical_profile_fix/candidate/ackermann_rpp/test/test_controller.cpp:159&#x0A;Expected equality of these values:&#x0A;  fixed.twist.linear.x&#x0A;    Which is: 1&#x0A;  0.&#x0A;    Which is: 0" type=""><![CDATA[/home/ly/town_memory_validation_20261009/physical_profile_fix/candidate/ackermann_rpp/test/test_controller.cpp:159
+Expected equality of these values:
+  fixed.twist.linear.x
+    Which is: 1
+  0.
+    Which is: 0]]></failure>
+    </testcase>
+    <testcase name="ALocalCropOrWrongHeadingCannotTriggerTerminalBraking" status="run" result="completed" time="0.015" timestamp="2026-10-10T18:09:59" classname="wildos_ackermann_rpp.ActualPlugin" />
+    <testcase name="TerminalBrakingDoesNotDisableFootprintCollisionCheck" status="run" result="completed" time="0.019" timestamp="2026-10-10T18:09:59" classname="wildos_ackermann_rpp.ActualPlugin" />
+  </testsuite>
+</testsuites>

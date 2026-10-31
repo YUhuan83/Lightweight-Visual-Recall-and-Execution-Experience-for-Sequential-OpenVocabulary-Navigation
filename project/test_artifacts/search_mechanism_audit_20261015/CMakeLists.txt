@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.16)
+project(search_mechanism_audit)
+set(CMAKE_CXX_STANDARD 17)
+find_package(ament_cmake REQUIRED)
+find_package(wildos_ackermann_smac REQUIRED)
+find_package(nav2_costmap_2d REQUIRED)
+add_executable(connector_probe connector_probe.cpp)
+ament_target_dependencies(connector_probe wildos_ackermann_smac nav2_costmap_2d)

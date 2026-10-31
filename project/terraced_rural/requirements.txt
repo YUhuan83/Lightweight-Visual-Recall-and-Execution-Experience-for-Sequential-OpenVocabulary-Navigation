@@ -1,0 +1,2 @@
+beamngpy==1.36
+Pillow>=11,<13

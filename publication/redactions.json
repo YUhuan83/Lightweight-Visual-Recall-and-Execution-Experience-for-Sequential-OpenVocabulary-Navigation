@@ -1,0 +1,12 @@
+[
+  {
+    "path": "project/test_artifacts/continuous_exploration_20261024/candidate/vision_offline/test_kit.py",
+    "kind": "url_credential",
+    "line": 45
+  },
+  {
+    "path": "project/vision_offline/test_kit.py",
+    "kind": "url_credential",
+    "line": 45
+  }
+]

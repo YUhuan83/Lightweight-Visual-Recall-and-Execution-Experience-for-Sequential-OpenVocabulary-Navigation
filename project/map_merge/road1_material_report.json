@@ -1,0 +1,909 @@
+{
+  "archive": "C:\\Users\\Yu\\Desktop\\Beamng\\american_road_0.39.zip",
+  "archive_size_bytes": 519328433,
+  "archive_size_and_mtime_unchanged": true,
+  "archive_open_mode": "r",
+  "spawn_xyz": [
+    -2326.96729,
+    1479.02979,
+    -547.536377
+  ],
+  "quaternion_xyzw": [
+    0.0002917,
+    -0.0001847,
+    0.5349686,
+    0.8448718
+  ],
+  "user_reported_facing_xy": [
+    -0.904,
+    -0.428
+  ],
+  "distance_method": "Closest XY point on each consecutive node segment; centerline, not road edge, spline tessellation, terrain projection, or visibility test.",
+  "coordinate_conventions": {
+    "DecalRoad": {
+      "road_count": 2390,
+      "position_comparable_count": 2390,
+      "first_node_matches_position_within_2cm": 2390,
+      "interpretation": "Node coordinates used directly as world coordinates; object position is not added. Equality with the first node is archive evidence, not an independent runtime transform verification."
+    },
+    "MeshRoad": {
+      "road_count": 748,
+      "position_comparable_count": 748,
+      "first_node_matches_position_within_2cm": 748,
+      "interpretation": "Node coordinates used directly as world coordinates; object position is not added. Equality with the first node is archive evidence, not an independent runtime transform verification."
+    }
+  },
+  "radius_m": 100,
+  "roads_within_radius_count": 7,
+  "closest_roads": [
+    {
+      "class": "DecalRoad",
+      "name": null,
+      "uuid": "e67256ce-76f5-4975-81a8-08a15588993f",
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "materials": {
+        "material": "mymap_dirt_trail"
+      },
+      "object_position": [
+        -2228.39209,
+        1383.85693,
+        -548.036011
+      ],
+      "rotationMatrix": null,
+      "scale": null,
+      "first_node": [
+        -2228.39209,
+        1383.85693,
+        -548.036011,
+        3.5
+      ],
+      "node_count": 18,
+      "node_widths_m": [
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5
+      ],
+      "first_node_position_delta_xyz": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "min_distance_xy_m": 0.4210940745887701,
+      "nearest_segment_index": 15,
+      "nearest_segment_nodes": [
+        [
+          -2321.86792,
+          1480.62549,
+          -549.129944,
+          3.5
+        ],
+        [
+          -2329.44556,
+          1478.89612,
+          -548.466248,
+          3.5
+        ]
+      ],
+      "segment_fraction": 0.6853140474132267,
+      "closest_xy": [
+        -2327.0609831382403,
+        1479.4403284458251
+      ],
+      "interpolated_node_z": -548.675103807988,
+      "interpolated_width_m": 3.5,
+      "position_added_min_distance_xy_m": 2489.3426074369586
+    },
+    {
+      "class": "DecalRoad",
+      "name": null,
+      "uuid": "35fa62a8-fc44-4881-9c7b-e7dc95c2763a",
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "materials": {
+        "material": "mymap_dirt_trail"
+      },
+      "object_position": [
+        -2328.8186,
+        1478.93457,
+        -548.521851
+      ],
+      "rotationMatrix": null,
+      "scale": null,
+      "first_node": [
+        -2328.8186,
+        1478.93457,
+        -548.521851,
+        3.5
+      ],
+      "node_count": 22,
+      "node_widths_m": [
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5
+      ],
+      "first_node_position_delta_xyz": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "min_distance_xy_m": 0.5837082450073968,
+      "nearest_segment_index": 0,
+      "nearest_segment_nodes": [
+        [
+          -2328.8186,
+          1478.93457,
+          -548.521851,
+          3.5
+        ],
+        [
+          -2323.33789,
+          1481.07117,
+          -549.046204,
+          3.5
+        ]
+      ],
+      "segment_fraction": 0.29910319913286515,
+      "closest_xy": [
+        -2327.1793021054805,
+        1479.5736338952672
+      ],
+      "interpolated_node_z": -548.6786866597749,
+      "interpolated_width_m": 3.5,
+      "position_added_min_distance_xy_m": 2755.4273059903417
+    },
+    {
+      "class": "DecalRoad",
+      "name": null,
+      "uuid": "c41412da-957d-4e1f-b8fc-c5e8df0afadd",
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "materials": {
+        "material": "BrightG1"
+      },
+      "object_position": [
+        -2270.25317,
+        1335.07825,
+        -547.202148
+      ],
+      "rotationMatrix": null,
+      "scale": null,
+      "first_node": [
+        -2270.25317,
+        1335.07825,
+        -547.202148,
+        8
+      ],
+      "node_count": 29,
+      "node_widths_m": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "first_node_position_delta_xyz": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "min_distance_xy_m": 11.299350221184618,
+      "nearest_segment_index": 3,
+      "nearest_segment_nodes": [
+        [
+          -2318.49316,
+          1433.34753,
+          -547.921631,
+          8
+        ],
+        [
+          -2340.39673,
+          1481.22363,
+          -547.991821,
+          8
+        ]
+      ],
+      "segment_fraction": 0.8559879479909133,
+      "closest_xy": [
+        -2337.2423519379754,
+        1474.3288945968077
+      ],
+      "interpolated_node_z": -547.9817127940695,
+      "interpolated_width_m": 8.0,
+      "position_added_min_distance_xy_m": 2513.6702180577163
+    },
+    {
+      "class": "DecalRoad",
+      "name": null,
+      "uuid": "68bb8341-eaa9-4f3d-9281-9113fd2f6fe2",
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "materials": {
+        "material": "mymap_dirt_trail"
+      },
+      "object_position": [
+        -2305.86646,
+        1469.0907,
+        -549.601257
+      ],
+      "rotationMatrix": null,
+      "scale": null,
+      "first_node": [
+        -2305.86646,
+        1469.0907,
+        -549.601257,
+        3.5
+      ],
+      "node_count": 2,
+      "node_widths_m": [
+        3.5,
+        3.5
+      ],
+      "first_node_position_delta_xyz": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "min_distance_xy_m": 14.7757377124653,
+      "nearest_segment_index": 0,
+      "nearest_segment_nodes": [
+        [
+          -2305.86646,
+          1469.0907,
+          -549.601257,
+          3.5
+        ],
+        [
+          -2320.86133,
+          1500.56995,
+          -549.8125,
+          3.5
+        ]
+      ],
+      "segment_fraction": 0.5175891069808689,
+      "closest_xy": [
+        -2313.6276413725946,
+        1485.3840168959275
+      ],
+      "interpolated_node_z": -549.710594075726,
+      "interpolated_width_m": 3.5,
+      "position_added_min_distance_xy_m": 2710.9550724781275
+    },
+    {
+      "class": "DecalRoad",
+      "name": null,
+      "uuid": "cce7293c-a051-4e29-acef-9e0fe6ba0658",
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "materials": {
+        "material": "mymap_dirt_trail"
+      },
+      "object_position": [
+        -2258.54956,
+        1353.95947,
+        -547.468994
+      ],
+      "rotationMatrix": null,
+      "scale": null,
+      "first_node": [
+        -2258.54956,
+        1353.95947,
+        -547.468994,
+        3.5
+      ],
+      "node_count": 6,
+      "node_widths_m": [
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5
+      ],
+      "first_node_position_delta_xyz": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "min_distance_xy_m": 81.10623450608533,
+      "nearest_segment_index": 4,
+      "nearest_segment_nodes": [
+        [
+          -2271.01001,
+          1393.64185,
+          -548.265015,
+          3.5
+        ],
+        [
+          -2280.47949,
+          1412.56848,
+          -548.670837,
+          3.5
+        ]
+      ],
+      "segment_fraction": 1.0,
+      "closest_xy": [
+        -2280.47949,
+        1412.56848
+      ],
+      "interpolated_node_z": -548.670837,
+      "interpolated_width_m": 3.5,
+      "position_added_min_distance_xy_m": 2511.3434603349
+    },
+    {
+      "class": "DecalRoad",
+      "name": null,
+      "uuid": "bf0f8136-3fde-4e9d-8c93-849f192b50c2",
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "materials": {
+        "material": "mymap_dirt_trail"
+      },
+      "object_position": [
+        -2350.45801,
+        1560.11316,
+        -549.82251
+      ],
+      "rotationMatrix": null,
+      "scale": null,
+      "first_node": [
+        -2350.45801,
+        1560.11316,
+        -549.82251,
+        3.5
+      ],
+      "node_count": 4,
+      "node_widths_m": [
+        3.5,
+        3.5,
+        3.5,
+        3.5
+      ],
+      "first_node_position_delta_xyz": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "min_distance_xy_m": 84.4175740984974,
+      "nearest_segment_index": 0,
+      "nearest_segment_nodes": [
+        [
+          -2350.45801,
+          1560.11316,
+          -549.82251,
+          3.5
+        ],
+        [
+          -2350.57178,
+          1562.72131,
+          -549.902954,
+          3.5
+        ]
+      ],
+      "segment_fraction": 0.0,
+      "closest_xy": [
+        -2350.45801,
+        1560.11316
+      ],
+      "interpolated_node_z": -549.82251,
+      "interpolated_width_m": 3.5,
+      "position_added_min_distance_xy_m": 2879.5254153922265
+    },
+    {
+      "class": "DecalRoad",
+      "name": null,
+      "uuid": "2b2cbe73-c86b-488b-823e-14105fdef7ef",
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "materials": {
+        "material": "mymap_dirt_trail"
+      },
+      "object_position": [
+        -2355.29321,
+        1569.24414,
+        -549.808472
+      ],
+      "rotationMatrix": null,
+      "scale": null,
+      "first_node": [
+        -2355.29321,
+        1569.24414,
+        -549.808472,
+        3.5
+      ],
+      "node_count": 15,
+      "node_widths_m": [
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5,
+        3.5
+      ],
+      "first_node_position_delta_xyz": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "min_distance_xy_m": 91.53918789318587,
+      "nearest_segment_index": 1,
+      "nearest_segment_nodes": [
+        [
+          -2352.33984,
+          1568.43054,
+          -549.97644,
+          3.5
+        ],
+        [
+          -2347.80005,
+          1568.16687,
+          -550.275391,
+          3.5
+        ]
+      ],
+      "segment_fraction": 1.0,
+      "closest_xy": [
+        -2347.80005,
+        1568.16687
+      ],
+      "interpolated_node_z": -550.275391,
+      "interpolated_width_m": 3.5,
+      "position_added_min_distance_xy_m": 2750.3044051768784
+    }
+  ],
+  "material_targets_all_roads_within_radius": [
+    "BrightG1",
+    "Grid512_Red_Mat",
+    "mymap_dirt_trail"
+  ],
+  "material_definitions": [
+    {
+      "name": "mymap_dirt_trail",
+      "source_filepath": "levels/american_road/art/road/main.materials.json",
+      "aliases": [
+        "mymap_dirt_trail",
+        "unmapped_mat"
+      ],
+      "matched_road_or_grid_names": [
+        "mymap_dirt_trail"
+      ],
+      "inherits": null,
+      "texture_references": [
+        {
+          "field": "Stages[0].baseColorMap",
+          "reference": "/levels/american_road/art/road/mymap_dirt_trail_d.dds",
+          "candidate_paths": [
+            "levels/american_road/art/road/mymap_dirt_trail_d.dds"
+          ],
+          "exact_in_mod": [
+            "levels/american_road/art/road/mymap_dirt_trail_d.dds"
+          ],
+          "link_entries_in_mod": [],
+          "case_only_matches": [],
+          "status": "exact_in_mod"
+        },
+        {
+          "field": "Stages[0].normalMap",
+          "reference": "/levels/american_road/art/road/mymap_dirt_trail_n.dds",
+          "candidate_paths": [
+            "levels/american_road/art/road/mymap_dirt_trail_n.dds"
+          ],
+          "exact_in_mod": [
+            "levels/american_road/art/road/mymap_dirt_trail_n.dds"
+          ],
+          "link_entries_in_mod": [],
+          "case_only_matches": [],
+          "status": "exact_in_mod"
+        },
+        {
+          "field": "Stages[0].roughnessMap",
+          "reference": "/levels/american_road/art/road/mymap_dirt_trail_s_r.data.png",
+          "candidate_paths": [
+            "levels/american_road/art/road/mymap_dirt_trail_s_r.data.png"
+          ],
+          "exact_in_mod": [
+            "levels/american_road/art/road/mymap_dirt_trail_s_r.data.png"
+          ],
+          "link_entries_in_mod": [],
+          "case_only_matches": [],
+          "status": "exact_in_mod"
+        },
+        {
+          "field": "Stages[0].opacityMap",
+          "reference": "/levels/american_road/art/road/mymap_dirt_trail_d_o.data.png",
+          "candidate_paths": [
+            "levels/american_road/art/road/mymap_dirt_trail_d_o.data.png"
+          ],
+          "exact_in_mod": [
+            "levels/american_road/art/road/mymap_dirt_trail_d_o.data.png"
+          ],
+          "link_entries_in_mod": [],
+          "case_only_matches": [],
+          "status": "exact_in_mod"
+        }
+      ],
+      "render_settings": {
+        "name": "mymap_dirt_trail",
+        "mapTo": "unmapped_mat",
+        "class": "Material",
+        "persistentId": "910f3951-4193-4f53-ac2b-26781c5cc3aa",
+        "translucent": true,
+        "translucentBlendOp": "LerpAlpha",
+        "translucentZWrite": true,
+        "materialTag0": "RoadAndPath",
+        "materialTag1": "beamng",
+        "materialTag2": "RoadAndPath",
+        "version": 1.5
+      }
+    },
+    {
+      "name": "BrightG1",
+      "source_filepath": "levels/american_road/art/supernew/MyRoads/main.materials.json",
+      "aliases": [
+        "BrightG1",
+        "unmapped_mat"
+      ],
+      "matched_road_or_grid_names": [
+        "BrightG1"
+      ],
+      "inherits": null,
+      "texture_references": [
+        {
+          "field": "Stages[0].baseColorMap",
+          "reference": "/levels/american_road/art/supernew/MyRoads/BrightG_przeryw.dds",
+          "candidate_paths": [
+            "levels/american_road/art/supernew/MyRoads/BrightG_przeryw.dds"
+          ],
+          "exact_in_mod": [
+            "levels/american_road/art/supernew/MyRoads/BrightG_przeryw.dds"
+          ],
+          "link_entries_in_mod": [],
+          "case_only_matches": [],
+          "status": "exact_in_mod"
+        },
+        {
+          "field": "Stages[0].normalMap",
+          "reference": "/levels/american_road/art/supernew/MyRoads/BrightG_boczne_NRM.png",
+          "candidate_paths": [
+            "levels/american_road/art/supernew/MyRoads/BrightG_boczne_NRM.png"
+          ],
+          "exact_in_mod": [
+            "levels/american_road/art/supernew/MyRoads/BrightG_boczne_NRM.png"
+          ],
+          "link_entries_in_mod": [],
+          "case_only_matches": [],
+          "status": "exact_in_mod"
+        },
+        {
+          "field": "Stages[0].roughnessMap",
+          "reference": "/levels/american_road/art/supernew/MyRoads/DarkRoadSPEC_r.data.png",
+          "candidate_paths": [
+            "levels/american_road/art/supernew/MyRoads/DarkRoadSPEC_r.data.png"
+          ],
+          "exact_in_mod": [
+            "levels/american_road/art/supernew/MyRoads/DarkRoadSPEC_r.data.png"
+          ],
+          "link_entries_in_mod": [],
+          "case_only_matches": [],
+          "status": "exact_in_mod"
+        },
+        {
+          "field": "Stages[0].opacityMap",
+          "reference": "/levels/american_road/art/supernew/MyRoads/BrightG_przeryw_o.data.png",
+          "candidate_paths": [
+            "levels/american_road/art/supernew/MyRoads/BrightG_przeryw_o.data.png"
+          ],
+          "exact_in_mod": [
+            "levels/american_road/art/supernew/MyRoads/BrightG_przeryw_o.data.png"
+          ],
+          "link_entries_in_mod": [],
+          "case_only_matches": [],
+          "status": "exact_in_mod"
+        }
+      ],
+      "render_settings": {
+        "name": "BrightG1",
+        "mapTo": "unmapped_mat",
+        "class": "Material",
+        "persistentId": "8e287bf1-755d-4368-b526-f624a3a05fce",
+        "translucent": true,
+        "translucentBlendOp": "LerpAlpha",
+        "translucentZWrite": true,
+        "castShadows": true,
+        "annotation": "BUILDINGS",
+        "materialTag0": "RoadAndPath",
+        "materialTag1": "myroads",
+        "version": 1.5
+      }
+    }
+  ],
+  "unresolved_material_names": [
+    "Grid512_Red_Mat"
+  ],
+  "grid_asset_entries": [],
+  "grid_text_mentions": [
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 32,
+      "context": "59.046753],\"decalBias\":0.000500000024,\"distanceFade\":[1.00000001e-07,1],\"drivability\":1,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[1985.61694,-345.394348,-559.046753,8],[2524.75635,-654.784668,-557.695618,8]],\"oneWay\":true,\"overObjects\":true}"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 73,
+      "context": "16.922546],\"decalBias\":0.000500000024,\"distanceFade\":[1.00000001e-07,1],\"drivability\":1,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[3302.72705,-3995.07202,-516.922546,8],[3424.87012,-4028.25806,-516.887695,8],[3464.45142,-4034.80688,-516.230591,8]],\"overObjects\":true}"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 186,
+      "context": "32.014587],\"decalBias\":0.000500000024,\"distanceFade\":[1.00000001e-07,1],\"drivability\":1,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[5002.37842,2197.22754,-232.014587,8],[4894.99463,2268.47974,-237.300446,8]],\"overObjects\":true}"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 198,
+      "context": "08.041504],\"decalBias\":0.000500000024,\"distanceFade\":[1.00000001e-07,1],\"drivability\":1,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[-3597.39478,714.408142,-508.041504,8],[-3564.76831,730.137268,-508.442322,8]],\"overObjects\":true}"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 227,
+      "context": ".984375],\"decalBias\":0.000500000024,\"distanceFade\":[1.00000001e-07,1],\"drivability\":0.5,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[5578.46826,-1079.1676,-555.984375,5],[5589.83545,-1090.69104,-556.34137,5],[5594.66797,-1096.53027,-556.474548,5],[5597.5415,-1101.43933,-556.576111"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 267,
+      "context": "30.374023],\"decalBias\":0.000500000024,\"distanceFade\":[1.00000001e-07,1],\"drivability\":1,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[-1819.84253,-1393.81372,-530.374023,8],[-1820.00793,-1301.91284,-530.318848,8]]}"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 344,
+      "context": "43.073547],\"decalBias\":0.000500000024,\"distanceFade\":[1.00000001e-07,1],\"drivability\":1,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[5778.81201,-2784.31226,-543.073547,8],[5695.65967,-2889.02515,-539.622681,8]],\"overObjects\":true}"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 396,
+      "context": "44.335571],\"decalBias\":0.000500000024,\"distanceFade\":[1.00000001e-07,1],\"drivability\":1,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[4990.92236,-1456.9353,-544.335571,8],[4950.94629,-1496.07959,-544.363159,8]],\"oneWay\":true,\"overObjects\":true}"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 400,
+      "context": "40.853088],\"decalBias\":0.000500000024,\"distanceFade\":[1.00000001e-07,1],\"drivability\":1,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[5041.67822,-1680.4126,-540.853088,8],[5053.80029,-1672.1134,-539.353821,8],[5093.08301,-1647.71411,-538.810791,8],[5108.95947,-1637.52649,-539.48400"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 428,
+      "context": "40.516479],\"decalBias\":0.000500000024,\"distanceFade\":[1.00000001e-07,1],\"drivability\":1,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[5112.28174,-2176.98291,-540.516479,8],[5064.22607,-2139.49268,-540.855896,8]]}"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 444,
+      "context": "30.350952],\"decalBias\":0.000500000024,\"distanceFade\":[1.00000001e-07,1],\"drivability\":1,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[-1822.94324,-1303.30566,-530.350952,8],[-1824.6084,-1382.16785,-530.374023,8],[-1825.15674,-1396.75208,-530.374023,8]],\"overObjects\":true}"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 471,
+      "context": ".707581],\"decalBias\":0.000500000024,\"distanceFade\":[1.00000001e-07,1],\"drivability\":0.5,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[5609.4248,-1110.73877,-556.707581,5],[5615.13086,-1109.37708,-556.72467,5],[5620.01318,-1112.68286,-556.765625,5],[5633.60205,-1130.09009,-556.85333"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 523,
+      "context": "53.098572],\"decalBias\":0.000500000024,\"distanceFade\":[1.00000001e-07,1],\"drivability\":1,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[1246.38843,79.397995,-553.098572,8],[1581.76575,-113.446686,-556.631348,8]],\"oneWay\":true,\"overObjects\":true}"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 608,
+      "context": "536.84906],\"decalBias\":0.000500000024,\"distanceFade\":[1.00000001e-07,1],\"drivability\":1,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[5415.06396,-2468.66382,-536.84906,8],[5494.27002,-2543.41382,-535.266724,8]]}"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 667,
+      "context": "27.847717],\"decalBias\":0.000500000024,\"distanceFade\":[1.00000001e-07,1],\"drivability\":1,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[-1294.15186,-721.137268,-527.847717,8],[-1308.57043,-746.046387,-527.764221,8]],\"overObjects\":true}"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 767,
+      "context": "439.51651],\"decalBias\":0.000500000024,\"distanceFade\":[1.00000001e-07,1],\"drivability\":1,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[2506.1626,-1806.0238,-439.51651,8],[2518.36572,-1731.98865,-430.21637,8]],\"overObjects\":true}"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 777,
+      "context": "calBias\":0.000500000024,\"distanceFade\":[1.00000001e-07,1],\"drivability\":1,\"lanesLeft\":0,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[1527.10864,-868.487793,-542.204712,8],[1482.72363,-878.22113,-546.485107,8]],\"oneWay\":true,\"overObjects\":true}"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 782,
+      "context": "77.595947],\"decalBias\":0.000500000024,\"distanceFade\":[1.00000001e-07,1],\"drivability\":1,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[5088.91016,2200.67627,-177.595947,8],[5034.5708,2351.93506,-191.893127,8]]}"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 860,
+      "context": "\":0.000500000024,\"distanceFade\":[1.00000001e-07,1],\"drivability\":1,\"flipDirection\":true,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[4997.52295,-1465.12512,-544.3255,8],[4958.41162,-1503.34595,-544.802429,8],[4946.43066,-1515.40051,-544.798523,8]],\"oneWay\":true,\"overObjects\":true}"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 1007,
+      "context": "39.827637],\"decalBias\":0.000500000024,\"distanceFade\":[1.00000001e-07,1],\"drivability\":1,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[5205.89502,-2249.50122,-539.827637,8],[5126.73096,-2197.63379,-540.381775,8],[5079.87744,-2168.21704,-540.695557,8]],\"oneWay\":true,\"overObjects\":tru"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 1035,
+      "context": "04.783325],\"decalBias\":0.000500000024,\"distanceFade\":[1.00000001e-07,1],\"drivability\":1,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[794.163574,-2470.50537,-504.783325,8],[770.525269,-2499.05249,-504.957092,8]],\"overObjects\":true}"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 1079,
+      "context": "40.376099],\"decalBias\":0.000500000024,\"distanceFade\":[1.00000001e-07,1],\"drivability\":1,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[5132.49365,-2189.71753,-540.376099,8],[5206.68262,-2238.04443,-539.864136,8]],\"overObjects\":true}"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 1126,
+      "context": "calBias\":0.000500000024,\"distanceFade\":[1.00000001e-07,1],\"drivability\":1,\"lanesLeft\":0,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[5209.78369,-2232.82983,-539.877319,8],[5125.84766,-2179.15479,-540.446289,8]],\"oneWay\":true,\"overObjects\":true}"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 1190,
+      "context": "e\":[1.00000001e-07,1],\"drivability\":1,\"flipDirection\":true,\"lanesLeft\":0,\"lanesRight\":2,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[2514.92773,-669.879761,-557.695618,8],[1973.8634,-359.538422,-559.046753,8]],\"oneWay\":true,\"overObjects\":true}"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 1202,
+      "context": "calBias\":0.000500000024,\"distanceFade\":[1.00000001e-07,1],\"drivability\":1,\"lanesLeft\":0,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[5164.52051,-1686.56201,-540.316223,8],[5140.16309,-1699.44556,-539.208252,8],[5079.84961,-1728.0614,-539.582458,8],[5062.21094,-1736.16541,-541.3014"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 1357,
+      "context": "43.726196],\"decalBias\":0.000500000024,\"distanceFade\":[1.00000001e-07,1],\"drivability\":1,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[-1132.31311,1470.61328,-543.726196,8],[-1026.349,1353.96912,-541.335571,8]],\"oneWay\":true,\"overObjects\":true}"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 1370,
+      "context": "46.301758],\"decalBias\":0.000500000024,\"distanceFade\":[1.00000001e-07,1],\"drivability\":1,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[4726.49951,-3244.33887,-546.301758,8],[4628.2373,-3224.90259,-547.387512,8]],\"overObjects\":true}"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 1385,
+      "context": "567.43457],\"decalBias\":0.000500000024,\"distanceFade\":[1.00000001e-07,1],\"drivability\":1,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[-1320.56372,2820.82642,-567.43457,8],[-1222.6095,2863.11694,-567.645142,8]],\"oneWay\":true,\"overObjects\":true}"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 1455,
+      "context": ".765564],\"decalBias\":0.000500000024,\"distanceFade\":[1.00000001e-07,1],\"drivability\":0.5,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[5499.15088,-1142.30786,-556.765564,5],[5505.3208,-1141.04321,-556.782288,5],[5512.0166,-1140.90417,-556.835266,5],[5517.47266,-1140.78992,-556.86792"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 1585,
+      "context": "24,\"distanceFade\":[1.00000001e-07,1],\"drivability\":1,\"flipDirection\":true,\"lanesLeft\":0,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[5198.37256,-2279.6311,-539.75061,8],[5114.18506,-2223.30029,-540.358582,8],[5072.479,-2195.83423,-540.65686,8]],\"oneWay\":true,\"overObjects\":true}"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 1659,
+      "context": "00000024,\"distanceFade\":[1.00000001e-07,1],\"drivability\":1,\"lanesLeft\":0,\"lanesRight\":2,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[3062.64233,-3636.86401,-507.562103,8],[3006.91577,-3597.4729,-507.404175,8],[2849.9043,-3514.94141,-507.80777,8]],\"oneWay\":true,\"overObjects\":true}"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 1809,
+      "context": "e\":[1.00000001e-07,1],\"drivability\":1,\"flipDirection\":true,\"lanesLeft\":2,\"lanesRight\":0,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[-3609.96094,1758.4762,-539.229675,7],[-3528.34937,1865.14014,-544.872375,7]],\"oneWay\":true,\"overObjects\":true}"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 1927,
+      "context": "05.065369],\"decalBias\":0.000500000024,\"distanceFade\":[1.00000001e-07,1],\"drivability\":1,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[-2878.73218,89.8656464,-505.065369,8],[-2897.28735,60.1404533,-506.411041,8]],\"overObjects\":true}"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 1988,
+      "context": "-559.5625],\"decalBias\":0.000500000024,\"distanceFade\":[1.00000001e-07,1],\"drivability\":1,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[1648.11597,2765.64844,-559.5625,8],[1649.4939,2727.15747,-559.60968,8]],\"overObjects\":true}"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 2020,
+      "context": "e\":[1.00000001e-07,1],\"drivability\":1,\"flipDirection\":true,\"lanesLeft\":0,\"lanesRight\":2,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[1572.38489,-123.018837,-556.607666,8],[1237.84473,69.0742416,-553.080566,8]],\"oneWay\":true,\"overObjects\":true}"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 2029,
+      "context": "39.629028],\"decalBias\":0.000500000024,\"distanceFade\":[1.00000001e-07,1],\"drivability\":1,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[5214.06982,-2289.83984,-539.629028,8],[5242.51953,-2316.22754,-539.345276,8]]}"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 2033,
+      "context": "40.376099],\"decalBias\":0.000500000024,\"distanceFade\":[1.00000001e-07,1],\"drivability\":1,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[5112.39551,-2222.08887,-540.376099,8],[5083.81885,-2211.46411,-540.551636,8]]}"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 2211,
+      "context": "calBias\":0.000500000024,\"distanceFade\":[1.00000001e-07,1],\"drivability\":1,\"lanesLeft\":0,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[5247.77588,-2258.9458,-539.573486,8],[5206.32617,-2237.20947,-539.867249,8]],\"oneWay\":true}"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 2217,
+      "context": "47.731018],\"decalBias\":0.000500000024,\"distanceFade\":[1.00000001e-07,1],\"drivability\":1,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[-317.506287,884.963257,-547.731018,8],[-183.782166,988.799438,-558.772461,8]],\"overObjects\":true}"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 2261,
+      "context": "24,\"distanceFade\":[1.00000001e-07,1],\"drivability\":1,\"flipDirection\":true,\"lanesLeft\":0,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[5194.7251,-2283.9668,-539.761963,8],[5117.104,-2232.49292,-540.323486,8]],\"oneWay\":true,\"overObjects\":true}"
+    },
+    {
+      "source_filepath": "levels/american_road/main/MissionGroup/items.level.json",
+      "line": 2365,
+      "context": "00000024,\"distanceFade\":[1.00000001e-07,1],\"drivability\":1,\"lanesLeft\":0,\"lanesRight\":2,\"material\":\"Grid512_Red_Mat\",\"nodes\":[[5081.71875,-2190.59399,-540.621826,8],[5097.58691,-2200.6936,-540.516479,8],[5199.84961,-2266.99487,-539.795898,8],[5229.5498,-2287.26782,-539.55139"
+    }
+  ],
+  "duplicate_zip_members": [],
+  "warnings": [],
+  "unsupported_cs_road_sources": [],
+  "limitations": [
+    "Only archive evidence; external game and other-mod assets are not inspected.",
+    ".dds.link entries are not treated as invalid; targets and runtime resolution are unverified.",
+    "File presence does not establish image validity, material loading, or rendering behavior.",
+    "Material duplicates/load order, CS expressions/inheritance and runtime overrides are not resolved.",
+    "CS road geometry is not parsed; any such sources are explicitly listed.",
+    "Grid512 and ECA detail warnings do not establish the cause of the white road.",
+    "The actual visible surface and white-road cause remain unknown."
+  ],
+  "manual_investigation_plan": [
+    "Identify the visible surface against the closest road UUIDs and segment coordinates.",
+    "Check that surface material and active stages in the running game only when separately authorized.",
+    "Resolve external/link assets and duplicate material load order before classifying references as missing.",
+    "Correlate a surface-specific render warning or controlled experiment before proposing a fix."
+  ]
+}

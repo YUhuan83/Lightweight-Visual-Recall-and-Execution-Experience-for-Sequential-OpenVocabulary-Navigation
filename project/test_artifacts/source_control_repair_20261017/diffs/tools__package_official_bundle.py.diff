@@ -1,0 +1,23 @@
+--- before/tools/package_official_bundle.py
++++ after/tools/package_official_bundle.py
+@@ -85,6 +85,7 @@
+         'check_ackermann_cusp_execution.py','check_continuous_start_execution.py',
+         'test_cusp_probe_contract.py','check_execution_braking_dds.py',
+         'check_rviz_image_delivery.py','image_stream_health.py','test_image_stream_health.py')})
++    names.update({'tools/check_native_freshness_beamng.py','tools/test_source_control_preflight.py'})
+     names.update({'tools/'+name for name in ('offline_extension_ownership_audit.py',
+         'test_offline_extension_ownership_audit.py', 'offline_execution_contract_audit.py',
+         'offline_goal_chain_replay.py', 'test_offline_goal_chain_replay.py',
+@@ -100,7 +101,11 @@
+                   'test_artifacts/server_validation_20261012/direct_steering_evidence.zip'})
+     names.update({'test_artifacts/server_validation_20261004/unseeded_house_station_2_generic_20261004/'+name
+                   for name in ('full_test.json','events.jsonl')})
+-    return names
++    # A frozen source bundle must not import a stale setuptools/colcon output
++    # copied from a previous install (especially across wire protocol changes).
++    return {name for name in names if not any(
++        part in ('build', 'install', 'log', '__pycache__') or part.endswith('.egg-info')
++        for part in Path(name).parts)}
+ 
+ 
+ def main():

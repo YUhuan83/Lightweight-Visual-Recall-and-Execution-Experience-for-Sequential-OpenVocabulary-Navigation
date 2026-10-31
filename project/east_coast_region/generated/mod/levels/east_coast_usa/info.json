@@ -1,0 +1,36 @@
+{
+  "features": "levels.east_coast_usa.info.features",
+  "suitablefor": "levels.east_coast_usa.info.suitablefor",
+  "authors": "BeamNG",
+  "roads": "levels.east_coast_usa.info.roads",
+  "title": "levels.east_coast_usa.info.title",
+  "description": "levels.east_coast_usa.info.description",
+  "defaultSpawnPointName": "wildos_town_industrial",
+  "country": "levels.common.country.usa",
+  "region": "northAmerica",
+  "biome": "levels.east_coast_usa.info.biome",
+  "size": [
+    2048,
+    2048
+  ],
+  "previews": [
+    "east_coast_usa_preview1_v2.jpg",
+    "east_coast_usa_preview2_v2.jpg",
+    "east_coast_usa_preview3_v2.jpg"
+  ],
+  "spawnPoints": [
+    {
+      "translationId": "WildOS Town Industrial",
+      "objectname": "wildos_town_industrial",
+      "preview": "spawns_townindustrial.jpg"
+    },
+    {
+      "translationId": "WildOS Sawmill Outdoor",
+      "objectname": "wildos_sawmill_outdoor",
+      "preview": "spawns_sawmill.jpg"
+    }
+  ],
+  "roadRules": {
+    "turnOnRed": true
+  }
+}

@@ -1,0 +1,15 @@
+[16:06:52] target = 'house'  (type a new target + Enter any time to change)
+[16:06:52] spawn spawns_city pos=[5290.0, -1145.3, -544.9] start=[5290.0, -1145.3, -544.9]
+[16:07:04] vision worker ready (SigLIP2 + C-RADIO + heads loaded once)
+[16:07:04] closing any running BeamNG (avoid multi-instance conflicts)
+[16:07:07] launching local BeamNG (American Road) [headless]
+[16:08:14] time of day set to morning (reduce overexposure)
+[16:08:22] cycle 0: pos=(5290.0,-1145.3) query='house'
+[16:08:30]   mask_px=0 target=None path=2 dist=35.0 trav_center=0.127
+[16:08:36]   stuck (moved 0.00m); backing up
+[16:08:46] cycle 1: pos=(5290.0,-1145.3) query='house'
+[16:08:51]   mask_px=0 target=None path=2 dist=35.0 trav_center=0.127
+[16:08:57]   stuck (moved 0.00m); backing up
+[16:09:10] cycle 2: pos=(5290.0,-1145.3) query='house'
+[16:09:16]   mask_px=0 target=None path=2 dist=35.0 trav_center=0.127
+[16:09:24]   stuck (moved 0.00m); backing up

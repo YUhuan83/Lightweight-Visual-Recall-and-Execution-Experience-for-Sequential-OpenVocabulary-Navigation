@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "WildOS 视觉记忆与 Heading 算法",
+    "locale": "zh-CN",
+    "output": "visual-memory-heading.html",
+    "quality_profile": "showcase",
+    "viewBox": [2050, 900],
+    "views": [
+      { "id": "main", "label": "主处理链", "focus": ["inputs", "perception", "anchor", "memory", "heading", "planner", "follower"], "note": "观测绑定到图节点和方向分桶，再进入 Heading 评分和规划。" },
+      { "id": "feedback", "label": "反馈闭环", "focus": ["heading", "follower", "feedback"], "note": "TraversalFeedback 反映执行成功率、滑移、距离和能耗，影响下一轮方向效用。" }
+    ]
+  },
+  "layout": { "mode": "grid", "origin": [70, 90], "cols": 7, "gapX": 30, "gapY": 80, "cellW": 250, "cellH": 130 },
+  "components": [
+    { "id": "inputs", "type": "external", "label": "相机 + Odometry", "tag": "ROS input", "pos": [70, 220], "size": [230, 90] },
+    { "id": "perception", "type": "backend", "label": "RADIO 感知", "tag": "embedding / 16 bins", "pos": [330, 220], "size": [240, 90] },
+    { "id": "anchor", "type": "backend", "label": "图锚定观测", "tag": "map + node + bin", "pos": [600, 220], "size": [250, 90] },
+    { "id": "memory", "type": "database", "label": "VisualMemoryMap", "tag": "node views / objects / coverage", "pos": [880, 220], "size": [250, 90] },
+    { "id": "heading", "type": "backend", "label": "Heading Utility", "tag": "frontier + utility - risk", "pos": [1160, 220], "size": [260, 90] },
+    { "id": "planner", "type": "backend", "label": "graphnav_planner", "tag": "target heading + frontier", "pos": [1450, 220], "size": [250, 90] },
+    { "id": "follower", "type": "backend", "label": "Path Follower", "tag": "execute node / heading", "pos": [1730, 220], "size": [240, 90] },
+    { "id": "graph", "type": "backend", "label": "NavigationGraph", "tag": "node + topology + physics", "pos": [1160, 40], "size": [260, 90] },
+    { "id": "feedback", "type": "messagebus", "label": "TraversalFeedback", "sublabel": "outcome / slip / energy", "tag": "writes traversal_history", "pos": [1160, 520], "size": [280, 100] }
+  ],
+  "connections": [
+    { "id": "inputs-perception", "from": "inputs", "to": "perception", "variant": "emphasis" },
+    { "id": "perception-anchor", "from": "perception", "to": "anchor", "variant": "emphasis" },
+    { "id": "anchor-memory", "from": "anchor", "to": "memory" },
+    { "id": "memory-heading", "from": "memory", "to": "heading", "variant": "emphasis" },
+    { "id": "heading-planner", "from": "heading", "to": "planner", "variant": "emphasis" },
+    { "id": "planner-follower", "from": "planner", "to": "follower", "variant": "emphasis" },
+    { "id": "graph-heading", "from": "graph", "to": "heading", "fromSide": "bottom", "toSide": "top" },
+    { "id": "feedback-heading", "from": "feedback", "to": "heading", "variant": "dashed", "fromSide": "top", "toSide": "bottom" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "视觉记忆", "items": ["索引键：(map_id, node_uuid, heading_bin)", "节点方向观测、语义对象、正/负搜索覆盖持久化到 SQLite", "不建立独立 SLAM / 关键帧空间图"] },
+    { "dot": "amber", "title": "Heading 算法", "items": ["当前 yaw 映射到 16 个 heading bins，每 bin 22.5°", "HeadingCandidate 融合 frontier、语义/物理可通行性、dynamic_risk", "Utility 加入 motion_cost、turn cost、uncertainty、predicted_utility"] },
+    { "dot": "emerald", "title": "闭环反馈", "items": ["Path Follower 发布 TraversalFeedback", "反馈记录成功率、时长、距离、滑移和能耗", "反馈更新 traversal_history，并影响后续方向评分"] }
+  ]
+}

@@ -1,0 +1,38 @@
+--- v25/nav2_adapter/test/test_goal_confirmation_ros.py
++++ v26/nav2_adapter/test/test_goal_confirmation_ros.py
+@@ -104,14 +104,14 @@
+         self.assertAlmostEqual(self.node.last_standoff_object_distance, 4.351995092, places=6)
+         self.node.publisher.publish.assert_called_once()
+ 
+-    def test_missing_pose_is_not_search_success_and_retries_when_pose_recovers(self):
++    def test_missing_pose_keeps_consensus_but_route_waits_until_pose_recovers(self):
+         self.node.odom = None
+         with patch.object(self.node, 'on_odom'):
+             for _ in range(5):
+                 self.observe((20., 0., 2.))
+         data = json.loads(self.node.confirmation_pub.publish.call_args.args[0].data)
+         self.assertTrue(data['position_confirmed'])
+-        self.assertFalse(data['search_confirmed'])
++        self.assertTrue(data['search_confirmed'])
+         self.assertFalse(data['approach_goal_ready'])
+         self.assertEqual(data['approach_failure_reason'], 'missing_vehicle_pose')
+         self.node.publisher.publish.assert_not_called()
+@@ -216,7 +216,7 @@
+         self.node.on_odom(bad)
+         self.assertIs(self.node.odom, newer)
+ 
+-    def test_fully_blocked_standoff_is_not_reported_as_search_success(self):
++    def test_blocked_standoff_keeps_consensus_without_publishing_route_goal(self):
+         grid = OccupancyGrid()
+         grid.header.frame_id = 'spot1/base_link'
+         grid.header.stamp.sec = 100
+@@ -232,7 +232,8 @@
+             self.node.on_occupancy(deepcopy(grid))
+             self.observe((20., 0., 2.), stamp=self.now)
+         data = json.loads(self.node.confirmation_pub.publish.call_args.args[0].data)
+-        self.assertFalse(data['search_confirmed'])
++        self.assertTrue(data['search_confirmed'])
++        self.assertFalse(data['approach_goal_ready'])
+         self.assertEqual(data['approach_failure_reason'], 'no_reachable_standoff')
+         self.node.publisher.publish.assert_not_called()
+ 

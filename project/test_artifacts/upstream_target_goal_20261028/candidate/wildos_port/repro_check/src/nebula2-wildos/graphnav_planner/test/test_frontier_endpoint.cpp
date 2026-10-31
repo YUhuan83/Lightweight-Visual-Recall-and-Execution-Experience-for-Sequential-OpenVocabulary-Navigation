@@ -1,0 +1,82 @@
+#include <gtest/gtest.h>
+#include <algorithm>
+#include <limits>
+#include "graphnav_planner/planner.hpp"
+
+namespace {
+using Graph = graphnav_msgs::msg::NavigationGraph;
+geometry_msgs::msg::Point point(double x, double y=0., double z=0.) {
+  geometry_msgs::msg::Point p; p.x=x; p.y=y; p.z=z; return p;
+}
+std::shared_ptr<Graph> fixture(std::vector<geometry_msgs::msg::Point> points) {
+  auto g=std::make_shared<Graph>(); g->header.frame_id="spot1/odom";
+  g->header.stamp.sec=100; g->trav_classes={"default"}; g->current_node_idx=0;
+  for (double x : {0.,2.}) {
+    graphnav_msgs::msg::Node n; n.pose.position.x=x; n.pose.orientation.w=1.;
+    n.trav_properties.resize(1); g->nodes.push_back(n);
+  }
+  g->nodes[1].trav_properties[0].is_frontier=true;
+  g->nodes[1].trav_properties[0].frontier_points=points;
+  graphnav_msgs::msg::Edge e; e.from_idx=0; e.to_idx=1;
+  e.traversability.resize(1); e.traversability[0].traversability_cost=2.;
+  g->edges.push_back(e); return g;
+}
+}
+
+TEST(FrontierEndpoint, ScoredForwardExitMustNotBecomeBackwardCentroid) {
+  auto g=fixture({point(3.),point(-8.)});
+  graphnav_planner::Planner planner(rclcpp::get_logger("endpoint"));
+  planner.set_trav_class("default"); planner.update_graph(g);
+  Eigen::Vector3d goal(50.,0.,0.);
+  auto path=planner.plan_to_goal(goal,.5,rclcpp::Time(g->header.stamp));
+  ASSERT_FALSE(path.empty()); EXPECT_DOUBLE_EQ(path.back().x(),3.);
+  EXPECT_FALSE(planner.route_complete());
+}
+
+TEST(FrontierEndpoint, NoInventedPointBetweenDisjointExits) {
+  auto g=fixture({point(3.,4.),point(3.,-4.)});
+  graphnav_planner::Planner planner(rclcpp::get_logger("endpoint"));
+  planner.set_trav_class("default"); planner.update_graph(g);
+  Eigen::Vector3d goal(50.,4.,0.);
+  auto path=planner.plan_to_goal(goal,.5,rclcpp::Time(g->header.stamp));
+  ASSERT_FALSE(path.empty()); EXPECT_DOUBLE_EQ(path.back().x(),3.);
+  EXPECT_DOUBLE_EQ(path.back().y(),4.); EXPECT_FALSE(planner.route_complete());
+}
+
+TEST(FrontierEndpoint, ReplanUsesCurrentDestinationAndPreservesPartialStatus) {
+  auto g=fixture({point(3.),point(-8.)});
+  graphnav_planner::Planner planner(rclcpp::get_logger("endpoint"));
+  planner.set_trav_class("default"); planner.update_graph(g);
+  Eigen::Vector3d forward(50.,0.,0.),backward(-50.,0.,0.);
+  auto first=planner.plan_to_goal(forward,.5,rclcpp::Time(100,0,RCL_ROS_TIME));
+  auto second=planner.plan_to_goal(backward,.5,rclcpp::Time(101,0,RCL_ROS_TIME));
+  ASSERT_FALSE(first.empty()); ASSERT_FALSE(second.empty());
+  EXPECT_DOUBLE_EQ(first.back().x(),3.); EXPECT_DOUBLE_EQ(second.back().x(),-8.);
+  EXPECT_FALSE(planner.route_complete());
+}
+
+TEST(FrontierEndpoint, SingleExitAndInputPermutationHaveSameEndpoint) {
+  for(auto points : {std::vector{point(3.)},std::vector{point(3.),point(-8.)},std::vector{point(-8.),point(3.)}}) {
+    auto g=fixture(points); graphnav_planner::Planner planner(rclcpp::get_logger("endpoint"));
+    planner.set_trav_class("default");planner.update_graph(g);Eigen::Vector3d goal(50.,0.,0.);
+    auto path=planner.plan_to_goal(goal,.5,rclcpp::Time(g->header.stamp));
+    ASSERT_FALSE(path.empty());EXPECT_DOUBLE_EQ(path.back().x(),3.);
+  }
+}
+
+TEST(FrontierEndpoint, InvalidHeightCannotSupplyScoreForAnotherExit) {
+  auto g=fixture({point(45.,0.,std::numeric_limits<double>::quiet_NaN()),point(3.)});
+  graphnav_planner::Planner planner(rclcpp::get_logger("endpoint"));
+  planner.set_trav_class("default");planner.update_graph(g);Eigen::Vector3d goal(50.,0.,0.);
+  auto path=planner.plan_to_goal(goal,.5,rclcpp::Time(g->header.stamp));
+  ASSERT_FALSE(path.empty()); EXPECT_DOUBLE_EQ(path.back().x(),3.);
+  EXPECT_FALSE(planner.route_complete());
+}
+
+TEST(FrontierEndpoint, InvalidOnlyFrontierCannotBecomeExecutableRoute) {
+  auto g=fixture({point(45.,0.,std::numeric_limits<double>::quiet_NaN())});
+  graphnav_planner::Planner planner(rclcpp::get_logger("endpoint"));
+  planner.set_trav_class("default");planner.update_graph(g);Eigen::Vector3d goal(50.,0.,0.);
+  auto path=planner.plan_to_goal(goal,.5,rclcpp::Time(g->header.stamp));
+  EXPECT_TRUE(path.empty()); EXPECT_FALSE(planner.route_complete());
+}

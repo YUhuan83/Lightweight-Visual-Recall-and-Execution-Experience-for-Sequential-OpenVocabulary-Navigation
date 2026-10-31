@@ -1,0 +1,204 @@
+--- v7/nav2_adapter/wildos_nav2_adapter/graph_path_bridge.py
++++ candidate/nav2_adapter/wildos_nav2_adapter/graph_path_bridge.py
+@@ -1920,6 +1920,51 @@
+         self.add_navigation_done_callback(future,
+             lambda f: self.on_plan_accepted(f, epoch, index, serial))
+ 
++    def reserve_short_route_probe(self):
++        """Use a remaining failure slot for a geometrically different prefix.
++
++        Normal candidate order stays intact. Only an already failing, stopped
++        exploration may probe a short prefix before retiring its route. A
++        reversible car can reach a point behind it without turning its body
++        to face that point; required observation headings remain directional.
++        """
++        if (self.carrier_model != 'ackermann' or not self.follow_enabled
++                or self.following or self.extending_path or self.recovering
++                or self.expected is not None or self.memory_goal is not None
++                or self.memory_selecting or self.memory_active is not None
++                or self.query_reset_pending or self.follow_quarantine
++                or self.follow_release is not None
++                or self.input_freshness_issue() is not None):
++            return False
++        start = xy(self.odom.pose.pose)
++        current_heading = yaw(self.odom.pose.pose)
++        observation_heading = self.exploration_observation_heading()
++        observation_endpoint = self.exploration_destination() or self.route_endpoint
++        probes = []
++        for x, y, heading, arc in self.candidates:
++            if (observation_heading is not None and observation_endpoint is not None
++                    and distance((x, y), observation_endpoint) < 1e-6):
++                continue
++            behind = ((x-start[0])*math.cos(current_heading)
++                      + (y-start[1])*math.sin(current_heading) < 0.)
++            if behind and math.cos(heading-current_heading) < 0.:
++                heading = math.remainder(heading+math.pi, 2*math.pi)
++            if any(distance((x, y), previous[:2]) < 1e-6
++                   and abs(math.remainder(heading-previous[2], 2*math.pi)) < 1e-6
++                   for previous in self.candidates[:self.candidate_index+1]):
++                continue
++            if (self.goal_recently_failed(start, (x, y), heading)
++                    or not self.vehicle_pose_feasible((x, y), heading)):
++                continue
++            probes.append((x, y, heading, arc))
++        if not probes:
++            return False
++        probe = min(probes, key=lambda p: (p[3], abs(math.remainder(p[2]-current_heading, 2*math.pi))))
++        self.candidates.insert(self.candidate_index+1, probe)
++        self.status('short_route_probe', candidate_goal=list(probe[:3]),
++                    failed_attempts=self.empty_path_streak)
++        return True
++
+     def candidate_failed(self, reason):
+         self.get_logger().warning("ComputePath candidate failed: epoch=%d candidate=%d reason=%s" %
+                                   (self.epoch, self.candidate_index, reason))
+@@ -1975,6 +2020,11 @@
+             self.normal_best = None
+             self.execute_checked_path(path, target)
+             return
++        if (reason == 'empty_path'
++                and 0 < self.empty_path_streak < self.max_consecutive_empty_paths
++                and (self.empty_path_streak == self.max_consecutive_empty_paths-1
++                     or self.candidate_index+1 >= len(self.candidates))):
++            self.reserve_short_route_probe()
+         self.candidate_index += 1
+         self.try_candidate()
+ 
+--- v7/nav2_adapter/wildos_nav2_adapter/continuous_path.py
++++ candidate/nav2_adapter/wildos_nav2_adapter/continuous_path.py
+@@ -91,7 +91,7 @@
+                 or self.follow_active is None or self.active_follow_serial is None
+                 or self.follow_active['serial'] != self.active_follow_serial
+                 or self.follow_request is not None or self.follow_quarantine or self.follow_hold
+-                or self.pending or self.extending_path or self.replacement_pending
++                or (self.pending and not self.extending_path) or self.replacement_pending
+                 or self.prepared_extension is not None or self.frontier_choice is not None
+                 or self.frontier_comparison is not None or not self.motion_queue
+                 or self.input_freshness_issue() is not None
+@@ -123,6 +123,14 @@
+                                    xy(self.odom.pose.pose), yaw(self.odom.pose.pose))
+         if issue:
+             return False
++        if self.extending_path:
++            # Retiring an intention invalidates its future extension, not the
++            # already accepted and revalidated controller section. A late
++            # planner acceptance/result is fenced by its request serial.
++            self.cancel_goal(self.plan_handle, 'retired_exploration_extension')
++            self.plan_handle = self.active_plan_serial = self.plan_request_started_at = None
++            self.pending = self.extending_path = self.candidate_waiting_for_map = False
++            self.normal_best = self.prepared_extension = None
+         self.retired_motion = dict(identity=identity, epoch=self.epoch,
+             serial=self.active_follow_serial, bounded=bounded, forward=forward,
+             deadline=time.monotonic()+float(self.get_parameter('follow_response_timeout_sec').value),
+--- v7/nav2_adapter/test/test_graph_path_bridge_routing.py
++++ candidate/nav2_adapter/test/test_graph_path_bridge_routing.py
+@@ -317,6 +317,100 @@
+         self.node.try_candidate = Mock()
+         self.node.start_segment()
+         self.assertEqual(self.node.candidates[0][:3], (6., 0., 1.2))
++
++    def test_empty_path_budget_covers_near_and_far_route_samples(self):
++        # v7 223039: the first four failures only tried the far end of a
++        # shared prefix; three different frontiers repeated that prefix.
++        self.node.route = route((0., 0.), (24., 0.))
++        self.node.route_endpoint = (24., 0.)
++        self.node.follow_enabled = True
++        self.node.try_candidate = Mock()
++        self.node.start_segment()
++        self.assertEqual([c[0] for c in self.node.candidates[:3]], [24., 22., 20.])
++        for _ in range(self.node.max_consecutive_empty_paths-1):
++            self.node.candidate_failed('empty_path')
++        # The existing ten-sample cap retains 24..6 m on this straight route.
++        self.assertEqual(self.node.candidates[self.node.candidate_index][:2], (6., 0.))
++        self.node.block_current_route = Mock()
++        self.node.reject_exploration_route = Mock()
++        self.node.candidate_failed('empty_path')
++        self.node.reject_exploration_route.assert_called_once()
++
++    def test_reverse_prefix_candidates_use_the_same_cache_and_pose_filter(self):
++        self.node.route = route((0., 0.), (-6., 0.))
++        self.node.route_endpoint = (-6., 0.)
++        self.node.follow_enabled = True
++        self.node.try_candidate = Mock()
++        self.node.goal_recently_failed = Mock(side_effect=lambda start, point, heading:
++            point == (-6., 0.) and abs(math.remainder(heading, 2*math.pi)) < .1)
++        self.node.vehicle_pose_feasible = Mock(side_effect=lambda point, heading:
++            not (point == (-4., 0.) and abs(math.remainder(heading, 2*math.pi)) < .1))
++        self.node.start_segment()
++        self.node.candidate_failed('empty_path')
++        self.node.candidate_failed('empty_path')
++        self.assertTrue(self.node.candidates)  # Original-direction alternatives remain.
++        self.assertFalse(any(abs(math.remainder(c[2], 2*math.pi)) < .1
++                             for c in self.node.candidates))
++
++    def test_ideal_carrier_keeps_original_prefix_order(self):
++        self.node.carrier_model = 'ideal_point'
++        self.node.route = route((0., 0.), (24., 0.))
++        self.node.route_endpoint = (24., 0.)
++        self.node.try_candidate = Mock()
++        self.node.start_segment()
++        self.assertEqual([c[0] for c in self.node.candidates[:4]], [24., 22., 20., 18.])
++
++    def test_backward_graph_prefix_can_keep_vehicle_heading(self):
++        # A graph tangent points along travel; it is not the car's required
++        # body heading when the same intermediate point is reached in reverse.
++        self.node.route = route((0., 0.), (-6., 0.))
++        self.node.route_endpoint = (-6., 0.)
++        self.node.follow_enabled = True
++        self.node.try_candidate = Mock()
++        self.node.start_segment()
++        self.assertAlmostEqual(abs(self.node.candidates[0][2]), math.pi)
++        self.node.candidate_failed('empty_path')
++        self.node.candidate_failed('empty_path')
++        probe = self.node.candidates[self.node.candidate_index]
++        self.assertEqual(probe[:2], (-4., 0.))
++        self.assertAlmostEqual(math.remainder(probe[2], 2*math.pi), 0.)
++        self.assertTrue(any(c[:2] == (-6., 0.) and
++            abs(math.remainder(c[2]-math.pi, 2*math.pi)) < 1e-6
++            for c in self.node.candidates))  # The original heading is still an option.
++
++    def test_visible_observation_heading_is_not_reversed(self):
++        self.node.route = route((0., 0.), (-6., 0.))
++        self.node.route_endpoint = (-6., 0.)
++        self.node.expected = (-6., 0.)
++        self.node.visible_approach_active = True
++        self.node.try_candidate = Mock()
++        self.node.start_segment()
++        self.assertTrue(all(abs(math.remainder(c[2]-math.pi, 2*math.pi)) < 1e-6
++                            for c in self.node.candidates))
++
++    def test_ordinary_first_failure_keeps_original_next_prefix(self):
++        self.node.route = route((0., 0.), (24., 0.))
++        self.node.route_endpoint = (24., 0.)
++        self.node.follow_enabled = True
++        self.node.try_candidate = Mock()
++        self.node.start_segment()
++        original = list(self.node.candidates)
++        self.node.candidate_failed('empty_path')
++        self.assertEqual(self.node.candidates, original)
++        self.assertEqual(self.node.candidate_index, 1)
++
++    def test_short_probe_preserves_required_heading_beyond_graph_endpoint(self):
++        from wildos_nav2_adapter.input_quality import stamp_ns
++        self.node.follow_enabled = True
++        self.node.route = route((0.,0.),(-2.,0.))
++        self.node.route_endpoint = (-2.,0.)
++        self.node.route_metadata[stamp_ns(self.node.route)] = dict(
++            exploration_id='required:1', complete=True, goal=[-4.,0.],
++            observation_heading=math.pi)
++        self.node.candidates = [(-4.,0.,math.pi,4.)]
++        self.node.candidate_index = 0
++        self.assertFalse(self.node.reserve_short_route_probe())
++        self.assertEqual(len(self.node.candidates), 1)
+ 
+     def test_route_candidates_that_collide_with_vehicle_body_are_skipped(self):
+         # 093254 epoch 6: seven route samples passed the centre-cell check but
+@@ -2274,7 +2368,7 @@
+ 
+     def test_resolved_frontier_keeps_cancel_for_stale_or_uncertain_execution(self):
+         for field, value in (('pending', True), ('replacement_pending', True),
+-                             ('extending_path', True), ('follow_request', {'serial': 8}),
++                             ('follow_request', {'serial': 8}),
+                              ('odom_received_at', time.monotonic()-5.)):
+             with self.subTest(field=field):
+                 old = getattr(self.node, field)

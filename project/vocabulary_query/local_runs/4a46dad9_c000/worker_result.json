@@ -1,0 +1,18 @@
+{
+  "status": "ok",
+  "query": "house",
+  "image_size": [
+    960,
+    640
+  ],
+  "regions": [],
+  "mask_pixels": 0,
+  "traversability_range": [
+    2.086162567138672e-06,
+    0.99951171875
+  ],
+  "frontier_range": [
+    0.0,
+    0.80712890625
+  ]
+}

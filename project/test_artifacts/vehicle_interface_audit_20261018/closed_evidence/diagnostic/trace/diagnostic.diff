@@ -1,0 +1,150 @@
+--- src/connector.cpp
++++ C:\Users\Yu\Desktop\拟真\test_artifacts\vehicle_interface_audit_20261018\trace\src\connector.cpp
+@@ -1,5 +1,5 @@
+ // SPDX-License-Identifier: Apache-2.0
+-#include "wildos_ackermann_smac/connector.hpp"
++#include "wildos_ackermann_smac_trace/connector.hpp"
+ #include <algorithm>
+ #include <cmath>
+ #include <stdexcept>
+@@ -7,7 +7,7 @@
+ #include "nav2_smac_planner/collision_checker.hpp"
+ #include "nav2_util/line_iterator.hpp"
+ 
+-namespace wildos_ackermann_smac {
++namespace wildos_ackermann_smac_trace {
+ bool safe(nav2_costmap_2d::Costmap2D & map,
+   const nav2_costmap_2d::Footprint & footprint, Pose p, bool unknown)
+ {
+@@ -177,4 +177,4 @@
+   }
+   return out;
+ }
+-}  // namespace wildos_ackermann_smac
++}  // namespace wildos_ackermann_smac_trace
+--- src/planner.cpp
++++ C:\Users\Yu\Desktop\拟真\test_artifacts\vehicle_interface_audit_20261018\trace\src\planner.cpp
+@@ -1,6 +1,6 @@
+ // SPDX-License-Identifier: Apache-2.0
+-#include "wildos_ackermann_smac/planner.hpp"
+-#include "wildos_ackermann_smac/path_contract.hpp"
++#include "wildos_ackermann_smac_trace/planner.hpp"
++#include "wildos_ackermann_smac_trace/path_contract.hpp"
+ #include <cmath>
+ #include <algorithm>
+ #include <stdexcept>
+@@ -10,7 +10,7 @@
+ #include "tf2/utils.h"
+ #include "tf2_geometry_msgs/tf2_geometry_msgs.hpp"
+ 
+-namespace wildos_ackermann_smac {
++namespace wildos_ackermann_smac_trace {
+ static Pose poseOf(const geometry_msgs::msg::PoseStamped & p) {
+   return {p.pose.position.x, p.pose.position.y, tf2::getYaw(p.pose.orientation)};
+ }
+@@ -188,7 +188,7 @@
+       if(successful && geometry_ok(smooth) && validate(smooth)) { return smooth; }
+       RCLCPP_INFO(_logger,"smoothed path rejected; validating same-search raw path");
+     }
+-    if(!geometry_ok(raw) || !validate(raw)) {
++    const bool trace_raw_geometry=geometry_ok(raw); RCLCPP_WARN(_logger,"TRACE raw poses=%zu geometry=%d remaining=%.9f",raw.poses.size(),trace_raw_geometry,std::chrono::duration<double>(deadline-Clock::now()).count()); if(!trace_raw_geometry || !validate(raw)) {
+       throw nav2_core::PlannerException("Raw path violates directional geometry, collision or time budget");
+     }
+     return raw;
+@@ -203,13 +203,13 @@
+   // Compare feasible complete routes, bounded by the existing candidate/time caps.
+   std::vector<std::pair<double, nav_msgs::msg::Path>> feasible;
+   for (const auto & c : candidates.curves) {
+-    if (!enough_time(!feasible.empty())) { break; }
++    if (!enough_time(!feasible.empty())) { RCLCPP_WARN(_logger,"TRACE no_time remaining=%.9f required=%.9f",std::chrono::duration<double>(deadline-Clock::now()).count(),_max_planning_time); break; }
+     auto anchor = stamped(c.poses.back(), start.header);
+     nav_msgs::msg::Path suffix;
+     try { suffix = native_plan(anchor); }
+-    catch (const std::runtime_error &) { continue; }
+-    if (suffix.poses.empty()) { continue; }
+-    auto first = poseOf(suffix.poses.front()), end = c.poses.back();
++    catch (const std::runtime_error & e) { RCLCPP_WARN(_logger,"TRACE suffix_exception: %s",e.what()); continue; }
++    if (suffix.poses.empty()) { RCLCPP_WARN(_logger,"TRACE empty_suffix"); continue; }
++    auto first = poseOf(suffix.poses.front()), end = c.poses.back(); RCLCPP_WARN(_logger,"TRACE join pos=%.12g yaw=%.12g",std::hypot(first.x-end.x,first.y-end.y),std::abs(std::remainder(first.yaw-end.yaw,2.*std::acos(-1.))));
+     if (std::hypot(first.x - end.x, first.y - end.y) > 1e-6 ||
+       std::abs(std::atan2(std::sin(first.yaw - end.yaw), std::cos(first.yaw - end.yaw))) > 1e-5) {
+       continue;
+@@ -219,7 +219,7 @@
+     result.poses.insert(result.poses.end(), suffix.poses.begin() + 1, suffix.poses.end());
+     std::vector<Pose> combined;combined.reserve(result.poses.size());
+     for(const auto & p:result.poses) { combined.push_back(poseOf(p)); }
+-    if (curvatureFeasible(combined,resolution_,limits_.radius,limits_.bins) && validate(result)) {
++    const bool trace_geometry=curvatureFeasible(combined,resolution_,limits_.radius,limits_.bins); RCLCPP_WARN(_logger,"TRACE combined geometry=%d remaining=%.9f",trace_geometry,std::chrono::duration<double>(deadline-Clock::now()).count()); if (trace_geometry && validate(result)) {
+       const double cost = maneuverCost(combined);
+       if (std::isfinite(cost)) { feasible.emplace_back(cost, std::move(result)); }
+     }
+@@ -238,5 +238,5 @@
+   }
+   throw nav2_core::PlannerException("No safe bounded continuous-start plan");
+ }
+-}  // namespace wildos_ackermann_smac
+-PLUGINLIB_EXPORT_CLASS(wildos_ackermann_smac::Planner, nav2_core::GlobalPlanner)
++}  // namespace wildos_ackermann_smac_trace
++PLUGINLIB_EXPORT_CLASS(wildos_ackermann_smac_trace::Planner, nav2_core::GlobalPlanner)
+--- src/path_contract.cpp
++++ C:\Users\Yu\Desktop\拟真\test_artifacts\vehicle_interface_audit_20261018\trace\src\path_contract.cpp
+@@ -1,9 +1,9 @@
+ // SPDX-License-Identifier: Apache-2.0
+-#include "wildos_ackermann_smac/path_contract.hpp"
++#include "wildos_ackermann_smac_trace/path_contract.hpp"
+ #include <algorithm>
+ #include <cmath>
+ #include <limits>
+-namespace wildos_ackermann_smac {
++namespace wildos_ackermann_smac_trace {
+ double maneuverCost(const std::vector<Pose> & path) {
+   if (path.size() < 2) { return std::numeric_limits<double>::infinity(); }
+   double cost = 0., previous_dx = 0., previous_dy = 0.;
+--- include/wildos_ackermann_smac/connector.hpp
++++ C:\Users\Yu\Desktop\拟真\test_artifacts\vehicle_interface_audit_20261018\trace\include\wildos_ackermann_smac_trace\connector.hpp
+@@ -6,7 +6,7 @@
+ #include "nav2_costmap_2d/footprint.hpp"
+ #include "nav2_costmap_2d/footprint_collision_checker.hpp"
+ 
+-namespace wildos_ackermann_smac {
++namespace wildos_ackermann_smac_trace {
+ using Clock = std::chrono::steady_clock;
+ struct Pose { double x, y, yaw; };
+ struct Curve { std::vector<Pose> poses; double length = 0; unsigned cusps = 0; };
+@@ -23,4 +23,4 @@
+ SearchResult search(nav2_costmap_2d::Costmap2D & map,
+   const nav2_costmap_2d::Footprint & footprint, Pose from,
+   const Limits & limits, Clock::time_point deadline);
+-}  // namespace wildos_ackermann_smac
++}  // namespace wildos_ackermann_smac_trace
+--- include/wildos_ackermann_smac/planner.hpp
++++ C:\Users\Yu\Desktop\拟真\test_artifacts\vehicle_interface_audit_20261018\trace\include\wildos_ackermann_smac_trace\planner.hpp
+@@ -2,8 +2,8 @@
+ #pragma once
+ #include <map>
+ #include "nav2_smac_planner/smac_planner_hybrid.hpp"
+-#include "wildos_ackermann_smac/connector.hpp"
+-namespace wildos_ackermann_smac {
++#include "wildos_ackermann_smac_trace/connector.hpp"
++namespace wildos_ackermann_smac_trace {
+ class Planner : public nav2_smac_planner::SmacPlannerHybrid {
+ public:
+   void configure(const rclcpp_lifecycle::LifecycleNode::WeakPtr & parent, std::string name,
+@@ -21,4 +21,4 @@
+   std::map<std::string, rclcpp::Parameter> frozen_;
+   rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr guard_;
+ };
+-}  // namespace wildos_ackermann_smac
++}  // namespace wildos_ackermann_smac_trace
+--- include/wildos_ackermann_smac/path_contract.hpp
++++ C:\Users\Yu\Desktop\拟真\test_artifacts\vehicle_interface_audit_20261018\trace\include\wildos_ackermann_smac_trace\path_contract.hpp
+@@ -1,7 +1,7 @@
+ // SPDX-License-Identifier: Apache-2.0
+ #pragma once
+-#include "wildos_ackermann_smac/connector.hpp"
+-namespace wildos_ackermann_smac {
++#include "wildos_ackermann_smac_trace/connector.hpp"
++namespace wildos_ackermann_smac_trace {
+ // Same directional-window contract as GraphPathBridge's geometry admission.
+ // This checks geometry only; current-map footprint checks remain mandatory.
+ bool curvatureFeasible(const std::vector<Pose> & path, double resolution,

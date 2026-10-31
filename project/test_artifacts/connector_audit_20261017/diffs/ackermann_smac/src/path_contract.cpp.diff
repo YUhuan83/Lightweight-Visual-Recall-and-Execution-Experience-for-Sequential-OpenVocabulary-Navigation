@@ -1,0 +1,28 @@
+--- before/ackermann_smac/src/path_contract.cpp
++++ after/ackermann_smac/src/path_contract.cpp
+@@ -2,7 +2,25 @@
+ #include "wildos_ackermann_smac/path_contract.hpp"
+ #include <algorithm>
+ #include <cmath>
++#include <limits>
+ namespace wildos_ackermann_smac {
++double maneuverCost(const std::vector<Pose> & path) {
++  if (path.size() < 2) { return std::numeric_limits<double>::infinity(); }
++  double cost = 0., previous_dx = 0., previous_dy = 0.;
++  bool previous = false;
++  for (size_t i = 0; i < path.size(); ++i) {
++    if (!std::isfinite(path[i].x) || !std::isfinite(path[i].y) ||
++      !std::isfinite(path[i].yaw)) { return std::numeric_limits<double>::infinity(); }
++    if (!i) { continue; }
++    const double dx = path[i].x - path[i-1].x, dy = path[i].y - path[i-1].y;
++    const double length = std::hypot(dx, dy);
++    if (length <= 1e-9) { continue; }
++    cost += length;
++    if (previous && dx * previous_dx + dy * previous_dy < 0.) { cost += 3.; }
++    previous_dx = dx; previous_dy = dy; previous = true;
++  }
++  return previous ? cost : std::numeric_limits<double>::infinity();
++}
+ namespace {
+ double distance(const Pose & a, const Pose & b) { return std::hypot(a.x-b.x,a.y-b.y); }
+ double delta(double a,double b) { return std::remainder(a-b,2.*std::acos(-1.)); }

@@ -1,0 +1,27 @@
+--- before/nav2_adapter/launch/physical_vehicle_control.launch.py
++++ after/nav2_adapter/launch/physical_vehicle_control.launch.py
+@@ -40,7 +40,7 @@
+                 'filter_footprint_returns': 'true'}.items()),
+         Node(package='wildos_nav2_adapter', executable='graph_path_bridge',
+              name='wildos_graph_path_bridge', parameters=[{
+-                 'follow_path': False, 'carrier_model': 'ackermann',
++                 'follow_path': False, 'carrier_model': 'ackermann', 'require_source_control': True,
+                  'planner_id': 'CarLike', 'minimum_turning_radius': 8.0}],
+              output='screen'),
+         Node(package='wildos_nav2_adapter', executable='cmd_vel_to_control',
+@@ -48,11 +48,14 @@
+                  'enable': False, 'allow_reverse': True,
+                  'cmd_vel_topic': '/wildos/cmd_vel',
+                  'state_topic': '/vehicles/ego/sensors/state',
+-                 'control_topic': '/wildos/native_control',
++                 'control_topic': '/wildos/native_control_command',
++                 'control_protocol': 'wildos_source_control_v1',
+                  'minimum_turning_radius': 8.0, 'wheelbase': SBR_WHEELBASE,
+                  'max_speed': 0.0, 'overspeed_limit': 0.0}], output='screen'),
+         Node(package='wildos_nav2_adapter', executable='native_vehicle_control',
+              name='wildos_native_vehicle_control', parameters=[{
++                 'control_topic': '/wildos/native_control_command',
++                 'control_protocol': 'wildos_source_control_v1',
+                  'host': LaunchConfiguration('host'),
+                  'port': ParameterValue(LaunchConfiguration('port'), value_type=int),
+                  'vehicle_port': ParameterValue(

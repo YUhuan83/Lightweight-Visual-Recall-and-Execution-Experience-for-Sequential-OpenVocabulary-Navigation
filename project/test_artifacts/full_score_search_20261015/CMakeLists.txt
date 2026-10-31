@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.16)
+project(full_score_clearance_probe)
+set(CMAKE_CXX_STANDARD 17)
+find_package(ament_cmake REQUIRED)
+find_package(wildos_ackermann_smac REQUIRED)
+find_package(nav2_costmap_2d REQUIRED)
+add_executable(probe_clearance probe_clearance.cpp)
+ament_target_dependencies(probe_clearance wildos_ackermann_smac nav2_costmap_2d)

@@ -1,0 +1,24 @@
+num_cameras: 1
+parent_frame: spot1/odom
+cam_frame: spot1/realsense/{}_color_optical_frame
+lidar_frame: spot1/ouster/front/os_lidar
+object_mask_topic: /spot1/object_mask
+lidar_topic: /spot1/ouster/front/points_filtered
+
+triangulated_object_topic: /spot1/triangulated_object
+navigation_goal_topic: /spot1/raw_object_waypoint
+particle_viz_topic: /spot1/object_hypotheses
+
+qos_history_depth: 10
+syncsub_queue_size: 100
+syncsub_slop: 5.0
+max_views: 350
+min_lidar_points: 150
+min_view_distance: 1.0
+particle_generator_config:
+  num_particles: 1000
+  depth_range: [1.0, 100.0]
+  add_odom_drift: false
+use_mask_for_projection: true
+buffer_size: 10
+timer_duration: 0.2

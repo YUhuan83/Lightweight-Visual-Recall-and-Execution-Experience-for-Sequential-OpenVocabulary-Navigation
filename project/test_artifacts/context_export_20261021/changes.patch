@@ -1,0 +1,822 @@
+diff --git a/ackermann_smac/src/planner.cpp b/ackermann_smac/src/planner.cpp
+index 94d7847..7bd1894 100644
+--- a/ackermann_smac/src/planner.cpp
++++ b/ackermann_smac/src/planner.cpp
+@@ -218,6 +218,34 @@ nav_msgs::msg::Path Planner::createPlan(const geometry_msgs::msg::PoseStamped &
+     for (const auto & p:goal_curve.poses) { direct.poses.push_back(stamped(p,direct.header)); }
+     if (!validate(direct)) { direct.poses.clear(); }
+   }
++  // Diagnostic only (no behavior change): attribute reverse-first sections to
++  // the direct connection, the continuous-start connector or the Smac suffix.
++  // trial_20261021_183339 drove north for ~75 s with a goal ~25 m south; the
++  // recorder now also keeps /wildos/full_planned_path for the same split.
++  auto cusp_count = [](const nav_msgs::msg::Path & path) {
++    size_t count = 0; bool have = false; double px = 0., py = 0.;
++    for (size_t i = 1; i < path.poses.size(); ++i) {
++      const auto a = poseOf(path.poses[i-1]), b = poseOf(path.poses[i]);
++      const double dx = b.x - a.x, dy = b.y - a.y;
++      if (std::hypot(dx, dy) <= 1e-9) { continue; }
++      if (have && dx*px + dy*py < 0.) { ++count; }
++      px = dx; py = dy; have = true;
++    }
++    return count;
++  };
++  auto first_cosine = [&](const nav_msgs::msg::Path & path) {
++    if (path.poses.empty()) { return 1.; }
++    const auto start = poseOf(path.poses.front());
++    const double gx = goal.pose.position.x - start.x, gy = goal.pose.position.y - start.y;
++    const double norm = std::hypot(gx, gy);
++    for (size_t i = 1; i < path.poses.size(); ++i) {
++      const auto a = poseOf(path.poses[i-1]), b = poseOf(path.poses[i]);
++      const double dx = b.x - a.x, dy = b.y - a.y, length = std::hypot(dx, dy);
++      if (length <= 1e-9) { continue; }
++      return norm > 1e-9 ? (dx*gx + dy*gy) / (length*norm) : 1.;
++    }
++    return 1.;
++  };
+   // A short start connector can lead to an expensive suffix with many cusps.
+   // Compare feasible complete routes, bounded by the existing candidate/time caps.
+   std::vector<std::pair<double, nav_msgs::msg::Path>> feasible;
+@@ -251,7 +279,12 @@ nav_msgs::msg::Path Planner::createPlan(const geometry_msgs::msg::PoseStamped &
+     for(const auto & p:result.poses) { combined.push_back(poseOf(p)); }
+     if (curvatureFeasible(combined,resolution_,limits_.radius,limits_.bins) && validate(result)) {
+       const double cost = maneuverCost(combined);
+-      if (std::isfinite(cost)) { feasible.emplace_back(cost, std::move(result)); }
++      if (std::isfinite(cost)) {
++        RCLCPP_INFO(_logger,
++          "connector_candidate: cost=%.3f poses=%zu connector_poses=%zu cusps=%zu first_cos=%.3f",
++          cost, result.poses.size(), c.poses.size(), cusp_count(result), first_cosine(result));
++        feasible.emplace_back(cost, std::move(result));
++      }
+     }
+   }
+   std::stable_sort(feasible.begin(), feasible.end(), [](const auto & a, const auto & b) {
+@@ -301,17 +334,19 @@ nav_msgs::msg::Path Planner::createPlan(const geometry_msgs::msg::PoseStamped &
+       if (std::isfinite(direct_risk) && direct_cost<=completion_bound+1e-6 &&
+         direct_risk<=native_risk+1e-9) {
+         if (Clock::now()>=deadline) { break; }
+-        RCLCPP_INFO(_logger,"continuous_goal_selected: cost=%.6f risk=%.6f",direct_cost,direct_risk);
++        RCLCPP_INFO(_logger,"continuous_goal_selected: cost=%.6f risk=%.6f cusps=%zu first_cos=%.3f",
++          direct_cost,direct_risk,cusp_count(direct),first_cosine(direct));
+         return direct;
+       }
+       if (Clock::now()>=deadline) { break; }
+-      RCLCPP_INFO(_logger, "continuous_complete_selected: cost=%.6f candidates=%zu",
+-        candidate.first, feasible.size());
++      RCLCPP_INFO(_logger, "continuous_complete_selected: cost=%.6f candidates=%zu cusps=%zu first_cos=%.3f",
++        candidate.first, feasible.size(), cusp_count(candidate.second), first_cosine(candidate.second));
+       return candidate.second;
+     }
+   }
+   if (std::isfinite(direct_risk) && Clock::now()<deadline) {
+-    RCLCPP_INFO(_logger,"continuous_goal_selected: no safe lattice route, cost=%.6f",direct_cost);
++    RCLCPP_INFO(_logger,"continuous_goal_selected: no safe lattice route, cost=%.6f cusps=%zu first_cos=%.3f",
++      direct_cost,cusp_count(direct),first_cosine(direct));
+     return direct;
+   }
+   throw nav2_core::PlannerException("No safe bounded continuous-start plan");
+diff --git a/nav2_adapter/test/test_graph_path_bridge_routing.py b/nav2_adapter/test/test_graph_path_bridge_routing.py
+index c9091f9..d696532 100644
+--- a/nav2_adapter/test/test_graph_path_bridge_routing.py
++++ b/nav2_adapter/test/test_graph_path_bridge_routing.py
+@@ -12,6 +12,7 @@ from nav_msgs.msg import OccupancyGrid, Odometry, Path
+ from std_msgs.msg import String
+ 
+ from wildos_nav2_adapter.graph_path_bridge import GraphPathBridge
++from wildos_nav2_adapter.motion_path import motion_sections
+ 
+ 
+ def pose(x, y):
+@@ -317,6 +318,110 @@ class GraphBridgeRoutingTests(unittest.TestCase):
+         self.node.start_segment()
+         self.assertEqual(self.node.candidates[0][:3], (6., 0., 1.2))
+ 
++    def test_route_candidates_that_collide_with_vehicle_body_are_skipped(self):
++        # 093254 epoch 6: seven route samples passed the centre-cell check but
++        # the body footprint overlapped lethal cells, so every ComputePath
++        # failed serially. The endpoint filter must leave only free samples.
++        self.node.follow_enabled = False
++        self.node.route = route((0., 0.), (10., 0.))
++        self.node.route_endpoint = (10., 0.)
++        # Thick wall across the route end; x=8/10 have no clear body pose
++        # within goal tolerance while x=4 remains free.
++        for ix in range(18, 23):
++            for iy in range(9, 11):
++                self.node.grid.data[iy*40+ix] = 100
++        self.node.try_candidate = Mock()
++        self.node.start_segment()
++        xs = [candidate[0] for candidate in self.node.candidates]
++        self.assertTrue(xs)
++        self.assertTrue(all(x < 8. for x in xs), xs)
++
++    def test_clear_pose_within_goal_tolerance_keeps_colliding_endpoint(self):
++        # 093254 candidate 5: the exact graph pose overlapped a lethal cell but
++        # the planner stopped just short and produced a valid 62-pose path.
++        # The endpoint filter must not discard that usable sample.
++        self.node.follow_enabled = False
++        self.node.route = route((0., 0.), (10., 0.))
++        self.node.route_endpoint = (10., 0.)
++        for iy in range(8, 12):
++            self.node.grid.data[iy*40+23] = 100  # x=13, exact 10 m body only
++        self.node.try_candidate = Mock()
++        self.node.start_segment()
++        xs = [candidate[0] for candidate in self.node.candidates]
++        self.assertIn(10., xs)
++
++    def test_failed_goal_cache_is_scoped_to_exploration_and_start_region(self):
++        self.node.sync_failed_goal_scope('a:1')
++        self.node.remember_failed_goal((0., 0.), (10., 0.), 0.)
++        self.assertTrue(self.node.goal_recently_failed((0., 0.), (10., 0.), 0.))
++        self.assertFalse(self.node.goal_recently_failed((3., 0.), (10., 0.), 0.))
++        self.assertFalse(self.node.goal_recently_failed((0., 0.), (10., 0.), 1.))
++        self.node.sync_failed_goal_scope('b:2')
++        self.assertFalse(self.node.goal_recently_failed((0., 0.), (10., 0.), 0.))
++
++    def test_side_lookback_turns_back_once_near_large_structure(self):
++        self.node.query = 'house'
++        self.node.query_origin = (-30., 0.)
++        self.node.odom_received_at = time.monotonic()
++        self.node.input_freshness_issue = Mock(return_value=None)
++        self.node.local_freshness_issue = Mock(return_value=None)
++        self.node.relay_destination = Mock()
++        # A large occupied cluster 1-3 m around the vehicle, excluding its cell.
++        for ix in range(7, 14):
++            for iy in range(7, 14):
++                if (ix, iy) != (10, 10):
++                    self.node.grid.data[iy*40+ix] = 100
++        self.assertTrue(self.node.maybe_side_lookback((0., 0.), 0.))
++        self.assertTrue(self.node.lookback_active)
++        self.assertIsNotNone(self.node.expected)
++        self.assertLess(self.node.expected[0], 0.)
++        self.node.relay_destination.assert_called_once()
++
++    def test_route_filter_falls_back_when_all_candidates_rejected(self):
++        self.node.follow_enabled = False
++        self.node.route = route((0., 0.), (10., 0.))
++        self.node.route_endpoint = (10., 0.)
++        for ix in range(15, 20):
++            for iy in range(8, 13):
++                self.node.grid.data[iy*40+ix] = 100
++        self.node.plan_client = Mock()
++        self.node.plan_client.wait_for_server.return_value = True
++        self.node.try_candidate = Mock()
++        self.node.start_segment()
++        self.assertTrue(self.node.candidates)
++        self.assertEqual(self.node.last_status['status'], 'route_filter_fallback')
++
++    def test_visible_approach_uses_local_fallback_when_graph_has_no_candidate(self):
++        self.node.visible_approach_active = True
++        self.node.expected = (10., 0.)
++        self.node.route = route((0., 0.), (10., 0.))
++        self.node.route_endpoint = (10., 0.)
++        self.node.plan_client = Mock()
++        self.node.plan_client.wait_for_server.return_value = True
++        self.node.try_candidate = Mock()
++        with patch('wildos_nav2_adapter.graph_path_bridge.route_candidates',
++                   return_value=[]):
++            self.node.start_segment()
++        self.assertEqual(self.node.candidates[0][:2], (10., 0.))
++        self.assertEqual(self.node.last_status['status'],
++                         'visible_target_local_fallback')
++
++    def test_route_candidate_with_cached_empty_path_is_skipped(self):
++        from wildos_nav2_adapter.input_quality import stamp_ns
++        self.node.follow_enabled = False
++        self.node.route = route((0., 0.), (10., 0.))
++        self.node.route_endpoint = (10., 0.)
++        self.node.route_metadata[stamp_ns(self.node.route)] = dict(
++            exploration_id='a:1', complete=True, goal=[10., 0.])
++        self.node.sync_failed_goal_scope('a:1')
++        self.node.remember_failed_goal((0., 0.), (10., 0.), 0.)
++        self.node.try_candidate = Mock()
++        self.node.start_segment()
++        xs = [candidate[0] for candidate in self.node.candidates]
++        self.assertTrue(xs)
++        self.assertNotIn(10., xs)
++        self.assertIn(8., xs)
++
+     def test_repeated_stall_postpones_exploration_after_two_retries(self):
+         self.node.reject_exploration_route = Mock(return_value=True)
+         self.node.recovery_attempts = 0
+@@ -2480,6 +2585,106 @@ class ExplorationTargetHandoffTests(unittest.TestCase):
+         self.node.reject_exploration_route.assert_not_called()
+         self.node.send_motion_segment.assert_not_called()
+ 
++    def _zigzag_path(self, reversals):
++        # Alternate forward/backward along x so each edge flips direction.
++        path = Path()
++        path.header.frame_id = "spot1/odom"
++        path.header.stamp = rclpy.clock.Clock().now().to_msg()
++        path.poses = [pose(2. * (i % 2), 0.) for i in range(reversals + 1)]
++        return path
++
++    def _ready_for_checked_path(self):
++        self.node.follow_enabled = True
++        self.node.odom = SimpleNamespace(
++            pose=SimpleNamespace(pose=pose(0., 0.).pose), header=Mock())
++        self.node.route = route((0., 0.), (10., 0.))
++        self.node.route_endpoint = (10., 0.)
++        self.node.input_freshness_issue = Mock(return_value=None)
++        self.node.validate_path = Mock(return_value=None)
++        self.node.initial_tracking_issue = Mock(return_value=None)
++        self.node.candidate_failed = Mock()
++        self.node.send_motion_segment = Mock()
++
++    def test_excessive_motion_sections_rejects_the_candidate(self):
++        # 181516 epoch 6: a 10-section path shuffled inside 9 m for 180 s.
++        self._ready_for_checked_path()
++        path = self._zigzag_path(8)
++        self.assertEqual(len(motion_sections([(p.pose.position.x, p.pose.position.y)
++                                              for p in path.poses])), 8)
++        self.node.execute_checked_path(path, (10., 0.))
++        self.node.candidate_failed.assert_called_once_with("excessive_motion_sections")
++        self.assertEqual(self.node.motion_queue, [])
++        self.node.send_motion_segment.assert_not_called()
++
++    def test_four_section_maneuver_still_runs(self):
++        # 130635 escaped the start area with at most four sections.
++        self._ready_for_checked_path()
++        path = self._zigzag_path(4)
++        self.node.execute_checked_path(path, (10., 0.))
++        self.node.candidate_failed.assert_not_called()
++        self.node.send_motion_segment.assert_called_once()
++
++    def test_section_cap_does_not_restrict_object_or_memory_legs(self):
++        for attribute, value in (('expected', (5., 5.)), ('memory_goal', (5., 5.))):
++            with self.subTest(attribute):
++                self._ready_for_checked_path()
++                setattr(self.node, attribute, value)
++                path = self._zigzag_path(8)
++                self.node.execute_checked_path(path, (10., 0.))
++                self.node.candidate_failed.assert_not_called()
++                self.node.send_motion_segment.assert_called_once()
++                setattr(self.node, attribute, None)
++
++    def _ready_for_failure_streak(self):
++        self.node.follow_enabled = True
++        self.node.route = route((0., 0.), (10., 0.))
++        self.node.route_endpoint = (10., 0.)
++        self.node.input_freshness_issue = Mock(return_value=None)
++        self.node.candidates = [(5., 0., 0., 5.), (6., 0., 0., 6.)]
++        self.node.candidate_index = 0
++        self.node.try_candidate = Mock()
++        self.node.block_current_route = Mock()
++        self.node.reject_exploration_route = Mock()
++        self.node.status = Mock()
++        self.node.empty_path_streak = 0
++        self.node.empty_path_streak_epoch = self.node.epoch
++
++    def test_repeated_empty_paths_retire_blocked_exploration_route(self):
++        # 183339 epoch 4: 19 consecutive empty_path candidates burned ~33 s.
++        self._ready_for_failure_streak()
++        for _ in range(self.node.max_consecutive_empty_paths):
++            self.node.candidate_failed('empty_path')
++        self.node.block_current_route.assert_called_once()
++        self.node.reject_exploration_route.assert_called_once()
++        # The streak is cleared with the retirement; a later failure starts over.
++        self.node.candidate_failed('empty_path')
++        self.node.block_current_route.assert_called_once()
++
++    def test_empty_path_streak_resets_on_other_reason_and_new_epoch(self):
++        for reset in ('other_reason', 'epoch'):
++            with self.subTest(reset):
++                self._ready_for_failure_streak()
++                for _ in range(self.node.max_consecutive_empty_paths - 1):
++                    self.node.candidate_failed('empty_path')
++                if reset == 'other_reason':
++                    self.node.candidate_failed('wrong_start')
++                else:
++                    self.node.epoch += 1
++                for _ in range(self.node.max_consecutive_empty_paths - 1):
++                    self.node.candidate_failed('empty_path')
++                self.node.block_current_route.assert_not_called()
++
++    def test_object_and_memory_goals_keep_trying_after_empty_paths(self):
++        for attribute in ('expected', 'memory_goal'):
++            with self.subTest(attribute):
++                self._ready_for_failure_streak()
++                setattr(self.node, attribute, (5., 5.))
++                for _ in range(self.node.max_consecutive_empty_paths + 1):
++                    self.node.candidate_failed('empty_path')
++                self.node.block_current_route.assert_not_called()
++                self.node.try_candidate.assert_called()
++                setattr(self.node, attribute, None)
++
+ 
+ if __name__ == "__main__":
+     unittest.main()
+diff --git a/nav2_adapter/wildos_nav2_adapter/graph_path_bridge.py b/nav2_adapter/wildos_nav2_adapter/graph_path_bridge.py
+index 9a7bfa0..e7695a0 100644
+--- a/nav2_adapter/wildos_nav2_adapter/graph_path_bridge.py
++++ b/nav2_adapter/wildos_nav2_adapter/graph_path_bridge.py
+@@ -20,9 +20,9 @@ from rcl_interfaces.msg import SetParametersResult
+ from std_msgs.msg import String
+ from std_srvs.srv import Trigger
+ 
+-from .graph_route import (distance, distance_to_route, footprint_blockers, point_blockers,
+-                          freshness_issue, maneuver_cost, remaining_route, route_candidates,
+-                          validate_vehicle_path, validate_local_prefix,
++from .graph_route import (cell_cost, distance, distance_to_route, footprint_blockers,
++                          point_blockers, freshness_issue, maneuver_cost, remaining_route,
++                          route_candidates, validate_vehicle_path, validate_local_prefix,
+                           validate_ideal_path, validate_ideal_local_prefix)
+ from .input_quality import measurement_age, stamp_ns, valid_pose, valid_grid
+ from .continuous_path import ContinuousPath, trim_moving_path
+@@ -73,6 +73,8 @@ class GraphPathBridge(ExplorationCostComparison, NavigationTransactions, Continu
+         self.declare_parameter("ideal_path_corridor", 8.0)
+         self.declare_parameter("max_segment_length", 24.0)
+         self.declare_parameter("max_candidates", 10)
++        self.declare_parameter("max_motion_sections", 6)
++        self.declare_parameter("max_consecutive_empty_paths", 4)
+         self.declare_parameter("minimum_turning_radius", 0.0)
+         self.declare_parameter("heading_quantization_bins", 72)
+         self.declare_parameter("odom_timeout_sec", 1.0)
+@@ -99,6 +101,11 @@ class GraphPathBridge(ExplorationCostComparison, NavigationTransactions, Continu
+         self.ideal_path_corridor = float(self.get_parameter("ideal_path_corridor").value)
+         self.max_segment = float(self.get_parameter("max_segment_length").value)
+         self.max_candidates = int(self.get_parameter("max_candidates").value)
++        self.max_motion_sections = int(self.get_parameter("max_motion_sections").value)
++        self.max_consecutive_empty_paths = int(
++            self.get_parameter("max_consecutive_empty_paths").value)
++        self.empty_path_streak = 0
++        self.empty_path_streak_epoch = 0
+         self.minimum_turning_radius = float(
+             self.get_parameter("minimum_turning_radius").value)
+         self.odom_timeout = float(self.get_parameter("odom_timeout_sec").value)
+@@ -107,6 +114,9 @@ class GraphPathBridge(ExplorationCostComparison, NavigationTransactions, Continu
+         self.compute_path_timeout = float(self.get_parameter("compute_path_timeout_sec").value)
+         self.tracking_error_limit = float(self.get_parameter("tracking_error_limit").value)
+         if (not math.isfinite(self.max_segment) or self.max_segment < 4 or self.max_candidates < 1
++                or self.max_motion_sections < 1 or self.max_motion_sections > 64
++                or self.max_consecutive_empty_paths < 1
++                or self.max_consecutive_empty_paths > 32
+                 or (self.carrier_model == "ackermann" and
+                     (not math.isfinite(self.minimum_turning_radius)
+                      or self.minimum_turning_radius <= 0))
+@@ -209,6 +219,15 @@ class GraphPathBridge(ExplorationCostComparison, NavigationTransactions, Continu
+         self.candidate_index = 0
+         self.failure_reasons = []
+         self.normal_best = None
++        # Bounded no-path memory, scoped to one GraphNav exploration identity
++        # and a 2 m start region. New owners or a moved vehicle retry the goal.
++        self.failed_goal_scope = None
++        self.failed_goals = {}
++        self.active_plan_start = None
++        self.lookback_active = False
++        self.lookback_started_at = 0.
++        self.lookback_last_at = 0.
++        self.lookback_last_pose = None
+         self.last_status = {"status": "idle", "source": "graphnav"}
+         self.init_observation()
+         self.init_execution_feedback()
+@@ -346,6 +365,120 @@ class GraphPathBridge(ExplorationCostComparison, NavigationTransactions, Continu
+             return point_blockers(grid, position)
+         return footprint_blockers(grid, position, heading)
+ 
++    def vehicle_pose_feasible(self, position, heading, tolerance=1.0):
++        """Can the planner finish at/near this graph pose with the real body?
++
++        The planner tolerance allows the returned path to stop short of the
++        requested endpoint. Rejecting a goal solely because its exact footprint
++        collides would discard usable samples (093254 candidate 5 succeeded
++        from a nearby pose). Search the same bounded neighbourhood instead.
++        """
++        if not self.pose_blockers(self.grid, position, heading):
++            return True
++        step = .2
++        limit = int(round(tolerance / step))
++        for dx in range(-limit, limit + 1):
++            for dy in range(-limit, limit + 1):
++                offset = (dx * step, dy * step)
++                if offset == (0., 0.) or math.hypot(*offset) > tolerance + 1e-9:
++                    continue
++                if not self.pose_blockers(
++                        self.grid, (position[0] + offset[0], position[1] + offset[1]), heading):
++                    return True
++        return False
++
++    def failed_goal_key(self, start, goal, heading):
++        # 0.5 m goal/heading buckets and a 2 m start region. A moved vehicle or
++        # a new exploration owner must be allowed to retry a previously failed
++        # endpoint; this is not a time-based or permanent blacklist.
++        return (int(round(goal[0] / .5)), int(round(goal[1] / .5)),
++                int(round(heading / .5)),
++                int(round(start[0] / 2.)), int(round(start[1] / 2.)))
++
++    def sync_failed_goal_scope(self, identity):
++        if identity != self.failed_goal_scope:
++            self.failed_goal_scope = identity
++            self.failed_goals.clear()
++
++    def goal_recently_failed(self, start, goal, heading):
++        return self.failed_goal_key(start, goal, heading) in self.failed_goals
++
++    def remember_failed_goal(self, start, goal, heading):
++        key = self.failed_goal_key(start, goal, heading)
++        self.failed_goals.pop(key, None)
++        self.failed_goals[key] = True
++        while len(self.failed_goals) > 128:
++            self.failed_goals.pop(next(iter(self.failed_goals)))
++
++    def maybe_side_lookback(self, start, heading):
++        """Turn back once after passing a nearby large structure.
++
++        The front camera cannot see a house that is beside/behind the car.
++        This is a bounded observation maneuver, not a target confirmation:
++        it is skipped around memory/confirmed/visible targets and recovers by
++        requesting a fresh GraphNav route after the look-back goal is reached.
++        """
++        if (self.query is None
++                or (self.expected is not None and not self.visible_approach_active)
++                or self.memory_goal is not None
++                or self.memory_selecting or self.confirmed_route_goal is not None
++                or self.object_found or self.query_reset_pending or self.grid is None
++                or self.query_origin is None
++                or distance(start, self.query_origin) < 20.
++                or self.get_clock().now().nanoseconds - self.query_started_ns < 20_000_000_000
++                or time.monotonic() - self.lookback_last_at < 20.
++                or (self.lookback_last_pose is not None
++                    and distance(start, self.lookback_last_pose) < 10.)):
++            return False
++        resolution = self.grid.info.resolution
++        occupied = 0
++        sum_x = sum_y = 0.
++        for dx in range(-12, 13):
++            for dy in range(-12, 13):
++                radial = math.hypot(dx, dy) * resolution
++                if resolution <= 0 or radial < 1. or radial > 3.:
++                    continue
++                x = start[0] + dx * resolution
++                y = start[1] + dy * resolution
++                if cell_cost(self.grid, x, y) >= 99:
++                    occupied += 1
++                    sum_x += x
++                    sum_y += y
++        if occupied < 25:
++            return False
++        cluster_bearing = math.atan2(sum_y/occupied-start[1],
++                                     sum_x/occupied-start[0])
++        if self.visible_approach_active:
++            # A large structure beside the car is more useful for the current
++            # query than continuing an unreachable visible-target approach.
++            # Block that target briefly and give exploration/look-back a turn.
++            self.release_visible_approach('side_lookback_preempt')
++            if self.visible_approach_active:
++                return False
++        back = heading + math.pi
++        for distance_back in (6., 5.):
++            point = (start[0] + distance_back * math.cos(back),
++                     start[1] + distance_back * math.sin(back))
++            if (cell_cost(self.grid, *point) >= 99
++                    or self.pose_blockers(self.grid, point, cluster_bearing)):
++                continue
++            self.lookback_active = True
++            self.lookback_started_at = time.monotonic()
++            self.lookback_last_at = self.lookback_started_at
++            self.lookback_last_pose = start
++            self.visible_hint = dict(
++                query=self.query, frame='spot1/odom',
++                observation_stamp_ns=self.get_clock().now().nanoseconds,
++                point=list(point), bearing=cluster_bearing, evidence='bearing_only',
++                position_confirmed=False, search_confirmed=False)
++            activated = self.activate_visible_approach()
++            if activated:
++                self.status('side_lookback', goal=list(point),
++                            requires_visual_confirmation=False)
++                return True
++            self.lookback_active = False
++        return False
++
+     def validate_path(self, points, headings, route, grid, target, *, start=None,
+                       target_heading=None):
+         if self.carrier_model == "ideal_point":
+@@ -486,6 +619,8 @@ class GraphPathBridge(ExplorationCostComparison, NavigationTransactions, Continu
+         self.waypoint_pub.publish(output)
+ 
+     def monitor_inputs(self):
++        if self.check_visible_approach_deadline():
++            return
+         if self.hold_revision:
+             self.publish_execution_hold(self.follow_hold)
+         if self.follow_quarantine:
+@@ -1190,12 +1325,49 @@ class GraphPathBridge(ExplorationCostComparison, NavigationTransactions, Continu
+             # Reuse the cancellation quarantine: clearing local state is not
+             # proof that an accepted controller action has stopped.
+             choice = self.frontier_choice_for_retirement(data)
++            replacement = self.replacement_route_for_retirement(identity)
+             self.reset(preserve_execution_corridor=same_frame)
+             if choice is not None:
+                 choice['epoch'] = self.epoch
+                 self.frontier_choice = choice
+             self.status('exploration_retired', exploration_id=identity,
+                         retirement_reason=data.get('reason'))
++            if replacement is not None:
++                # reset() retires the old action and clears old planning state.
++                # Re-admit the newer owner through the normal route contract;
++                # start_segment remains fenced by follow_quarantine until its
++                # terminal result and measured stop barrier are observed.
++                self.on_route(replacement)
++
++    def replacement_route_for_retirement(self, retired_identity):
++        """Snapshot a fresh, already-published route owned by another intent.
++
++        A frontier_resolved retirement can race the new owner's route callback.
++        Keep only the route message across reset; never carry its old action,
++        candidate queue, or execution authorization across the owner boundary.
++        """
++        route = self.latest_route
++        if (route is None or self.query_reset_pending or self.object_found
++                or self.memory_selecting or self.expected is not None
++                or self.memory_goal is not None or self.confirmed_approach_failure is not None
++                or self.visible_reobserve_until is not None):
++            return None
++        metadata = self.exploration_metadata(route)
++        if metadata is None:
++            return None
++        identity = metadata.get('exploration_id')
++        stamp = stamp_ns(route)
++        age = (self.get_clock().now().nanoseconds-stamp)*1e-9
++        if (not identity or identity == retired_identity
++                or identity in self.retired_explorations
++                or stamp < max(self.query_started_ns, self.minimum_route_stamp)
++                or stamp <= 0 or not -.2 <= age <= 5.
++                or not route.poses or self.odom is None or self.grid is None
++                or route.header.frame_id != self.odom.header.frame_id
++                or route.header.frame_id != self.grid.header.frame_id
++                or any(not all(map(math.isfinite, xy(p.pose))) for p in route.poses)):
++            return None
++        return deepcopy(route)
+ 
+     def on_route(self, message):
+         if self.object_found:
+@@ -1256,11 +1428,11 @@ class GraphPathBridge(ExplorationCostComparison, NavigationTransactions, Continu
+             incoming_complete = True
+             if self.expected is not None and distance(endpoint, self.expected) > 7.0:
+                 return
++        self.latest_route = message
++        self.latest_route_complete = incoming_complete
+         selected_choice = self.frontier_choice
+         if self.wait_for_frontier_choice(message, metadata):
+             return
+-        self.latest_route = message
+-        self.latest_route_complete = incoming_complete
+         if time.monotonic() - self.route_accept_log_at >= 2.0:
+             self.route_accept_log_at = time.monotonic()
+             self.get_logger().info("GraphNav route accepted: " + json.dumps({
+@@ -1482,9 +1654,25 @@ class GraphPathBridge(ExplorationCostComparison, NavigationTransactions, Continu
+                         blocked_samples=blocked)
+             return
+         points = self.current_route_points()
++        metadata = self.exploration_metadata(self.route)
++        self.sync_failed_goal_scope(metadata.get('exploration_id') if metadata else None)
++        if (self.lookback_active
++                and time.monotonic()-self.lookback_started_at > 15.):
++            self.release_visible_approach('side_lookback_timeout')
++            return
++        if self.maybe_side_lookback(start, yaw(self.odom.pose.pose)):
++            return
+         candidates = route_candidates(
+             start, points, self.grid, maximum=self.max_segment,
+             limit=self.max_candidates)
++        # Memory selection deliberately probes remembered views, including
++        # blocked ones, so its own rejection/switch logic must still see them.
++        filter_route = (not self.memory_selecting and self.memory_goal is None
++                        and self.grid is not None and self.route is not None
++                        and self.grid.header.frame_id == self.route.header.frame_id)
++        route_skipped = 0
++        cached_skipped = 0
++        route_rejected = []
+         self.candidates = []
+         if observation_heading is not None and distance(start, endpoint) <= self.max_segment:
+             self.candidates.append((*endpoint, observation_heading, distance(start, endpoint)))
+@@ -1496,8 +1684,15 @@ class GraphPathBridge(ExplorationCostComparison, NavigationTransactions, Continu
+             if self.memory_goal is not None and distance(candidate[:2], self.expected) < 1e-6:
+                 self.candidates.extend(self.memory_terminal_candidates(start, candidate[:2]))
+                 continue
+-            self.candidates.append(candidate)
+             x, y, heading, arc = candidate
++            if filter_route and self.goal_recently_failed(start, (x, y), heading):
++                cached_skipped += 1
++                route_rejected.append(candidate)
++            elif filter_route and not self.vehicle_pose_feasible((x, y), heading):
++                route_skipped += 1
++                route_rejected.append(candidate)
++            else:
++                self.candidates.append(candidate)
+             # A coarse graph corner is a position constraint, not a required
+             # vehicle orientation. Its outgoing edge can force a Dubins loop
+             # at a short segment endpoint. Also try the approach bearing;
+@@ -1505,7 +1700,27 @@ class GraphPathBridge(ExplorationCostComparison, NavigationTransactions, Continu
+             bearing = math.atan2(y - start[1], x - start[0])
+             difference = math.atan2(math.sin(bearing - heading), math.cos(bearing - heading))
+             if abs(difference) > 0.1:
+-                self.candidates.append((x, y, bearing, arc))
++                alternative = (x, y, bearing, arc)
++                if filter_route and self.goal_recently_failed(start, (x, y), bearing):
++                    cached_skipped += 1
++                    route_rejected.append(alternative)
++                elif filter_route and not self.vehicle_pose_feasible((x, y), bearing):
++                    route_skipped += 1
++                    route_rejected.append(alternative)
++                else:
++                    self.candidates.append(alternative)
++        if cached_skipped:
++            self.get_logger().info(
++                "Skipped %d cached failed route candidates" % cached_skipped)
++        if route_skipped:
++            self.get_logger().info(
++                "Skipped %d route candidates with no clear goal pose" % route_skipped)
++        if not self.candidates and route_rejected:
++            # Never strand the vehicle at a start/corner where every sample
++            # failed the endpoint pre-filter. Retry the original bounded list;
++            # the planner's collision/curvature checks still decide admission.
++            self.candidates = list(route_rejected)
++            self.status('route_filter_fallback', rejected=len(route_rejected))
+         if self.memory_selecting:
+             self.memory_full_check = getattr(self, 'route_complete', True) and distance(start, endpoint) <= self.max_segment
+             if self.memory_full_check:
+@@ -1520,6 +1735,24 @@ class GraphPathBridge(ExplorationCostComparison, NavigationTransactions, Continu
+         self.failure_reasons = []
+         self.normal_best = None
+         if not self.candidates:
++            # A visible target is only an observation step, not a GraphNav
++            # route commitment. If the graph has no free sample at that point,
++            # still try one bounded local ComputePath to the accepted point;
++            # the normal collision/curvature/freshness checks remain active.
++            if (self.visible_approach_active and self.expected is not None
++                    and distance(self.expected, endpoint) <= 2.0):
++                heading = math.atan2(self.expected[1]-start[1],
++                                     self.expected[0]-start[0])
++                self.candidates = [(*self.expected, heading,
++                                    distance(start, self.expected))]
++                if not self.plan_client.wait_for_server(timeout_sec=0.1):
++                    self.status("planner_unavailable")
++                    return
++                self.status('visible_target_local_fallback',
++                            goal=list(self.expected),
++                            requires_visual_confirmation=True)
++                self.try_candidate()
++                return
+             if self.extending_path:
+                 self.extension_failed('no_extension_candidate')
+                 return
+@@ -1601,6 +1834,7 @@ class GraphPathBridge(ExplorationCostComparison, NavigationTransactions, Continu
+         serial = self.active_plan_serial = self.plan_request_serial
+         self.pending = True
+         self.plan_request_started_at = time.monotonic()
++        self.active_plan_start = xy(self.odom.pose.pose) if self.odom is not None else None
+         try:
+             self.get_logger().info("ComputePath request sent: epoch=%d candidate=%d request=%d goal=(%.2f, %.2f)" %
+                                    (epoch, index, serial, x, y))
+@@ -1618,6 +1852,17 @@ class GraphPathBridge(ExplorationCostComparison, NavigationTransactions, Continu
+     def candidate_failed(self, reason):
+         self.get_logger().warning("ComputePath candidate failed: epoch=%d candidate=%d reason=%s" %
+                                   (self.epoch, self.candidate_index, reason))
++        if (reason == 'empty_path' and self.active_plan_start is not None
++                and self.candidate_index < len(self.candidates)):
++            goal = self.candidates[self.candidate_index]
++            self.remember_failed_goal(self.active_plan_start, goal[:2], goal[2])
++        if reason == 'empty_path':
++            if self.empty_path_streak_epoch != self.epoch:
++                self.empty_path_streak = 0
++                self.empty_path_streak_epoch = self.epoch
++            self.empty_path_streak += 1
++        else:
++            self.empty_path_streak = 0
+         self.pending = False
+         self.plan_handle = None
+         self.plan_request_started_at = None
+@@ -1626,6 +1871,27 @@ class GraphPathBridge(ExplorationCostComparison, NavigationTransactions, Continu
+             self.advance_frontier_comparison(reason)
+             return
+         self.failure_reasons.append(reason)
++        if (reason == 'empty_path'
++                and self.empty_path_streak >= self.max_consecutive_empty_paths
++                and self.follow_enabled and self.frontier_comparison is None
++                and self.expected is None and self.memory_goal is None
++                and self.memory_active is None and not self.memory_selecting):
++            # 183339 epoch 4: 19 consecutive empty_path candidates burned
++            # ~33 s while the graph route was blocked. A few independent
++            # failures are enough to retire this route instead of retrying
++            # every sample; no collision or freshness check is relaxed.
++            self.empty_path_streak = 0
++            self.motion_queue = []
++            self.pending = False
++            self.block_current_route()
++            self.reject_exploration_route()
++            self.status("no_vehicle_path",
++                        goal=(list(self.route_endpoint)
++                              if self.route_endpoint is not None else None),
++                        candidates=len(self.candidates),
++                        reasons=list(self.failure_reasons),
++                        candidate_goals=[list(c[:3]) for c in self.candidates])
++            return
+         if self.normal_best is not None:
+             path, target, _ = self.normal_best
+             self.normal_best = None
+@@ -1711,6 +1977,10 @@ class GraphPathBridge(ExplorationCostComparison, NavigationTransactions, Continu
+         headings = [yaw(p.pose) for p in path.poses]
+         target = self.candidates[index][:2]
+         route = self.current_route_points()
++        if self.visible_approach_active and self.expected is not None:
++            # The local observation fallback is validated against its own
++            # bounded segment; the graph may not contain the target point.
++            route = [xy(self.odom.pose.pose), tuple(self.expected)]
+         reason = self.validate_path(points, headings,
+             [xy(self.odom.pose.pose)] + route, self.grid, target,
+             start=xy(self.odom.pose.pose),
+@@ -1727,6 +1997,9 @@ class GraphPathBridge(ExplorationCostComparison, NavigationTransactions, Continu
+             self.candidate_failed(reason)
+             return
+         self.full_path_pub.publish(path)
++        # A valid path proves at least one route sample is reachable; a later
++        # failure starts a new streak rather than retiring the route.
++        self.empty_path_streak = 0
+         if self.memory_selecting:
+             self.record_memory_path(path, points, headings)
+             return
+@@ -1805,6 +2078,21 @@ class GraphPathBridge(ExplorationCostComparison, NavigationTransactions, Continu
+                     return
+                 self.send_motion_segment(replacement=sections)
+                 return
++        if (self.follow_enabled and self.carrier_model != "ideal_point"
++                and not self.memory_selecting and self.memory_goal is None
++                and self.expected is None and not self.recovering
++                and len(sections) > self.max_motion_sections):
++            # 181516 epoch 6: a 10-section exploration path shuffled the car
++            # inside 9 m for the whole 180 s budget. A plan that needs this
++            # many direction changes is not progress; refuse it and let the
++            # route owner try another candidate or retire the route. No
++            # collision, freshness or curvature check is relaxed here.
++            self.get_logger().warning(
++                "Rejecting exploration path with %d motion sections (limit %d)" %
++                (len(sections), self.max_motion_sections))
++            self.motion_queue = []
++            self.candidate_failed("excessive_motion_sections")
++            return
+         self.motion_queue = sections
+         self.send_motion_segment()
+ 
+diff --git a/nav2_adapter/wildos_nav2_adapter/motion_path.py b/nav2_adapter/wildos_nav2_adapter/motion_path.py
+index 3950d71..a85f4f5 100644
+--- a/nav2_adapter/wildos_nav2_adapter/motion_path.py
++++ b/nav2_adapter/wildos_nav2_adapter/motion_path.py
+@@ -36,6 +36,28 @@ def motion_sections(points):
+     return list(zip(boundaries, boundaries[1:]))
+ 
+ 
++def first_section_away(points, target, away_threshold=2.0):
++    """Report whether the first motion section moves away from ``target``.
++
++    A continuous-start connector can open with a section that heads away from
++    the goal before the searched suffix turns back.  trial_20261021_183339:
++    the goal was ~25 m south, yet the dispatched first sections drove north
++    (y=+0.2) for the first ~75 s.  This function only reports the geometry;
++    callers stay responsible for whether to reject or accept the plan.
++    """
++    if away_threshold <= 0 or len(points) < 2 or len(target) != 2:
++        return False
++    sections = motion_sections(points)
++    if not sections:
++        return False
++    first, last = sections[0]
++    if last <= first:
++        return False
++    before = math.hypot(points[first][0] - target[0], points[first][1] - target[1])
++    after = math.hypot(points[last][0] - target[0], points[last][1] - target[1])
++    return after > before + away_threshold
++
++
+ def maneuver_reached(position, heading, target, target_heading,
+                      position_tolerance=0.3, heading_tolerance=0.4):
+     """Independently confirm the cusp before sending the next direction."""
+diff --git a/tools/test_wildos_console.py b/tools/test_wildos_console.py
+index 009c04f..2cc7e4b 100644
+--- a/tools/test_wildos_console.py
++++ b/tools/test_wildos_console.py
+@@ -243,7 +243,10 @@ class ConsoleTests(unittest.TestCase):
+         for topic in ('/spot1/graphnav_planner/rejected_route_endpoint',
+                       '/spot1/traversal_feedback', '/spot1/graphnav_planner/route_status',
+                       '/spot1/graphnav_planner/vehicle_choice',
+-                      '/spot1/graphnav_planner/selection_ack'):
++                      '/spot1/graphnav_planner/selection_ack',
++                      # Full planner output (connector + suffix) is required to
++                      # separate them when diagnosing reverse-first sections.
++                      '/wildos/full_planned_path'):
+             self.assertIn(topic, launch.call_args.args[0])
+         self.assertEqual(backend.node.set_bool.call_args_list[-1].args,
+                          ('/wildos_graph_path_bridge', 'follow_path', True))
+diff --git a/tools/wildos_console.py b/tools/wildos_console.py
+index e496b2c..10e8389 100644
+--- a/tools/wildos_console.py
++++ b/tools/wildos_console.py
+@@ -262,7 +262,8 @@ class PhysicalBackend:
+         topics = ['/spot1/object_search/query', '/spot1/object_mask', '/spot1/object_localization',
+                   '/spot1/object_confirmation', '/spot1/remembered_object_candidates',
+                   '/spot1/visible_target_approach', '/wildos/memory_selection', '/wildos/plan_status',
+-                  '/wildos/planned_path', '/wildos/native_control_status', '/wildos/control_status',
++                  '/wildos/planned_path', '/wildos/full_planned_path',
++                  '/wildos/native_control_status', '/wildos/control_status',
+                   '/wildos/cmd_vel', '/wildos/cmd_vel_stamped', '/wildos/native_control', '/wildos/native_control_command',
+                   '/wildos/execution_feedback',
+                   '/tf', '/spot1/odom', '/spot1/measurement_timing', '/spot1/local_terrain',

@@ -1,0 +1,14 @@
+{
+  "status": "blocked",
+  "inference_ran": false,
+  "stage": "preflight",
+  "queries": [
+    "stop sign"
+  ],
+  "offline": true,
+  "calibration": "uncalibrated",
+  "scope": "2D dense similarity candidates only; not object confidence, 3D or navigation",
+  "error_type": "RuntimeError",
+  "error": "Source lacks patched local_files_only AutoModel/AutoProcessor API; use patched source-root",
+  "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\Yu\\Desktop\\拟真\\vocabulary_query\\query.py\", line 168, in main\n    report.update(inspect_inputs(source, root))\n                  ~~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"C:\\Users\\Yu\\Desktop\\拟真\\vocabulary_query\\query.py\", line 70, in inspect_inputs\n    raise RuntimeError(\"Source lacks patched local_files_only AutoModel/AutoProcessor API; use patched source-root\")\nRuntimeError: Source lacks patched local_files_only AutoModel/AutoProcessor API; use patched source-root\n"
+}

@@ -1,0 +1,153 @@
+{
+  "zip": "nizhen_rural.zip",
+  "zip_sha256": "723a1538d49ce97124b5384b0a46c03e04937ca18079471c4e784cd2fa9f5ea0",
+  "zip_bytes": 1722215,
+  "objects": 11,
+  "route_length_m": 166.34603961472916,
+  "max_grade": 0.04999535142068317,
+  "meshes": {
+    "concrete_entry": {
+      "triangles": 1080,
+      "bounds_local": {
+        "min": [
+          -0.6447062506738661,
+          -14.946876140133112,
+          -0.04
+        ],
+        "max": [
+          43.23876863769491,
+          1.6805814024741692,
+          1.9782023372784667
+        ]
+      }
+    },
+    "cobble_bedding": {
+      "triangles": 1200,
+      "bounds_local": {
+        "min": [
+          42.77683968639054,
+          -16.609121466879927,
+          1.9382023372784667
+        ],
+        "max": [
+          93.19697714977258,
+          -10.70044596111678,
+          2.4270025872966485
+        ]
+      }
+    },
+    "concrete_exit": {
+      "triangles": 1716,
+      "bounds_local": {
+        "min": [
+          92.54265325009811,
+          -14.240482717185108,
+          2.3559959999999966
+        ],
+        "max": [
+          152.7883532581795,
+          27.75907863781949,
+          2.441355826135897
+        ]
+      }
+    },
+    "cobbles_merged": {
+      "triangles": 30000,
+      "bounds_local": {
+        "min": [
+          42.78025742203133,
+          -16.606122959238924,
+          1.9782896001188255
+        ],
+        "max": [
+          93.19349027655625,
+          -10.70393219818496,
+          2.4545672309727653
+        ]
+      }
+    },
+    "timber_fences": {
+      "triangles": 2664,
+      "bounds_local": {
+        "min": [
+          15.785049653010836,
+          -18.117031934696367,
+          0.6639103935207361
+        ],
+        "max": [
+          148.20342064856163,
+          24.092801218797522,
+          3.5411851981195794
+        ]
+      }
+    },
+    "water_tank": {
+      "triangles": 2444,
+      "bounds_local": {
+        "min": [
+          -0.96,
+          -0.96,
+          0
+        ],
+        "max": [
+          1.12,
+          0.96,
+          2.2
+        ]
+      }
+    },
+    "barrel": {
+      "triangles": 640,
+      "bounds_local": {
+        "min": [
+          -0.33,
+          -0.33,
+          0
+        ],
+        "max": [
+          0.33,
+          0.33,
+          0.898
+        ]
+      }
+    },
+    "stone_trough": {
+      "triangles": 60,
+      "bounds_local": {
+        "min": [
+          -0.8,
+          -0.4,
+          0.0
+        ],
+        "max": [
+          0.8,
+          0.4,
+          0.64
+        ]
+      }
+    }
+  },
+  "packaged_files": [
+    "art/shapes/nizhen_rural/nz_concrete.color.png",
+    "art/shapes/nizhen_rural/nz_mortar.color.png",
+    "art/shapes/nizhen_rural/nz_wood.color.png",
+    "art/shapes/nizhen_rural/nz_zinc.color.png",
+    "art/shapes/nizhen_rural/nz_iron.color.png",
+    "art/shapes/nizhen_rural/nz_barrel.color.png",
+    "art/shapes/nizhen_rural/nz_stone_0.color.png",
+    "art/shapes/nizhen_rural/nz_stone_1.color.png",
+    "art/shapes/nizhen_rural/nz_stone_2.color.png",
+    "art/shapes/nizhen_rural/nz_stone_3.color.png",
+    "art/shapes/nizhen_rural/main.materials.json",
+    "art/shapes/nizhen_rural/concrete_entry.dae",
+    "art/shapes/nizhen_rural/cobble_bedding.dae",
+    "art/shapes/nizhen_rural/concrete_exit.dae",
+    "art/shapes/nizhen_rural/cobbles_merged.dae",
+    "art/shapes/nizhen_rural/timber_fences.dae",
+    "art/shapes/nizhen_rural/water_tank.dae",
+    "art/shapes/nizhen_rural/barrel.dae",
+    "art/shapes/nizhen_rural/stone_trough.dae",
+    "art/prefabs/nizhen_rural/course.prefab.json",
+    "art/shapes/nizhen_rural/ASSET_LICENSE.txt"
+  ]
+}

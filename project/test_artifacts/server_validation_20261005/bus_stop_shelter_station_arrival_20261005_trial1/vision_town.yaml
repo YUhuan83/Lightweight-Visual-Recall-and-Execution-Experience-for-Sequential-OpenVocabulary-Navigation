@@ -1,0 +1,73 @@
+adaptor_ckpt_path: /home/ly/ckpts/siglip2
+adaptor_version: siglip2
+cam_frame: spot1/realsense/{}_color_optical_frame
+camera_img_topic: /spot1/realsense/{}/color/image_raw
+camera_info_topic: /spot1/realsense/{}/color/camera_info
+cams_inverted: false
+ckpt_root: /home/ly/ckpts
+compute_paths: true
+default_max_score: 0.3
+frontier_ckpt: frontier_head.ckpt
+frontier_opening_kernel_size: 20
+frontier_threshold: 0.6
+frontier_w: 2.0
+frontiers_range: 9.0
+goal_w: 3.0
+graph_viz_topic: /spot1/nav_graph_viz
+heading_sim_thresh: 0.0
+local_files_only: true
+min_frontier_separation: 0.75
+model_precision: FP16
+model_version: c-radio_v3-b_half.pth.tar
+model_viz_topic: /spot1/model_visualization
+navigation_graph_topic: /spot1/nav_graph_perception
+num_angular_bins: 16
+num_cameras: 1
+object_mask_topic: /spot1/object_mask
+object_search_config:
+  mask_threshold: 0.08
+  obj_frontier_score: 0.9
+  obj_trav_score: 0.9
+  pixel_level_seg: false
+  text_queries:
+  - bus stop shelter
+  - gas station
+  - traffic light
+object_search_memory_capture_ttl: 5.0
+odometry_topic: /spot1/odom
+parent_frame: spot1/odom
+publish_legacy_remembered_goal: false
+qos_history_depth: 1
+radio_dim: 768
+reach_in_2D: true
+reach_scale: 0.25
+reachability_w: 2.0
+score_ring_topic: /spot1/score_rings
+scored_navgraph_topic: /spot1/scored_nav_graph
+scoring_method: MULTIPLICATIVE
+static_scale_factor: 0.75
+std_for_default_scores: 80.0
+std_for_frontier_heading: null
+syncsub_queue_size: 10
+syncsub_slop: 0.2
+tf_lookup_config:
+  buffer_size: 1
+  cache_time: 10
+  clear_buffer_on_process: true
+  lookup_timeout: 0
+  qos_history_depth: 100
+  spin_thread: false
+  timer_duration: 0.1
+  wait_for_oldest: false
+traversability_ckpt: trav_head.ckpt
+traversability_class: default
+traversability_threshold: 0.9
+use_naclip: true
+use_summary_for_spatial: true
+valid_geofrontiers_topic: /spot1/within_range_geofrontiers
+visual_memory_enabled: true
+visual_memory_map_enabled: true
+visual_memory_map_id: town-session-20261003
+visual_memory_map_path: ':memory:'
+visual_memory_path: ':memory:'
+visual_memory_map_save_images: false

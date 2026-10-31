@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='utf-8'?>
+<sdf version="1.8">
+  <model name="ph_rock_moss_set_01">
+    <static>true</static>
+    <link name="body">
+      <collision name="proxy0">
+        <pose>2.573932856321335 -1.8251632452011108 0.7638402283191681 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>2.1259822249412537 2.7573031187057495 1.2618526816368103</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name="proxy1">
+        <pose>0.10971271991729736 -1.975050449371338 0.6911414563655853 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>1.8173227906227112 2.9986637830734253 1.205450713634491</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name="proxy2">
+        <pose>-2.6747452318668365 -2.0216095447540283 0.8841599225997925 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>2.127629339694977 1.9647413492202759 1.768319845199585</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name="proxy3">
+        <pose>2.9480106234550476 1.7571690082550049 0.7999456077814102 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>2.108582615852356 2.0795856714248657 1.0996944606304169</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name="proxy4">
+        <pose>-0.033645570278167725 1.7858963012695312 0.826346680521965 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>2.6553808450698853 3.263720393180847 1.261991173028946</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name="proxy5">
+        <pose>-2.8834858536720276 1.789980173110962 0.7407509684562683 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>2.237632155418396 3.3688043355941772 1.4726980924606323</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="scan">
+        <geometry>
+          <mesh>
+            <uri>model://ph_rock_moss_set_01/visual.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+  </model>
+</sdf>

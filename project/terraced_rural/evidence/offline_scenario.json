@@ -1,0 +1,17 @@
+{
+  "name": "tc_drive_b45534dbfc3f4644bb0b0af2243a8145",
+  "description": "Standalone countryside: native D-Series, no overlay objects",
+  "difficulty": 0,
+  "authors": "BeamNGpy",
+  "lapConfig": [],
+  "forceNoCountDown": true,
+  "vehicles": {
+    "nc_ego": {
+      "playerUsable": true,
+      "startFocus": true
+    }
+  },
+  "prefabs": [
+    "levels/terraced_countryside/scenarios/tc_drive_b45534dbfc3f4644bb0b0af2243a8145/tc_drive_b45534dbfc3f4644bb0b0af2243a8145.prefab.json"
+  ]
+}

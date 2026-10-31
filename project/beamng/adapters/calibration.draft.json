@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "kind": "imu",
+  "evidence": {"accepted": false, "reference": null},
+  "sensor_id": null,
+  "input_frame": null,
+  "output_frame": null,
+  "time_source": null,
+  "time_kind": "acquisition",
+  "input_provenance": "sensor_measurement",
+  "extrinsic_evidence": {"accepted": false, "reference": null},
+  "transform": {
+    "source_frame": null,
+    "target_frame": null,
+    "translation_m": null,
+    "quaternion_xyzw": null
+  },
+  "colocated_origin_validated": null,
+  "angular_unit": "rad/s",
+  "acceleration_unit": "m/s^2",
+  "gravity": null,
+  "smoothing": null
+}

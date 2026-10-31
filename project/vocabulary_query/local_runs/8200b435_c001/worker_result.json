@@ -1,0 +1,30 @@
+{
+  "status": "ok",
+  "query": "house",
+  "image_size": [
+    960,
+    640
+  ],
+  "regions": [
+    {
+      "box_xyxy": [
+        0,
+        166,
+        312,
+        427
+      ],
+      "area_pixels": 55800,
+      "mean_cosine": 0.10146483778953552,
+      "max_cosine": 0.119264155626297
+    }
+  ],
+  "mask_pixels": 55800,
+  "traversability_range": [
+    0.0,
+    0.99951171875
+  ],
+  "frontier_range": [
+    0.0,
+    0.82958984375
+  ]
+}

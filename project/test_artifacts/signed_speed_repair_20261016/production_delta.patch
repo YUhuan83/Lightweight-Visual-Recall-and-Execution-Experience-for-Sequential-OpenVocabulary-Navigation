@@ -1,0 +1,136 @@
+--- 262264de/cmd_vel_to_control.py
++++ 9bcaf870/cmd_vel_to_control.py
+@@ -26,7 +26,7 @@
+ from .execution_hold import ExecutionHoldReceiver
+ 
+ 
+-from .drive_math import clamp, steering_from_angular, drive_outputs, bounded_cmd_velocity, speed_exceeds_limit, ThrottleIntegrator
++from .drive_math import clamp, steering_from_angular, drive_outputs, bounded_cmd_velocity, speed_exceeds_limit, ThrottleIntegrator, longitudinal_ground_speed
+ 
+ 
+ class CmdVelToControl(Node):
+@@ -78,6 +78,7 @@
+         self.target_speed = 0.0
+         self.target_angular = 0.0
+         self.speed = 0.0
++        self.longitudinal_speed = 0.0
+         self.last_command_time = 0.0
+         self.last_state_time = 0.0
+         self.throttle_loop = ThrottleIntegrator()
+@@ -205,6 +206,9 @@
+         # motion should not trigger longitudinal braking.
+         self.speed = math.hypot(
+             float(msg.velocity.x), float(msg.velocity.y))
++        self.longitudinal_speed = longitudinal_ground_speed(
++            float(msg.velocity.x), float(msg.velocity.y),
++            float(msg.dir.x), float(msg.dir.y))
+         if not math.isfinite(self.speed):
+             self.speed = float("inf")
+         self.last_state_time = self._safety_clock.now().nanoseconds * 1e-9
+@@ -271,8 +275,13 @@
+         rotating = (abs(self.target_angular) > 0.1
+                     and abs(self.target_speed) <= 0.01)
+         overspeed = speed_exceeds_limit(self.speed, float(self.get_parameter("overspeed_limit").value))
+-
+-        if self.execution_hold.held or not self.enabled or stale or state_stale or native_control_stale or overspeed:
++        invalid_direction = not math.isfinite(self.longitudinal_speed)
++        progress_speed = (math.copysign(1., self.target_speed) * self.longitudinal_speed
++                          if not invalid_direction else 0.)
++        opposite_motion = (not invalid_direction and abs(self.target_speed) > .01
++                           and progress_speed < -float(self.get_parameter('direction_change_speed').value))
++
++        if self.execution_hold.held or not self.enabled or stale or state_stale or native_control_stale or overspeed or invalid_direction:
+             self.throttle_loop.reset()
+             self.pending_gear = None
+             self.pending_gear_since = None
+@@ -282,7 +291,7 @@
+         else:
+             desired_gear, drive_throttle, drive_brake = drive_outputs(
+                 self.target_speed,
+-                self.speed,
++                max(0., progress_speed),
+                 float(self.get_parameter("throttle_gain").value),
+                 int(self.get_parameter("gear_forward").value),
+                 int(self.get_parameter("gear_reverse").value),
+@@ -305,7 +314,15 @@
+                 control.steering = 0.0
+             else:
+                 control.gear = self.current_gear
+-                if rotating or abs(self.target_speed) <= 0.01:
++                steering = 0.0
++                if opposite_motion:
++                    # R/D gear alone does not prove actual travel direction.
++                    # Brake a rollback before requesting driving torque again.
++                    self.throttle_loop.reset()
++                    control.throttle = 0.0
++                    control.brake = 1.0
++                    control.steering = 0.0
++                elif rotating or abs(self.target_speed) <= 0.01:
+                     self.throttle_loop.reset()
+                     # An Ackermann vehicle cannot rotate in place. A yaw-only
+                     # command must stop safely instead of adding hidden throttle.
+@@ -319,7 +336,7 @@
+                     slip = bool(native is not None and now - self.native_motion_at <= .5
+                         and native['speed'] < .2 and abs(native['wheelspeed']) > max(.3, native['speed'] + .3))
+                     control.throttle = self.throttle_loop.update(drive_throttle,
+-                        abs(self.target_speed) - self.speed, drive_brake, dt,
++                        abs(self.target_speed) - progress_speed, drive_brake, dt,
+                         gain=float(self.get_parameter('throttle_integral_gain').value),
+                         maximum=float(self.get_parameter('max_throttle').value),
+                         rise_rate=float(self.get_parameter('throttle_rise_rate').value),
+@@ -338,7 +355,9 @@
+                   'stale_state' if state_stale else
+                   'native_control_unavailable' if native_control_stale else
+                   'overspeed' if overspeed else
+-                  'gear_change' if self.pending_gear is not None else 'tracking')
++                  'invalid_motion_direction' if invalid_direction else
++                  'gear_change' if self.pending_gear is not None else
++                  'opposite_motion_braking' if opposite_motion else 'tracking')
+         self.publish_control(control, reason)
+ 
+     def on_execution_hold(self, message):
+@@ -366,6 +385,8 @@
+                            and control.brake < .9), reason=reason, target_speed=self.target_speed,
+             target_angular=self.target_angular,
+             measured_speed=self.speed, moving=bool(math.isfinite(self.speed) and self.speed > .05),
++            measured_longitudinal_speed=(self.longitudinal_speed
++                                         if math.isfinite(self.longitudinal_speed) else None),
+             throttle=control.throttle, brake=control.brake,
+             command_receipt_age_steady_sec=receipt_age(self.last_command_time),
+             state_receipt_age_steady_sec=receipt_age(self.last_state_time),
+--- 262264de/drive_math.py
++++ 9bcaf870/drive_math.py
+@@ -5,6 +5,21 @@
+ 
+ def clamp(value: float, low: float, high: float) -> float:
+     return float(max(low, min(high, value)))
++
++
++def longitudinal_ground_speed(vx: float, vy: float, forward_x: float,
++                              forward_y: float) -> float:
++    """Signed horizontal speed; velocity and forward share world coordinates.
++
++    Keep horizontal speed magnitude separately for stopping and gear changes.
++    Missing/degenerate heading cannot establish the direction of motion.
++    """
++    if not all(math.isfinite(v) for v in (vx, vy, forward_x, forward_y)):
++        return float('nan')
++    norm = math.hypot(forward_x, forward_y)
++    if not math.isfinite(norm) or norm < 1e-6:
++        return float('nan')
++    return vx * (forward_x / norm) + vy * (forward_y / norm)
+ 
+ 
+ class ThrottleIntegrator:
+@@ -56,8 +71,9 @@
+                   min_throttle: float = 0.06) -> tuple[int, float, float]:
+     """Map signed target speed to (gear, positive throttle, brake).
+ 
+-    ``speed`` is the measured speed magnitude from StateSensor. Reverse uses
+-    BeamNG's -1 gear and positive throttle; a negative throttle is never sent.
++    ``speed`` is non-negative measured progress in the requested direction.
++    The caller brakes opposing motion before applying these drive outputs.
++    Reverse uses BeamNG's -1 gear and positive throttle.
+     """
+     if not all(math.isfinite(v) for v in
+                (target_speed, speed, throttle_gain, brake_gain,

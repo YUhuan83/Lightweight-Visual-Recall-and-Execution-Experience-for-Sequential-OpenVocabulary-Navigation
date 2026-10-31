@@ -1,0 +1,46 @@
+--- before/nav2_adapter/test/test_runtime_contract.py
++++ after/nav2_adapter/test/test_runtime_contract.py
+@@ -1,3 +1,4 @@
++import ast
+ import copy
+ import importlib.util
+ from pathlib import Path
+@@ -17,12 +18,37 @@
+         required = navigation_runtime_contract(self.config, 'ackermann')
+         self.assertEqual(required['/planner_server']['planner_plugins'], ['CarLike'])
+         speed = required['/wildos_cmd_vel_to_control']
+-        self.assertEqual(speed['control_topic'], '/wildos/native_control')
++        self.assertEqual(speed['control_topic'], '/wildos/native_control_command')
++        self.assertEqual(speed['control_protocol'], 'wildos_source_control_v1')
++        self.assertEqual(required['/wildos_native_vehicle_control']['control_protocol'], speed['control_protocol'])
++        self.assertEqual(required['/wildos_native_vehicle_control']['control_topic'], speed['control_topic'])
++        self.assertTrue(required['/wildos_graph_path_bridge']['require_source_control'])
+         self.assertEqual(speed['state_topic'], '/vehicles/ego/sensors/state')
+         radius = required['/wildos_graph_path_bridge']['minimum_turning_radius']
+         self.assertGreater(required['/planner_server']['CarLike.minimum_turning_radius'],radius)
+         self.assertEqual(radius,required['/controller_server']['FollowPath.minimum_turning_radius'])
+         self.assertEqual(radius, speed['minimum_turning_radius'])
++
++    def test_physical_launch_and_runtime_gate_agree_on_source_control_wire_contract(self):
++        tree=ast.parse((ROOT/'nav2_adapter/launch/physical_vehicle_control.launch.py').read_text(encoding='utf8'))
++        launched={}
++        for node in ast.walk(tree):
++            if not isinstance(node,ast.Call) or not isinstance(node.func,ast.Name) or node.func.id!='Node':continue
++            keywords={k.arg:k.value for k in node.keywords}
++            name=keywords.get('name');params=keywords.get('parameters')
++            if not isinstance(name,ast.Constant) or not isinstance(params,ast.List):continue
++            literals={}
++            for item in params.elts:
++                if not isinstance(item,ast.Dict):continue
++                for key,value in zip(item.keys,item.values):
++                    try:literals[ast.literal_eval(key)]=ast.literal_eval(value)
++                    except (ValueError,TypeError):pass
++            launched['/'+name.value]=literals
++        required=navigation_runtime_contract(self.config,'ackermann')
++        for owner in ('/wildos_cmd_vel_to_control','/wildos_native_vehicle_control'):
++            for key in ('control_protocol','control_topic'):
++                self.assertEqual(launched[owner][key],required[owner][key])
++        self.assertIs(launched['/wildos_graph_path_bridge']['require_source_control'],True)
+ 
+     def test_original_empty_obstacles_or_disabled_collision_cannot_pass(self):
+         for changed in ('collision', 'local_costmap', 'global_costmap'):

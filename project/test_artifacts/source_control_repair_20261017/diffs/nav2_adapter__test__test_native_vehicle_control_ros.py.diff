@@ -1,0 +1,76 @@
+--- before/nav2_adapter/test/test_native_vehicle_control_ros.py
++++ after/nav2_adapter/test/test_native_vehicle_control_ros.py
+@@ -10,11 +10,13 @@
+ from unittest.mock import MagicMock, Mock, patch
+ from beamng_msgs.msg import StateSensor, VehicleControl
+ from std_msgs.msg import String
++from builtin_interfaces.msg import Time
+ from wildos_nav2_adapter.drive_math import speed_exceeds_limit
+ from wildos_nav2_adapter.wheel_contact import WHEEL_SNAPSHOT_LUA, classify_wheel_contact
+ from wildos_nav2_adapter.direct_vehicle_control import (
+     CONTROL_ACK, install_direct_steering_control)
+ from wildos_nav2_adapter.vehicle_control_lease import LEASE_VERSION
++from wildos_nav2_adapter.source_control import SourceControlReceiver, SourceControlSender, PROTOCOL, control_values
+ 
+ 
+ class NativeControlIoTests(unittest.TestCase):
+@@ -24,15 +26,16 @@
+         cls = next(n for n in tree.body if isinstance(n, ast.ClassDef))
+         cls.bases = []
+         cls.body = [n for n in cls.body if isinstance(n, ast.FunctionDef)
+-                    and n.name in ('poll_tick', 'control_tick', 'stop')]
+-        namespace = dict(json=json, math=math, time=time, StateSensor=StateSensor, String=String,
++                    and n.name in ('on_control', 'poll_tick', 'control_tick', 'stop')]
++        namespace = dict(json=json, math=math, time=time, StateSensor=StateSensor,
++            VehicleControl=VehicleControl, String=String,
+             speed_exceeds_limit=speed_exceeds_limit, WHEEL_SNAPSHOT_LUA=WHEEL_SNAPSHOT_LUA,
+-            classify_wheel_contact=classify_wheel_contact, LEASE_VERSION=LEASE_VERSION)
++            classify_wheel_contact=classify_wheel_contact, LEASE_VERSION=LEASE_VERSION, PROTOCOL=PROTOCOL)
+         exec(compile(ast.fix_missing_locations(ast.Module(body=[cls], type_ignores=[])), str(source), 'exec'), namespace)
+         self.node = namespace['NativeVehicleControl']()
+         self.node.get_parameter = lambda name: S(value=dict(command_timeout=.8, state_timeout=.5, overspeed_limit=0.,
+             max_throttle=1., max_steering=.6, vehicle='ego', wheel_probe_interval_sec=1.)[name])
+-        self.node.get_clock = lambda: S(now=lambda: S(to_msg=lambda: S(sec=100, nanosec=0)))
++        self.node.get_clock = lambda: S(now=lambda: S(to_msg=lambda: Time(sec=100, nanosec=0)))
+         # StateSensor and JSON health status are separate ROS topics. Keeping
+         # separate publishers makes each interface assertion independent.
+         self.node.pub = Mock()
+@@ -48,6 +51,13 @@
+         self.node.control_lease = Mock()
+         self.node.command = VehicleControl(throttle=.25, brake=0., gear=2)
+         self.node.command_at = self.node.last_tick = 100.
++        self.node.command_received_at = 100.
++        self.node.source_receiver = SourceControlReceiver()
++        self.node.source_rejection = None
++        self.sender = SourceControlSender('a'*32)
++        self.wall_ns = 1_700_000_000_000_000_000
++        wall = patch('time.time_ns', side_effect=lambda: self.wall_ns + int((time.monotonic()-100.)*1e9))
++        wall.start(); self.addCleanup(wall.stop)
+         self.node.command_lock = threading.Lock()
+         self.node.state_lock = threading.Lock()
+         self.node.latest_state = None
+@@ -61,6 +71,14 @@
+         self.node.wheel_probe_at = 0.
+         self.node.wheel_snapshot = self.node.stationary_since = None
+         self.node.get_logger = Mock()
++        self.send(dict(throttle=0., brake=1., steering=0., parkingbrake=0., clutch=0., gear=2))
++        self.send(control_values(self.node.command) | dict(throttle=.25, brake=0.))
++
++    def send(self, control, now=100.):
++        with patch('time.monotonic', return_value=now):
++            frame = self.sender.issue(control, time.time_ns(), int(now*1e9))
++            self.node.on_control(String(data=json.dumps(frame)))
++        return frame
+ 
+     def tick(self, now=100.):
+         with patch('time.monotonic', return_value=now):
+@@ -222,7 +240,8 @@
+             self.node.poll_tick()
+             self.node.control_tick()
+             self.node.vehicle.sensors.poll.side_effect = None
+-            self.node.command_at = clock[0]
++            self.send(control_values(self.node.command) | dict(throttle=0., brake=1.), clock[0])
++            self.send(control_values(self.node.command) | dict(throttle=.25, brake=0.), clock[0])
+             self.node.poll_tick()
+             self.node.control_tick()
+         self.assertEqual(self.node.pub.publish.call_count, 1)

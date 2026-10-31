@@ -1,0 +1,548 @@
+{
+  "nc_grass": {
+    "name": "nc_grass",
+    "mapTo": "nc_grass",
+    "class": "Material",
+    "version": 1.5,
+    "Stages": [
+      {
+        "baseColorMap": "/levels/terraced_countryside/art/shapes/grass.color.png",
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "roughnessFactor": 0.93,
+        "metallicFactor": 0,
+        "useAnisotropic": true
+      },
+      {},
+      {},
+      {}
+    ],
+    "groundType": "GRASS",
+    "translucentBlendOp": "None",
+    "doubleSided": false
+  },
+  "nc_concrete": {
+    "name": "nc_concrete",
+    "mapTo": "nc_concrete",
+    "class": "Material",
+    "version": 1.5,
+    "Stages": [
+      {
+        "baseColorMap": "/levels/terraced_countryside/art/shapes/concrete.color.png",
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "roughnessFactor": 0.93,
+        "metallicFactor": 0,
+        "useAnisotropic": true
+      },
+      {},
+      {},
+      {}
+    ],
+    "groundType": "ASPHALT",
+    "translucentBlendOp": "None",
+    "doubleSided": false
+  },
+  "nc_mortar": {
+    "name": "nc_mortar",
+    "mapTo": "nc_mortar",
+    "class": "Material",
+    "version": 1.5,
+    "Stages": [
+      {
+        "baseColorMap": "/levels/terraced_countryside/art/shapes/mortar.color.png",
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "roughnessFactor": 0.93,
+        "metallicFactor": 0,
+        "useAnisotropic": true
+      },
+      {},
+      {},
+      {}
+    ],
+    "groundType": "ASPHALT",
+    "translucentBlendOp": "None",
+    "doubleSided": false
+  },
+  "nc_stone": {
+    "name": "nc_stone",
+    "mapTo": "nc_stone",
+    "class": "Material",
+    "version": 1.5,
+    "Stages": [
+      {
+        "baseColorMap": "/levels/terraced_countryside/art/shapes/stone.color.png",
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "roughnessFactor": 0.93,
+        "metallicFactor": 0,
+        "useAnisotropic": true
+      },
+      {},
+      {},
+      {}
+    ],
+    "groundType": "ASPHALT",
+    "translucentBlendOp": "None",
+    "doubleSided": false
+  },
+  "nc_wood": {
+    "name": "nc_wood",
+    "mapTo": "nc_wood",
+    "class": "Material",
+    "version": 1.5,
+    "Stages": [
+      {
+        "baseColorMap": "/levels/terraced_countryside/art/shapes/wood.color.png",
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "roughnessFactor": 0.93,
+        "metallicFactor": 0,
+        "useAnisotropic": true
+      },
+      {},
+      {},
+      {}
+    ],
+    "groundType": "WOOD",
+    "translucentBlendOp": "None",
+    "doubleSided": false
+  },
+  "nc_wall": {
+    "name": "nc_wall",
+    "mapTo": "nc_wall",
+    "class": "Material",
+    "version": 1.5,
+    "Stages": [
+      {
+        "baseColorMap": "/levels/terraced_countryside/art/shapes/wall.color.png",
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "roughnessFactor": 0.93,
+        "metallicFactor": 0,
+        "useAnisotropic": true
+      },
+      {},
+      {},
+      {}
+    ],
+    "groundType": "ASPHALT",
+    "translucentBlendOp": "None",
+    "doubleSided": false
+  },
+  "nc_roof": {
+    "name": "nc_roof",
+    "mapTo": "nc_roof",
+    "class": "Material",
+    "version": 1.5,
+    "Stages": [
+      {
+        "baseColorMap": "/levels/terraced_countryside/art/shapes/roof.color.png",
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "roughnessFactor": 0.93,
+        "metallicFactor": 0,
+        "useAnisotropic": true
+      },
+      {},
+      {},
+      {}
+    ],
+    "groundType": "ASPHALT",
+    "translucentBlendOp": "None",
+    "doubleSided": false
+  },
+  "nc_window": {
+    "name": "nc_window",
+    "mapTo": "nc_window",
+    "class": "Material",
+    "version": 1.5,
+    "Stages": [
+      {
+        "baseColorMap": "/levels/terraced_countryside/art/shapes/window.color.png",
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "roughnessFactor": 0.93,
+        "metallicFactor": 0,
+        "useAnisotropic": true
+      },
+      {},
+      {},
+      {}
+    ],
+    "groundType": "ASPHALT",
+    "translucentBlendOp": "None",
+    "doubleSided": false
+  },
+  "nc_leaf": {
+    "name": "nc_leaf",
+    "mapTo": "nc_leaf",
+    "class": "Material",
+    "version": 1.5,
+    "Stages": [
+      {
+        "baseColorMap": "/levels/terraced_countryside/art/shapes/leaf.color.png",
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "roughnessFactor": 0.93,
+        "metallicFactor": 0,
+        "useAnisotropic": true
+      },
+      {},
+      {},
+      {}
+    ],
+    "groundType": "WOOD",
+    "translucentBlendOp": "None",
+    "doubleSided": false
+  },
+  "nc_leaf2": {
+    "name": "nc_leaf2",
+    "mapTo": "nc_leaf2",
+    "class": "Material",
+    "version": 1.5,
+    "Stages": [
+      {
+        "baseColorMap": "/levels/terraced_countryside/art/shapes/leaf2.color.png",
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "roughnessFactor": 0.93,
+        "metallicFactor": 0,
+        "useAnisotropic": true
+      },
+      {},
+      {},
+      {}
+    ],
+    "groundType": "WOOD",
+    "translucentBlendOp": "None",
+    "doubleSided": false
+  },
+  "nc_rock": {
+    "name": "nc_rock",
+    "mapTo": "nc_rock",
+    "class": "Material",
+    "version": 1.5,
+    "Stages": [
+      {
+        "baseColorMap": "/levels/terraced_countryside/art/shapes/rock.color.png",
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "roughnessFactor": 0.93,
+        "metallicFactor": 0,
+        "useAnisotropic": true
+      },
+      {},
+      {},
+      {}
+    ],
+    "groundType": "ROCK",
+    "translucentBlendOp": "None",
+    "doubleSided": false
+  },
+  "nc_white": {
+    "name": "nc_white",
+    "mapTo": "nc_white",
+    "class": "Material",
+    "version": 1.5,
+    "Stages": [
+      {
+        "baseColorMap": "/levels/terraced_countryside/art/shapes/white.color.png",
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "roughnessFactor": 0.93,
+        "metallicFactor": 0,
+        "useAnisotropic": true
+      },
+      {},
+      {},
+      {}
+    ],
+    "groundType": "ASPHALT",
+    "translucentBlendOp": "None",
+    "doubleSided": false
+  },
+  "nc_black": {
+    "name": "nc_black",
+    "mapTo": "nc_black",
+    "class": "Material",
+    "version": 1.5,
+    "Stages": [
+      {
+        "baseColorMap": "/levels/terraced_countryside/art/shapes/black.color.png",
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "roughnessFactor": 0.93,
+        "metallicFactor": 0,
+        "useAnisotropic": true
+      },
+      {},
+      {},
+      {}
+    ],
+    "groundType": "ASPHALT",
+    "translucentBlendOp": "None",
+    "doubleSided": false
+  },
+  "nc_red": {
+    "name": "nc_red",
+    "mapTo": "nc_red",
+    "class": "Material",
+    "version": 1.5,
+    "Stages": [
+      {
+        "baseColorMap": "/levels/terraced_countryside/art/shapes/red.color.png",
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "roughnessFactor": 0.93,
+        "metallicFactor": 0,
+        "useAnisotropic": true
+      },
+      {},
+      {},
+      {}
+    ],
+    "groundType": "ASPHALT",
+    "translucentBlendOp": "None",
+    "doubleSided": false
+  },
+  "nc_soil": {
+    "name": "nc_soil",
+    "mapTo": "nc_soil",
+    "class": "Material",
+    "version": 1.5,
+    "Stages": [
+      {
+        "baseColorMap": "/levels/terraced_countryside/art/shapes/soil.color.png",
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "roughnessFactor": 0.93,
+        "metallicFactor": 0,
+        "useAnisotropic": true
+      },
+      {},
+      {},
+      {}
+    ],
+    "groundType": "ASPHALT",
+    "translucentBlendOp": "None",
+    "doubleSided": false
+  },
+  "nc_crop": {
+    "name": "nc_crop",
+    "mapTo": "nc_crop",
+    "class": "Material",
+    "version": 1.5,
+    "Stages": [
+      {
+        "baseColorMap": "/levels/terraced_countryside/art/shapes/crop.color.png",
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "roughnessFactor": 0.93,
+        "metallicFactor": 0,
+        "useAnisotropic": true
+      },
+      {},
+      {},
+      {}
+    ],
+    "groundType": "ASPHALT",
+    "translucentBlendOp": "None",
+    "doubleSided": false
+  },
+  "nc_sack": {
+    "name": "nc_sack",
+    "mapTo": "nc_sack",
+    "class": "Material",
+    "version": 1.5,
+    "Stages": [
+      {
+        "baseColorMap": "/levels/terraced_countryside/art/shapes/sack.color.png",
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "roughnessFactor": 0.93,
+        "metallicFactor": 0,
+        "useAnisotropic": true
+      },
+      {},
+      {},
+      {}
+    ],
+    "groundType": "ASPHALT",
+    "translucentBlendOp": "None",
+    "doubleSided": false
+  },
+  "nc_metal": {
+    "name": "nc_metal",
+    "mapTo": "nc_metal",
+    "class": "Material",
+    "version": 1.5,
+    "Stages": [
+      {
+        "baseColorMap": "/levels/terraced_countryside/art/shapes/metal.color.png",
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "roughnessFactor": 0.93,
+        "metallicFactor": 0,
+        "useAnisotropic": true
+      },
+      {},
+      {},
+      {}
+    ],
+    "groundType": "ASPHALT",
+    "translucentBlendOp": "None",
+    "doubleSided": false
+  },
+  "nc_plaster": {
+    "name": "nc_plaster",
+    "mapTo": "nc_plaster",
+    "class": "Material",
+    "version": 1.5,
+    "Stages": [
+      {
+        "baseColorMap": "/levels/terraced_countryside/art/shapes/plaster.color.png",
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "roughnessFactor": 0.93,
+        "metallicFactor": 0,
+        "useAnisotropic": true
+      },
+      {},
+      {},
+      {}
+    ],
+    "groundType": "ASPHALT",
+    "translucentBlendOp": "None",
+    "doubleSided": false
+  },
+  "nc_brick": {
+    "name": "nc_brick",
+    "mapTo": "nc_brick",
+    "class": "Material",
+    "version": 1.5,
+    "Stages": [
+      {
+        "baseColorMap": "/levels/terraced_countryside/art/shapes/brick.color.png",
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "roughnessFactor": 0.93,
+        "metallicFactor": 0,
+        "useAnisotropic": true
+      },
+      {},
+      {},
+      {}
+    ],
+    "groundType": "ASPHALT",
+    "translucentBlendOp": "None",
+    "doubleSided": false
+  },
+  "nc_drygrass": {
+    "name": "nc_drygrass",
+    "mapTo": "nc_drygrass",
+    "class": "Material",
+    "version": 1.5,
+    "Stages": [
+      {
+        "baseColorMap": "/levels/terraced_countryside/art/shapes/drygrass.color.png",
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "roughnessFactor": 0.93,
+        "metallicFactor": 0,
+        "useAnisotropic": true
+      },
+      {},
+      {},
+      {}
+    ],
+    "groundType": "ASPHALT",
+    "translucentBlendOp": "None",
+    "doubleSided": false
+  }
+}

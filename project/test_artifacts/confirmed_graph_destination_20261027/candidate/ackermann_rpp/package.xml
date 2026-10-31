@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>wildos_ackermann_rpp</name><version>0.1.0</version>
+  <description>Humble RPP with one curvature for collision prediction and Ackermann actuation.</description>
+  <maintainer email="local@example.invalid">WildOS BeamNG integration</maintainer>
+  <license>Apache-2.0</license>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>nav2_regulated_pure_pursuit_controller</depend>
+  <depend>nav2_core</depend><depend>nav2_costmap_2d</depend><depend>nav2_util</depend>
+  <depend>rclcpp</depend><depend>rclcpp_lifecycle</depend><depend>pluginlib</depend>
+  <depend>geometry_msgs</depend><depend>nav_msgs</depend><depend>tf2</depend>
+  <test_depend>ament_cmake_gtest</test_depend>
+  <test_depend>nav2_controller</test_depend>
+  <export><build_type>ament_cmake</build_type></export>
+</package>
