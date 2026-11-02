@@ -1,0 +1,78 @@
+{
+  "version": 1.0,
+  "level": "tech_ground",
+  "name": "wildos_tech_ground",
+  "vehicles": [
+    {
+      "name": "ego",
+      "model": "sbr",
+      "color": "red",
+      "pos": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rot": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "sensors": [
+        {
+          "name": "electrics",
+          "type": "Electrics"
+        },
+        {
+          "name": "front_cam",
+          "type": "Camera.default",
+          "pos": [
+            -0.3,
+            -2.1,
+            1
+          ],
+          "is_streaming": false,
+          "is_using_shared_memory": false,
+          "resolution": [
+            480,
+            320
+          ],
+          "field_of_view_y": 60.0,
+          "is_render_colours": true,
+          "is_render_depth": false,
+          "is_render_annotations": false,
+          "requested_update_time": 0.5
+        },
+        {
+          "name": "front_lidar",
+          "type": "Lidar.default",
+          "pos": [
+            0.0,
+            0.0,
+            1.7
+          ],
+          "dir": [
+            0.0,
+            -1.0,
+            0.0
+          ],
+          "up": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "requested_update_time": 0.5,
+          "vertical_resolution": 8,
+          "vertical_angle": 60.0,
+          "horizontal_angle": 120.0,
+          "max_distance": 30.0,
+          "density": 30,
+          "is_360_mode": true,
+          "is_visualised": false,
+          "is_using_shared_memory": false,
+          "is_annotated": false
+        }
+      ]
+    }
+  ]
+}

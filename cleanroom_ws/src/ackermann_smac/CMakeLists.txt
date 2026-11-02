@@ -1,0 +1,36 @@
+cmake_minimum_required(VERSION 3.16)
+project(wildos_ackermann_smac)
+set(CMAKE_CXX_STANDARD 17)
+find_package(ament_cmake REQUIRED)
+find_package(nav2_smac_planner 1.1.20 EXACT REQUIRED)
+find_package(ompl REQUIRED)
+foreach(dep nav2_core nav2_costmap_2d nav2_util rclcpp rclcpp_lifecycle pluginlib geometry_msgs nav_msgs tf2 tf2_geometry_msgs)
+  find_package(${dep} REQUIRED)
+endforeach()
+add_library(${PROJECT_NAME} SHARED src/connector.cpp src/planner.cpp src/path_contract.cpp)
+target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include> ${OMPL_INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME} ${OMPL_LIBRARIES})
+ament_target_dependencies(${PROJECT_NAME} nav2_smac_planner nav2_core nav2_costmap_2d nav2_util rclcpp rclcpp_lifecycle pluginlib geometry_msgs nav_msgs tf2 tf2_geometry_msgs)
+pluginlib_export_plugin_description_file(nav2_core plugin.xml)
+install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib)
+install(DIRECTORY include/ DESTINATION include)
+ament_export_include_directories(include)
+ament_export_libraries(${PROJECT_NAME})
+ament_export_dependencies(nav2_smac_planner nav2_costmap_2d)
+if(BUILD_TESTING)
+  add_executable(replay_smac test/replay_smac.cpp)
+  # Link the plugin DSO by file path to avoid inheriting every Nav2 Smac
+  # package library into this executable. The ROS Humble export includes both
+  # 2D and Hybrid DSOs; loading both duplicates NodeHybrid static teardown.
+  target_include_directories(replay_smac PRIVATE include ${OMPL_INCLUDE_DIRS})
+  find_library(SMAC_HYBRID_LIBRARY nav2_smac_planner REQUIRED)
+  target_link_libraries(replay_smac "${CMAKE_CURRENT_BINARY_DIR}/libwildos_ackermann_smac.so"
+    "${SMAC_HYBRID_LIBRARY}")
+  ament_target_dependencies(replay_smac nav2_core nav2_costmap_2d nav2_util rclcpp
+    rclcpp_lifecycle geometry_msgs nav_msgs tf2 tf2_geometry_msgs)
+  find_package(ament_cmake_gtest REQUIRED)
+  ament_add_gtest(cleanroom_core test/test_core.cpp)
+  target_link_libraries(cleanroom_core wildos_ackermann_smac)
+endif()
+
+ament_package()

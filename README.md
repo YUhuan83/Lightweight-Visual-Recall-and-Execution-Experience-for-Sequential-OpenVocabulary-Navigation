@@ -1,57 +1,42 @@
-# WildOS + Visual Recall + BeamNG — code review snapshot
+# WildOS 视觉记忆与 BeamNG 导航研究项目
 
-这是用户授权于 **2026-10-31** 发布的公开源码快照，便于 Gemini 等工具审阅完整数据流与故障。包含未提交工作，**不是已通过整车验收的发布版本**。
+本项目在 WildOS 开放词汇视觉导航基础上，研究如何加入轻量的、同进程运行的视觉记忆，并在 BeamNG.tech 中验证阿克曼车辆的目标搜寻与路径执行。目标是让车辆在同一张地图、同一进程内，能利用先前观察到的物体与视点更快地定位后续目标；记忆不要求跨进程保存，也不替代探索或车辆规划。
 
-## 从哪里开始读
+## 系统工作流
 
-| 目录 | 含义 |
+```text
+RGB 相机 + LiDAR + 里程计
+        ↓
+WildOS 视觉语义、可通行区域和 frontier 探索
+        ↓
+目标掩码与三维观测 ── 视觉记忆检索与候选评分
+        ↓
+GraphNav 全局拓扑引导
+        ↓
+Nav2 Smac 阿克曼路径规划 + RPP 连续路径跟踪
+        ↓
+BeamNG 车辆、传感器与物理仿真接口
+```
+
+WildOS 负责视觉判断、地形可通行性和 frontier 探索；视觉记忆为已观察地标和执行经验提供检索线索，并参与候选评分。GraphNav 选择全局拓扑方向，Smac/RPP 负责符合车辆运动学和代价地图约束的路径生成与执行。记忆不会把 frontier 或 traversability（可通行性） 替换成另一套地图，也不会单独保证目标到达。
+
+项目保留四种轻量记忆存储：`ExecutionExperienceStore`、`GraphObservationStore`、`ConfirmedViewpointCache`、`PassiveLandmarkIndex`；`RecallCandidatePolicy` 用于比较召回候选。运行机制和数据结构以当前净室源码为准。
+
+## 仓库目录
+
+| 路径 | 内容 |
 | --- | --- |
-| [`project/`](project/) | 本机主项目当前工作区源码、配置、测试、文档；包括用户未提交改动，保持原目录结构。 |
-| [`candidates/v74_document_handoff/`](candidates/v74_document_handoff/) | 最新已实际测试的服务器隔离候选完整源码、配置、测试和运行入口；它没有合并到本机主源码。分析最新现场失败请优先阅读这份。 |
-| [`auxiliary/`](auxiliary/) | 辅助工作区的诊断、回放、实验与修复脚本；历史实验脚本不等于当前运行模块。 |
-| [`publication/`](publication/) | 文件哈希清单、公开快照脱敏记录与发布验证结果。 |
+| [`cleanroom_ws/`](cleanroom_ws/) | 当前独立的单一 colcon 工作区，包含运行源码、配置、测试与架构说明；对应服务器实测版本。 |
+| [`candidates/v74_document_handoff/`](candidates/v74_document_handoff/) | 先前隔离验收候选。它与净室工作区是不同快照，不要混用同名文件。 |
+| [`project/`](project/) | 主项目源码、配置、测试和项目记录的历史工作区快照。 |
+| [`auxiliary/`](auxiliary/) | 离线检查、日志分析与回放工具；其中脚本不一定属于当前运行流程。 |
 
-不要把 `project/` 与 `candidates/v74_document_handoff/` 中的同名文件混成一个运行版本；`test_artifacts/` 内也保留了历史候选源码。
+## 当前验证状态
 
-## 给 Gemini 的推荐阅读顺序
+2026-11-02 的同进程三目标任务按“红绿灯 → 带顶棚候车亭 → 加油站”运行，目标下发后总搜索时限为 300 秒。红绿灯阶段在约 109.7 秒通过，车辆与目标的水平距离为 1.85 米；候车亭阶段未产生目标确认，任务截止前未开始加油站阶段。因此，**这轮完整多目标任务未通过**。本机和 GitHub 中的验证范围记录在 [`cleanroom_ws/VALIDATION_20261102.md`](cleanroom_ws/VALIDATION_20261102.md)。
 
-1. [`project/docs/PROJECT_MEMORY.md`](project/docs/PROJECT_MEMORY.md)：历史证据、已验证修复、最新状态与尚未解决的问题。以末尾最新记录为准，历史假设不可当成当前结论。
-2. [`project/docs/DOCUMENT_PLAN_REPAIR_20261030.md`](project/docs/DOCUMENT_PLAN_REPAIR_20261030.md)：v73/v74 修改与验证范围。
-3. [`candidates/v74_document_handoff/candidate_scope.json`](candidates/v74_document_handoff/candidate_scope.json)：候选来源和完整验收失败状态。
-4. [`project/docs/VISUAL_RECALL_COMPONENTS.md`](project/docs/VISUAL_RECALL_COMPONENTS.md)：视觉记忆组件术语及旧名映射。
-5. 下列当前候选接口，顺着消息、坐标、时间戳、目标身份和动作所有权检查。
+组件测试不能替代整车验收。读代码、测试和引用现场结果时，请明确区分离线验证、单阶段成功与完整任务通过。
 
-## 当前候选关键代码
+## 运行与许可
 
-目录前缀均为 [`candidates/v74_document_handoff/`](candidates/v74_document_handoff/)：
-
-- `wildos_port/repro_check/src/nebula2-wildos/`：WildOS 源码及本项目修改，重点 `graphnav_mapper`、`graphnav_planner`、`visual_navigation`。
-- `nav2_adapter/wildos_nav2_adapter/graph_path_bridge.py`：图路线、目标与 Nav2 规划/执行交接。
-- `nav2_adapter/wildos_nav2_adapter/continuous_graph_path_bridge.py`：连续路径更新、控制器进度交接与目标接近。
-- `nav2_adapter/wildos_nav2_adapter/graph_route.py`：路径采样、地图/轮廓检查。
-- `nav2_adapter/wildos_nav2_adapter/arrival_criteria.py`：独立到达证据核对。
-- `nav2_adapter/wildos_nav2_adapter/pointcloud.py`：LiDAR 地面/障碍数据处理。
-- `ackermann_smac/`、`ackermann_rpp/`：车辆运动学相关全局规划及局部控制修改。
-- `official_adapter/`、`tools/`、`config/`：仿真传感器/车辆控制接口、启动和配置。
-- 各包的 `test/` 目录：接口和回归测试。
-
-主项目中还包含 `target_localization/`、`ros2_adapter/`、`vision_offline/`、`evaluation/` 等辅助包。精确启动来源以候选 `run_full.sh` 与配置为准，不能认为仓库内每个工具都同时运行。
-
-## 最新已知验证边界
-
-- 用户当前到达标准：车辆里程计到视觉定位目标的**水平 XY 距离严格小于 3 米**；原始定位 XYZ 保留用于确认和记忆。这是用户授权的新平面标准，不称为原文的三维距离。
-- 每轮目标下发后搜索 120 秒，地图/模型启动与停车收尾另计；默认不录像。
-- v74：914 项相关 ROS、28 项运行契约验证通过；与 v73 相同的 GraphNav 源码/库通过 30 项相关原生测试。组件通过不代表完整流程通过。
-- v73、v74 的两次 120 秒整车试验均超时未到达目标。近停率分别约 19.7%、32.9%；v74 约 93.6% 的近停时间发生在首个三维目标出现之前。
-- 待查：探索阶段 `retired_controller_progress_unavailable` 的实际控制器进度/路径所有权交接来源，以及目标出现后的低效图出口。状态码本身还不是已证明的根因。
-- 最新 v74 为隔离候选，没有推广为成功版本；本仓库的快照 commit 仅用于代码分享，不是整车修复验收 commit。
-
-## 快照范围与保密处理
-
-包含源码、配置、测试、文档和历史实验代码；不上传 Git 历史、密码/API 密钥/私钥文件、聊天导出、虚拟环境、依赖缓存、构建安装目录、录像、原始 ROS 录包、模型权重或大型地图二进制。
-
-公开副本中检测到的字面凭据会替换为占位符，原项目文件保持不变；路径及类别见 `publication/redactions.json`，不记录凭据值。需要的本地资源应通过环境或本地配置提供。该仓库用于代码审阅，不是包含 BeamNG、模型和地图数据的即开即用镜像。
-
-原始 WildOS 项目：<https://github.com/nasa-jpl/nebula2-wildos>。保留已包含的上游许可与归属；本快照不为第三方代码或资源重新授予许可。
-
-Windows 克隆时若遇深层历史目录路径过长，可用 `git -c core.longpaths=true clone <仓库地址>`。最新两轮的少量结果与统计保存在 [`evidence/document_plan_20261030/`](evidence/document_plan_20261030/)。
+净室工作区面向 ROS 2 Humble。完整现场运行还需要本地 BeamNG.tech、地图及 RADIO/SigLIP 模型权重；这些运行资产和录制视频不包含在源码快照中。运行入口与依赖说明见 [`cleanroom_ws/README.md`](cleanroom_ws/README.md)。上游 WildOS 项目为 [NASA JPL Nebula2 WildOS](https://github.com/nasa-jpl/nebula2-wildos)；仓库保留各组件原有许可和归属，不对第三方代码或资源重新授予许可。

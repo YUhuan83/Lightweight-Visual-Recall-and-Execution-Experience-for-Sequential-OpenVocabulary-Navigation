@@ -1,0 +1,82 @@
+{
+  "version": 1.0,
+  "level": "nizhen_countryside",
+  "name": "official_wildos_1789995896",
+  "time_of_day": 0.0,
+  "vehicles": [
+    {
+      "name": "ego",
+      "model": "sbr",
+      "part_config": "vehicles/sbr/TT_AWD_S2_DCT.pc",
+      "pos": [
+        -40.0,
+        -80.0,
+        10.65
+      ],
+      "rot": [
+        0.0,
+        0.0,
+        0.7071067811865475,
+        -0.7071067811865475
+      ],
+      "sensors": [
+        {
+          "name": "electrics",
+          "type": "Electrics"
+        },
+        {
+          "name": "front_cam",
+          "type": "Camera.default",
+          "pos": [
+            0,
+            -1.5,
+            2.35
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "resolution": [
+            960,
+            640
+          ],
+          "field_of_view_y": 60.0,
+          "is_streaming": false,
+          "is_using_shared_memory": false
+        },
+        {
+          "name": "front_lidar",
+          "type": "Lidar.default",
+          "pos": [
+            0,
+            0,
+            3.6
+          ],
+          "dir": [
+            0,
+            -1,
+            -0.45
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "vertical_resolution": 16,
+          "vertical_angle": 60.0,
+          "max_distance": 40.0,
+          "density": 30,
+          "is_360_mode": true,
+          "is_using_shared_memory": false,
+          "is_visualised": false
+        }
+      ]
+    }
+  ]
+}
