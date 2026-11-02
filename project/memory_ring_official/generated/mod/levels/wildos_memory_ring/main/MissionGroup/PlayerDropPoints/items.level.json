@@ -1,1 +1,0 @@
-{"name":"spawn_default","class":"SpawnSphere","persistentId":"f9b5d457-6560-50e6-98a4-9fdc59c3a699","__parent":"PlayerDropPoints","position":[48,88,0.8],"radius":2,"rotationMatrix":[0,1,0,-1,0,0,0,0,1],"dataBlock":"SpawnSphereMarker","spawnClass":"player","spawnDatablock":"DefaultPlayerData","enabled":"1"}

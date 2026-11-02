@@ -1,2 +1,0 @@
-435 members; source 0d145100656f87d692b6a81fdfa45a97b11c6ee30d98e46929cdf4051ea8328a
-Offline 50 PASS / 0 FAIL / 6 WARN. Server 3 origin / 5 ROS geometry / 24 runtime / 32 occupancy / 5 terrain tests passed. Actual Nav2 observation-buffer origin contract verified. Field session 20261015_203918: 421.85s timeout, 176.337m, 42 maneuvers/4 segments, 1 collision abort, no visual arrival. SDK continuous stop and owned cleanup passed. Full acceptance NOT passed; no commit. See docs/LIDAR_RAY_ORIGIN_REPAIR_20261015.md.

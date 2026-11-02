@@ -1,5 +1,0 @@
-<library path="wildos_ackermann_smac">
-  <class name="wildos_ackermann_smac/Planner" type="wildos_ackermann_smac::Planner" base_class_type="nav2_core::GlobalPlanner">
-    <description>Smac Hybrid with a bounded, collision-checked continuous start connection.</description>
-  </class>
-</library>

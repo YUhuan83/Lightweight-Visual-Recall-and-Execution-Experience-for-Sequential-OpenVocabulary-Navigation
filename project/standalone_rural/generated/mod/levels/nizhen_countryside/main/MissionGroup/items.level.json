@@ -1,3 +1,0 @@
-{"name":"Geometry","class":"SimGroup","persistentId":"e82560e0-9783-570f-ad6a-3ce1776ad9d5","__parent":"MissionGroup"}
-{"name":"Sky","class":"SimGroup","persistentId":"538900c5-5d10-5842-8ea0-2f05dae377a3","__parent":"MissionGroup"}
-{"name":"PlayerDropPoints","class":"SimGroup","persistentId":"ee8a2103-000a-5679-a3f4-ac7cfe89c48a","__parent":"MissionGroup"}

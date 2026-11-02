@@ -1,7 +1,0 @@
-{
-  "wildos_source": "C:\\Users\\Yu\\nebula2-wildos",
-  "checkpoint_root": "C:\\Users\\Yu\\ckpts",
-  "siglip_local_model": "C:\\Users\\Yu\\ckpts\\siglip2_ms",
-  "siglip_model_id": "google/siglip2-so400m-patch16-naflex",
-  "note": "Inventory only. Original resources are not copied, mounted, modified or loaded by this scene project."
-}

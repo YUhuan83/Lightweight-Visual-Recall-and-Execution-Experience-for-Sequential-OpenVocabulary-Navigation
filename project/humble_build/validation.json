@@ -1,9 +1,0 @@
-{
-  "platform": "Windows-11-10.0.26200-SP0",
-  "tests_run": 8,
-  "failures": 0,
-  "errors": 0,
-  "skipped": 1,
-  "output": "test_actual_graph (test_preflight.PreflightTests.test_actual_graph) ... ok\ntest_cli_requires_no_server_flag (test_preflight.PreflightTests.test_cli_requires_no_server_flag) ... ok\ntest_exclusions_and_hash_changes (test_preflight.PreflightTests.test_exclusions_and_hash_changes) ... ok\ntest_missing_ros_explicit_and_readonly (test_preflight.PreflightTests.test_missing_ros_explicit_and_readonly) ... ok\ntest_outside_home_refused (test_preflight.PreflightTests.test_outside_home_refused) ... ok\ntest_prepare_actual_source_and_refuse_reuse (test_preflight.PreflightTests.test_prepare_actual_source_and_refuse_reuse) ... ok\ntest_setuptools_discovery (test_preflight.PreflightTests.test_setuptools_discovery) ... ok\ntest_symlink_refused (test_preflight.PreflightTests.test_symlink_refused) ... skipped 'OS disallows symlink creation'\n\n----------------------------------------------------------------------\nRan 8 tests in 2.177s\n\nOK (skipped=1)\n",
-  "linux_build_performed": false
-}

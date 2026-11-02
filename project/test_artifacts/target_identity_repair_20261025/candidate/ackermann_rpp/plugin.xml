@@ -1,5 +1,0 @@
-<library path="wildos_ackermann_rpp">
-  <class name="wildos_ackermann_rpp/Controller" type="wildos_ackermann_rpp::Controller" base_class_type="nav2_core::Controller">
-    <description>Bound curvature before collision checking; retain Humble RPP speed regulation.</description>
-  </class>
-</library>

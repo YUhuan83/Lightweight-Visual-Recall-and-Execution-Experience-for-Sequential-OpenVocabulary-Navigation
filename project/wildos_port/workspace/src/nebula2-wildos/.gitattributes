@@ -1,3 +1,0 @@
-ckpts filter=lfs diff=lfs merge=lfs -text
-ckpts/frontier_head.ckpt filter=lfs diff=lfs merge=lfs -text
-ckpts/trav_head.ckpt filter=lfs diff=lfs merge=lfs -text

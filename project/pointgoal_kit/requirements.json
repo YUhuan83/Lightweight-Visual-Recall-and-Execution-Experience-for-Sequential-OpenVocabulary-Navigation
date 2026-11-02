@@ -1,8 +1,0 @@
-{
-  "python": ">=3.10",
-  "required": {"beamngpy": "==1.36", "numpy": ">=1.24,<3"},
-  "optional": {"Pillow": ">=9.1"},
-  "simulator_pairing": "BeamNG.tech 0.39; sensor authorization required",
-  "installation": "No automatic installation. Use the existing server venv. ZIP does not contain dependency wheels.",
-  "runtime_verified": false
-}

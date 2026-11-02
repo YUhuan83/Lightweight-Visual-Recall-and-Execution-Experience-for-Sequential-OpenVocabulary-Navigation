@@ -1,3 +1,0 @@
-{"name":"Level_objects","class":"SimGroup","persistentId":"a26cf97c-9579-5f13-b1d1-3616d25cec00","__parent":"MissionGroup"}
-{"name":"Geometry","class":"SimGroup","persistentId":"b68f1b85-885b-590b-ac56-46f8359604f8","__parent":"MissionGroup"}
-{"name":"PlayerDropPoints","class":"SimGroup","persistentId":"5c16cdea-cb5a-59cc-9252-be723151588d","__parent":"MissionGroup"}

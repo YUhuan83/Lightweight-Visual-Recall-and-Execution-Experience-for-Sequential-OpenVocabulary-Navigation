@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuites tests="3" failures="0" disabled="0" errors="0" time="0" timestamp="2026-10-10T18:09:58" name="AllTests">
-  <testsuite name="Curvature" tests="3" failures="0" disabled="0" errors="0" time="0" timestamp="2026-10-10T18:09:58">
-    <testcase name="PreserveSupportedSteering" status="run" result="completed" time="0" timestamp="2026-10-10T18:09:58" classname="wildos_ackermann_rpp.Curvature" />
-    <testcase name="SameBoundaryForForwardAndReverse" status="run" result="completed" time="0" timestamp="2026-10-10T18:09:58" classname="wildos_ackermann_rpp.Curvature" />
-    <testcase name="RejectInvalidContract" status="run" result="completed" time="0" timestamp="2026-10-10T18:09:58" classname="wildos_ackermann_rpp.Curvature" />
-  </testsuite>
-</testsuites>

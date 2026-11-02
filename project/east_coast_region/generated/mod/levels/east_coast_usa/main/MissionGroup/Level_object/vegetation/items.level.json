@@ -1,8 +1,0 @@
-{"name":"theForest","class":"Forest","persistentId":"1acda816-9f86-4554-9013-5eaa77f4b451","__parent":"vegetation","lodReflectScalar":0.150000006}
-{"name":"terrain_grass","class":"SimGroup","__parent":"vegetation"}
-{"name":"terrain_grass2","class":"SimGroup","__parent":"vegetation"}
-{"name":"terrain_grass3","class":"SimGroup","__parent":"vegetation"}
-{"name":"terrain_grass4","class":"SimGroup","__parent":"vegetation"}
-{"name":"terrain_dirt_grass","class":"SimGroup","__parent":"vegetation"}
-{"name":"terrain_forest","class":"SimGroup","__parent":"vegetation"}
-{"name":"terrain_forest_floor","class":"SimGroup","__parent":"vegetation"}

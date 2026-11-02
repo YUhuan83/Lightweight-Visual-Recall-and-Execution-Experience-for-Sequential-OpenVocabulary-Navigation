@@ -1,2 +1,0 @@
-{"name":"theTerrain","class":"TerrainBlock","persistentId":"73b6f431-1008-5483-82c4-40aba4064eb4","__parent":"Level_objects","position":[-1024,-1024,0],"materialTextureSet":"west_coast_usaTerrainMaterialTextureSet","maxHeight":384.640015,"terrainFile":"/levels/west_coast_usa/west_coast_usa.ter"}
-{"name":"theLevelInfo","class":"LevelInfo","persistentId":"60211957-494e-5e32-a2ab-f9553d83c416","__parent":"Level_objects","gravity":-9.81,"visibleDistance":16000,"canvasClearColor":"black"}
