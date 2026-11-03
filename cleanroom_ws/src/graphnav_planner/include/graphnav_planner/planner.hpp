@@ -251,6 +251,8 @@ public:
   // void set_keep_out_polygons(std::vector<Polygon> &keep_out_polygons);
   // void set_dynamic_obstacles(std::vector<Polygon> &obstacles);
   void update_graph(graphnav_msgs::msg::NavigationGraph::ConstSharedPtr graph);
+  std::vector<Eigen::Vector3d> plan_to_frontier(const std::string& node_uuid,
+      const geometry_msgs::msg::Point& endpoint, rclcpp::Time current_time);
   bool route_complete() const { return route_complete_; }
   bool route_complete_ = false;
   std::vector<Eigen::Vector3d> plan_to_goal(Eigen::Vector3d& goal, double goal_radius, rclcpp::Time current_time, graphnav_msgs::msg::NavigationGraph::ConstSharedPtr explicit_topology = nullptr);

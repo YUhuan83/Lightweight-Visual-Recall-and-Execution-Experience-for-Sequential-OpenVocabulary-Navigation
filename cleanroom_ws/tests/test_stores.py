@@ -7,6 +7,46 @@ from visual_navigation.wildos.passive_landmark_index import PassiveLandmarkIndex
 
 
 class StoreTests(unittest.TestCase):
+    def test_single_supported_landmark_is_an_unconfirmed_hint(self):
+        from wildos_nav2_adapter.navigation import arrived
+
+        store = PassiveLandmarkIndex(capacity=16)
+        features = np.zeros((1, 2, 8, 8), dtype=np.float32)
+        features[:, 0] = 1
+        camera = dict(
+            K=np.array([[100, 0, 20], [0, 100, 20], [0, 0, 1]]),
+            R_wc=np.eye(3),
+            t_wc=np.zeros(3),
+            width=40,
+            height=40,
+        )
+        points = np.array(
+            [[x / 10, y / 10, 10] for x in range(1, 5) for y in range(1, 5)]
+        )
+        self.assertEqual(
+            store.observe(features, [camera], points, [0, 0, 0],
+                          0.3, 1_000_000_000, 1, "spot1/odom"), 1,
+        )
+        views = store.retrieve("gas station", [1, 0], 0.8, 2)
+        self.assertEqual(len(views), 1)
+        view = views[0]
+        self.assertFalse(view["search_confirmed"])
+        self.assertEqual(view["position"], [0, 0, 0])
+        self.assertEqual(view["support_landmarks"], 1)
+        self.assertFalse(
+            arrived((0, 0), (0, 0, 10), dict(view, query="gas station"),
+                    "gas station", 2_000_000_000)
+        )
+        store.reject(view["id"], 2, cooldown=3)
+        self.assertEqual(store.retrieve("gas station", [1, 0], 0.8, 3), [])
+        self.assertTrue(store.retrieve("gas station", [1, 0], 0.8, 6))
+        sparse = PassiveLandmarkIndex(capacity=16)
+        self.assertEqual(
+            sparse.observe(features, [camera], points[:7], [0, 0, 0],
+                           0.3, 1_000_000_000, 1, "spot1/odom"), 0,
+        )
+        self.assertEqual(sparse.retrieve("gas station", [1, 0], 0.8, 2), [])
+
     def test_execution_feedback_changes_retrieved_direction_prior(self):
         store = ExecutionExperienceStore(":memory:", "test")
         try:

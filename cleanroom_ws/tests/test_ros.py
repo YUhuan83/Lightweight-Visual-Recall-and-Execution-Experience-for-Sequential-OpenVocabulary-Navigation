@@ -30,6 +30,7 @@ class ActionFlowTests(unittest.TestCase):
         query = io.create_publisher(String, "/spot1/object_search/query", 10)
         targets = io.create_publisher(PoseStamped, "/spot1/raw_object_waypoint", 10)
         confirms = io.create_publisher(String, "/spot1/object_confirmation", 10)
+        recalls = io.create_publisher(String, "/spot1/remembered_object_candidates", 10)
         odometry = io.create_publisher(Odometry, "/spot1/odom", 10)
         io.create_subscription(
             String,
@@ -93,10 +94,20 @@ class ActionFlowTests(unittest.TestCase):
                 lambda: (
                     query.get_subscription_count() == 1
                     and confirms.get_subscription_count() == 1
+                    and recalls.get_subscription_count() == 1
                 )
             )
             query.publish(String(data="traffic light"))
             wait(lambda: started() == 1)
+            recalls.publish(String(data=json.dumps(dict(
+                query="traffic light", views=[dict(
+                    id="passive:traffic light:33", position=[0, 0, 52],
+                    heading=0.0, search_confirmed=False,
+                )],
+            ))))
+            wait(lambda: any(s["state"] == "recall_selected" for s in statuses))
+            drain()
+            self.assertEqual(found(), 0)
             vehicle_x = 17.1
             drain()
             target()
@@ -241,7 +252,10 @@ class ActionFlowTests(unittest.TestCase):
         bridge = GraphPathBridge()
         group = ReentrantCallbackGroup()
         status, stop = [], threading.Event()
-        control = dict(fail=False, follows=0, cancels=0)
+        unreachable = []
+        io.create_subscription(PoseStamped, "/spot1/graphnav_planner/unreachable", unreachable.append, 10)
+        control = dict(fail=False, follows=0, cancels=0, vehicle_x=0.0, abort_number=0)
+        recalls = io.create_publisher(String, "/spot1/remembered_object_candidates", 10)
         query = io.create_publisher(String, "/spot1/object_search/query", 10)
         routes = io.create_publisher(Path, "/spot1/graphnav_planner/path", 10)
         odometry = io.create_publisher(Odometry, "/spot1/odom", 10)
@@ -259,6 +273,7 @@ class ActionFlowTests(unittest.TestCase):
             msg.header.frame_id = "spot1/odom"
             msg.header.stamp = io.get_clock().now().to_msg()
             msg.pose.pose.position.z = 52.0
+            msg.pose.pose.position.x = control["vehicle_x"]
             msg.pose.pose.orientation.w = 1.0
             odometry.publish(msg)
 
@@ -278,6 +293,9 @@ class ActionFlowTests(unittest.TestCase):
             control["follows"] += 1
             number = control["follows"]
             while not stop.wait(0.02):
+                if number == control["abort_number"]:
+                    handle.abort()
+                    return FollowPath.Result()
                 if handle.is_cancel_requested:
                     control["cancels"] += 1
                     handle.canceled()
@@ -317,11 +335,11 @@ class ActionFlowTests(unittest.TestCase):
                 time.sleep(0.02)
             self.fail("ROS flow timed out: " + repr(status[-4:]))
 
-        def route(offset):
+        def route(offset, middle=None):
             msg = Path()
             msg.header.frame_id = "spot1/odom"
             msg.header.stamp = io.get_clock().now().to_msg()
-            for x, y in [(0, 0), (9, offset), (18, offset)]:
+            for x, y in [(0, 0), (9, offset if middle is None else middle), (18, offset)]:
                 point = PoseStamped()
                 point.header = msg.header
                 point.pose.position.x, point.pose.position.y = float(x), float(y)
@@ -340,8 +358,13 @@ class ActionFlowTests(unittest.TestCase):
             wait(lambda: any(s["state"] == "query_started" for s in status))
             route(0)
             wait(lambda: control["follows"] == 1)
+            planned_before = sum(s["state"] == "planning" for s in status)
+            route(.2)
+            time.sleep(1.3)
+            self.assertEqual(sum(s["state"] == "planning" for s in status), planned_before,
+                             "Small topology refresh replaced a healthy distant path")
             control["fail"] = True
-            route(2)
+            route(6)
             wait(
                 lambda: any(
                     s["state"] == "no_vehicle_path" and s["retained_action"]
@@ -349,12 +372,65 @@ class ActionFlowTests(unittest.TestCase):
                 )
             )
             self.assertEqual(control["cancels"], 0)
+            self.assertFalse(unreachable, "Background failure retired a healthy route")
+            planned_before = sum(s["state"] == "planning" for s in status)
+            route(6, middle=7)
+            time.sleep(1.3)
+            self.assertEqual(sum(s["state"] == "planning" for s in status), planned_before,
+                             "Failed intent was retried for an unchanged endpoint")
             control["fail"] = False
-            route(3)
+            route(9)
             wait(lambda: control["follows"] >= 2)
             self.assertEqual(control["cancels"], 0)
+            # Once the current action aborts and every replacement fails, the
+            # graph planner must receive the actual topology route endpoint.
+            control["fail"] = True
+            control["abort_number"] = control["follows"]
+            wait(lambda: len(unreachable) >= 1)
+            self.assertAlmostEqual(unreachable[-1].pose.position.x, 18.)
+            self.assertAlmostEqual(unreachable[-1].pose.position.y, 9.)
+            failures = len(unreachable)
+            control["fail"] = False
+            route(4)
+            wait(lambda: control["follows"] > control["abort_number"])
             point = PoseStamped()
             point.header.frame_id = "spot1/odom"
+            point.header.stamp = io.get_clock().now().to_msg()
+            point.pose.position.x, point.pose.position.z = 10.0, 58.0
+            targets.publish(point)
+            wait(
+                lambda: any(
+                    s["state"] == "following" and abs(s["goal"][0] - 8) < .01
+                    for s in status
+                )
+            )
+            pinned = control["follows"]
+            semantic_status_start = len(status)
+            control["fail"] = True
+            control["abort_number"] = pinned
+            wait(lambda: any(s["state"] == "no_vehicle_path" and not s["retained_action"] for s in status[semantic_status_start:]))
+            self.assertEqual(len(unreachable), failures, "Semantic target was rejected as a frontier")
+            control["fail"] = False
+            wait(lambda: control["follows"] > pinned)
+            pinned = control["follows"]
+            control["vehicle_x"] = 4.0
+            for offset in (4, 5, 6):
+                route(offset)
+                point.header.stamp = io.get_clock().now().to_msg()
+                point.pose.position.x, point.pose.position.z = 10.1, 60.0
+                targets.publish(point)
+                time.sleep(1.1)
+            self.assertEqual(
+                control["follows"], pinned, "Healthy terminal path was replaced"
+            )
+            control["abort_number"] = pinned
+            wait(lambda: control["follows"] > pinned)
+            recovered = control["follows"]
+            point.header.stamp = io.get_clock().now().to_msg()
+            point.pose.position.x = 14.0
+            targets.publish(point)
+            wait(lambda: control["follows"] > recovered)
+            self.assertEqual(control["cancels"], 0)
             point.header.stamp = io.get_clock().now().to_msg()
             point.pose.position.x, point.pose.position.z = 2.9, 58.0
             point.pose.orientation.w = 1.0
@@ -374,6 +450,18 @@ class ActionFlowTests(unittest.TestCase):
             )
             wait(lambda: any(s["state"] == "object_found" for s in status))
             wait(lambda: control["cancels"] == 1)
+            recall_status_start = len(status)
+            query.publish(String(data="gas station"))
+            wait(lambda: any(s["state"] == "query_started" for s in status[recall_status_start:]))
+            control["fail"] = True
+            recalls.publish(String(data=json.dumps(dict(
+                query="gas station", views=[dict(id="station-view", position=[18., 0., 52.])],
+            ))))
+            wait(lambda: any(s["state"] == "recall_selected" for s in status[recall_status_start:]))
+            recall_attempt_start = len(status)
+            route(7)
+            wait(lambda: any(s["state"] == "planning" for s in status[recall_attempt_start:]) and any(s["state"] == "no_vehicle_path" and not s["retained_action"] for s in status[recall_attempt_start:]))
+            self.assertEqual(len(unreachable), failures, "Recalled target was rejected as a frontier")
         finally:
             stop.set()
             executor.shutdown(timeout_sec=3)

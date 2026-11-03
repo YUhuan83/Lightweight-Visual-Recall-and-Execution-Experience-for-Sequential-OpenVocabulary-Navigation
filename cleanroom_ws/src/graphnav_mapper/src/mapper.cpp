@@ -925,6 +925,18 @@ void Mapper::traversability_update(const grid_map_msgs::msg::GridMap::ConstShare
   graph_.rebuild_kdtree();
 
   auto start_time_frontier_update = std::chrono::high_resolution_clock::now();
+  const auto all_nodes = graph_.get_all_nodes();
+  double explored_search_radius = 0.;
+  for (const auto& id : all_nodes)
+    explored_search_radius = std::max(explored_search_radius, graph_.get_node_properties(id).explored_radius);
+  const auto already_explored = [&](const Eigen::Vector3d& point) {
+    // Attachment distance is not the extent of historical observations.
+    for (const auto& id : graph_.get_nodes_in_radius(point, explored_search_radius))
+      if ((graph_.get_node_position(id) - point).norm() <
+          graph_.get_node_properties(id).explored_radius - explored_radius_margin_)
+        return true;
+    return false;
+  };
   // update frontier nodes
   struct extracted_frontier_properties
   {
@@ -935,6 +947,7 @@ void Mapper::traversability_update(const grid_map_msgs::msg::GridMap::ConstShare
   for (const auto& frontier_cell_pos_map : frontier_cells)
   {
     Eigen::Vector3d frontier_cell_pos_graph = map2graph * frontier_cell_pos_map;
+    if (already_explored(frontier_cell_pos_graph)) continue;
     std::optional<graphnav::NavigationGraph::UUID> closest_node;
     double closest_distance = frontier_cell_max_dist_;
     std::set<std::string> closest_traversability_classes;
@@ -942,11 +955,6 @@ void Mapper::traversability_update(const grid_map_msgs::msg::GridMap::ConstShare
     {
       Eigen::Vector3d node_pos = graph_.get_node_position(node_id);
       double distance = (node_pos - frontier_cell_pos_graph).norm();
-      if (distance < graph_.get_node_properties(node_id).explored_radius - explored_radius_margin_)
-      {
-        closest_node.reset();  // already explored, ignore this frontier point
-        break;
-      }
       Eigen::Vector2d node_pos_map = (graph2map * node_pos).head<2>();
       if (!gridmap.isInside(node_pos_map))
       {
@@ -997,7 +1005,7 @@ void Mapper::traversability_update(const grid_map_msgs::msg::GridMap::ConstShare
   RCLCPP_DEBUG(logger_, "  frontier node assignment took %f ms", duration_frontier_node_assignment);
   auto start_time_frontier_clean_up = std::chrono::high_resolution_clock::now();
   // clean up explored frontiers
-  for (const auto& node_id : nearby_nodes_in_map)
+  for (const auto& node_id : all_nodes)
   {
     if (!graph_.node_exists(node_id))
     {
@@ -1026,7 +1034,8 @@ void Mapper::traversability_update(const grid_map_msgs::msg::GridMap::ConstShare
       size_t nb_frontier_points_before = trav_property.frontier_points.size();
       trav_property.frontier_points.erase(
           std::remove_if(trav_property.frontier_points.begin(), trav_property.frontier_points.end(),
-                         [&gridmap, &node2map, this, &trav_class](const Eigen::Vector3d& point) {
+                         [&gridmap, &node2map, &node2graph, &already_explored, this, &trav_class](const Eigen::Vector3d& point) {
+                           if (already_explored(node2graph * point)) return true;
                            Eigen::Vector2d point_map = (node2map * point).head<2>();
                            if (!gridmap.isInside(point_map))
                            {

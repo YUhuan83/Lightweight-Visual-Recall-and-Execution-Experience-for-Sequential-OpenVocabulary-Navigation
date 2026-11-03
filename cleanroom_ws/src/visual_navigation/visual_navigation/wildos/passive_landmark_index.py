@@ -330,9 +330,9 @@ class PassiveLandmarkIndex:
             neighbours = neighbours[
                 np.linalg.norm(a["position"][neighbours] - centre, axis=1) <= 3.0
             ]
-            # Require spatial support from distinct voxels, rather than one
-            # weak patch or several views of exactly the same pixel location.
-            if len(np.unique(a["key"][neighbours, :3], axis=0)) < 2:
+            # LiDAR-supported records are unconfirmed viewing hints. A single
+            # semantic match can guide reobservation without confirming a goal.
+            if not len(neighbours):
                 continue
             centre = np.median(a["position"][neighbours], axis=0)
             radius = min(

@@ -80,4 +80,10 @@ install(PROGRAMS
 )
 
 
+if(BUILD_TESTING)
+  find_package(ament_cmake_gtest REQUIRED)
+  ament_add_gtest(frontier_coverage test/test_frontier_coverage.cpp)
+  target_link_libraries(frontier_coverage graphnav_mapper_component)
+endif()
+
 ament_package()

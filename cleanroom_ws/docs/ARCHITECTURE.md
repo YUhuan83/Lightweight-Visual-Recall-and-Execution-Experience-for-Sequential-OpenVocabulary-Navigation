@@ -71,6 +71,19 @@ terrain grid feeds GraphNav mapping. Nav2 costmaps and RPP retain obstacle and
 footprint checks. GraphNav supplies topological direction; Smac and RPP handle
 vehicle curvature and local collision-aware execution.
 
+GraphNav connects measured object goals to road nodes by horizontal XY distance,
+retaining measured target Z. Once Smac supplies an endpoint inside the arrival
+disk, the bridge keeps that FollowPath through topology refreshes and small
+target refinements. Action completion/failure, obstacles, or a target shift
+over 0.5 m allow replanning through the existing action flow.
+
+Autonomous exploration selects one measured frontier exit. Both candidate
+reachability checks and execution route through its owning graph node to that
+same exit; they do not accept a path to a different frontier as reachability.
+Mapper filters new and stored exits against historical explored radii across
+the graph. The 4 m attachment search does not limit this coverage check.
+Known roads remain available as transit routes to unexplored branches.
+
 The target estimate remains a 3D point in `spot1/odom`. Navigation completes
 when the vehicle-to-target, target-to-confirmed-observation, and
 vehicle-to-confirmed-observation horizontal distances are each strictly below
@@ -91,6 +104,8 @@ RGB video.
   viewpoints for in-process reuse.
 - `PassiveLandmarkIndex` stores a fixed-size descriptor and LiDAR-supported
   position for scene retrieval; retrieval is a hint, never target confirmation.
+  One supported semantic record can suggest its original viewpoint; spatial
+  clustering combines nearby matches without requiring multiple voxels.
 - `RecallCandidatePolicy` ranks eligible remembered views against current
   position and heading. The live query and current observation still govern
   navigation and arrival.

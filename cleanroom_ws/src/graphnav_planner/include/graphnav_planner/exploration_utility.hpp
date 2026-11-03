@@ -3,9 +3,31 @@
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <vector>
+#include <geometry_msgs/msg/point.hpp>
 
 namespace graphnav_planner
 {
+inline constexpr double frontier_visit_penalty = 0.08;
+
+inline bool frontier_endpoint_current(const geometry_msgs::msg::Point & selected,
+    const std::vector<geometry_msgs::msg::Point> & endpoints)
+{
+  // Match the existing quarter-metre destination tolerance, not the whole
+  // frontier node: a node can keep a different exit after this one disappears.
+  return std::any_of(endpoints.begin(),endpoints.end(),[&](const auto & p){
+    return std::hypot(p.x-selected.x,p.y-selected.y)<=0.25;
+  });
+}
+
+// Hysteresis equals the existing cost of revisiting a frontier once.
+inline bool frontier_candidate_should_preempt(double candidate_utility,
+                                              double current_utility)
+{
+  return std::isfinite(candidate_utility) && std::isfinite(current_utility) &&
+         candidate_utility > current_utility + frontier_visit_penalty;
+}
+
 // Keep unknown frontiers available for exploration, but prefer candidates on
 // terrain that the mapper has measured to be physically traversable.
 inline double exploration_candidate_utility(double heading_score,
@@ -26,7 +48,7 @@ inline double exploration_candidate_utility(double heading_score,
   const double adjusted_heading_score = heading_score > 0.0 ?
       heading_score * confidence_factor : heading_score;
 
-  return adjusted_heading_score - 0.004 * distance_m - 0.08 * visits +
+  return adjusted_heading_score - 0.004 * distance_m - frontier_visit_penalty * visits +
       (keep_current ? 0.15 : 0.0);
 }
 }  // namespace graphnav_planner

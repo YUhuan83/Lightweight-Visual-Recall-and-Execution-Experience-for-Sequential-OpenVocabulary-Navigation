@@ -43,6 +43,7 @@ class GraphPathBridge(Node):
         self.grid = None
         self.local_grid = None
         self.active_path = None
+        self.active_route = None
         self.evidence = None
         self.query_started_ns = 0
         self.active = None
@@ -67,6 +68,9 @@ class GraphPathBridge(Node):
             PoseStamped, "/spot1/graphnav_destination", 10
         )
         self.events = self.create_publisher(String, "/wildos/plan_status", 10)
+        self.unreachable = self.create_publisher(
+            PoseStamped, "/spot1/graphnav_planner/unreachable", 10
+        )
         self.recall_feedback = self.create_publisher(
             String, "/spot1/remembered_object_feedback", 10
         )
@@ -115,7 +119,7 @@ class GraphPathBridge(Node):
         self.task.state = State.IDLE
         if self.active is not None:
             self.active.cancel_goal_async()
-        self.active = self.active_endpoint = None
+        self.active = self.active_endpoint = self.active_route = None
         self.experience_start = None
         # A pending acceptance checks the task before adopting its handle.
 
@@ -240,6 +244,11 @@ class GraphPathBridge(Node):
             )
             if points != previous:
                 self.route = message
+            else:
+                # Refresh the source stamp without triggering another plan for
+                # identical geometry. Failure feedback identifies this route.
+                self.route.header = message.header
+                self.route.poses = message.poses
 
     def on_target(self, message):
         stamp = message.header.stamp.sec * 10**9 + message.header.stamp.nanosec
@@ -334,7 +343,7 @@ class GraphPathBridge(Node):
         ):
             if self.active is not None:
                 self.active.cancel_goal_async()
-            self.active = self.active_endpoint = None
+            self.active = self.active_endpoint = self.active_route = None
             self.task.state = State.ARRIVED
             self.status(
                 "object_found",
@@ -369,7 +378,27 @@ class GraphPathBridge(Node):
             return
         target = self.task.target or (self.recall or {}).get("position")
         points = [xy(p.pose) for p in self.route.poses] if self.route else []
-        updated = self.route is not self.last_planned_route
+        # Prefix/node refreshes do not change the exploration destination.
+        # Keep executing until near the endpoint unless its intent moves by
+        # the existing 3 m frontier arrival distance or an obstacle intervenes.
+        updated = self.route is not None and (
+            self.active_route is None
+            or distance(
+                xy(self.route.poses[-1].pose),
+                xy(self.active_route.poses[-1].pose),
+            ) > 3.0
+        )
+        # A failed background request does not become the accepted intent,
+        # but identical requests can wait until the car advances/near_end.
+        if (
+            updated
+            and self.last_planned_route is not None
+            and self.last_planned_route is not self.active_route
+        ):
+            updated = distance(
+                xy(self.route.poses[-1].pose),
+                xy(self.last_planned_route.poses[-1].pose),
+            ) > 0.5
         near_end = (
             self.active_endpoint is None
             or distance(current, self.active_endpoint) < 8.0
@@ -377,10 +406,16 @@ class GraphPathBridge(Node):
         target_changed = target is not None and (
             self.planned_target is None or distance(target, self.planned_target) > 0.5
         )
+        # Once Smac has accepted a pose inside the arrival disk, execute it.
+        # Changing topology must not rotate that pose around the object again.
+        terminal_path = (
+            target is not None
+            and self.active_endpoint is not None
+            and distance(self.active_endpoint, target) < 3.0
+        )
         if (
             self.active is not None
-            and not near_end
-            and not updated
+            and (terminal_path or (not near_end and not updated))
             and not target_changed
             and not self.local_obstacle_ahead(current)
         ):
@@ -399,6 +434,17 @@ class GraphPathBridge(Node):
         if not self.candidates:
             if self.active is None:
                 self.task.state = State.RECOVERING
+                if (
+                    self.task.target is None
+                    and self.recall is None
+                    and self.last_planned_route is not None
+                ):
+                    route = self.last_planned_route
+                    failure = deepcopy(route.poses[-1])
+                    failure.header = deepcopy(route.header)
+                    self.unreachable.publish(failure)
+                    if self.route is route:
+                        self.route = None
             self.status("no_vehicle_path", retained_action=self.active is not None)
             return
         x, y, heading = self.candidates.pop(0)
@@ -498,6 +544,7 @@ class GraphPathBridge(Node):
             return
         self.active, self.active_endpoint = handle, endpoint
         self.active_path = path
+        self.active_route = self.last_planned_route
         if self.experience_start is None:
             self.experience_start = deepcopy(self.odom)
         self.task.state = (
@@ -513,7 +560,7 @@ class GraphPathBridge(Node):
     def on_follow_result(self, future, handle):
         if handle is not self.active:
             return
-        self.active = self.active_endpoint = None
+        self.active = self.active_endpoint = self.active_route = None
         self.status("path_finished", action_status=future.result().status)
 
 

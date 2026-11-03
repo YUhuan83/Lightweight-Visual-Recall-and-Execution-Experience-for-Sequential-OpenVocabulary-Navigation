@@ -9,6 +9,7 @@
 #include <tuple>
 
 #include "graphnav_planner/planner.hpp"
+#include "graphnav_planner/exploration_utility.hpp"
 
 namespace graphnav_planner
 {
@@ -291,6 +292,39 @@ UnexploredSpaceMap Planner::compute_unexplored_space_map()
   return unexplored_map;
 }
 
+std::vector<Eigen::Vector3d> Planner::plan_to_frontier(const std::string& node_uuid,
+    const geometry_msgs::msg::Point& endpoint, rclcpp::Time current_time)
+{
+  route_complete_ = false;
+  for (const auto& [id, node] : graph_.get_vertices()) {
+    if (uuid_to_string(node.uuid) != node_uuid || trav_class_idx_ >= node.trav_properties.size()) continue;
+    const auto& trav = node.trav_properties[trav_class_idx_];
+    if (!trav.is_frontier || !frontier_endpoint_current(endpoint, trav.frontier_points)) return {};
+    const auto* physical = profile_node_assessment(node, robot_profile_id_);
+    const bool fresh = assessment_fresh(physical, current_time, stale_observation_seconds_);
+    if (fresh && (!physical->feasible || physical->dynamic_risk >= 1.f)) return {};
+    const bool heading_current = physical == nullptr ||
+        assessment_fresh(physical, current_time, stale_observation_seconds_, 0.0);
+    if (heading_current && !node.heading_candidates.empty() &&
+        best_heading_candidate(node, std::atan2(endpoint.y-node.pose.position.y,
+                                              endpoint.x-node.pose.position.x)) == nullptr) return {};
+    const auto route = graaf::algorithm::dijkstra_shortest_path(graph_, current_node_idx_, id);
+    if (!route) return {};
+    std::vector<Eigen::Vector3d> points;
+    for (const auto vertex : route->vertices) {
+      const auto& p = graph_.get_vertex(vertex).pose.position;
+      points.emplace_back(p.x,p.y,p.z);
+    }
+    const Eigen::Vector3d target(endpoint.x,endpoint.y,endpoint.z);
+    if (points.empty() || (points.back()-target).norm()>1e-6) points.push_back(target);
+    route_complete_ = true;
+    latest_frontier_ = Eigen::Vector3d(node.pose.position.x,node.pose.position.y,node.pose.position.z);
+    latest_frontier_time_ = current_time;
+    return points;
+  }
+  return {};
+}
+
 std::vector<Eigen::Vector3d> Planner::plan_to_goal(Eigen::Vector3d& goal, double goal_radius, rclcpp::Time current_time, graphnav_msgs::msg::NavigationGraph::ConstSharedPtr explicit_topology)
 {
   route_complete_ = false;
@@ -318,7 +352,8 @@ std::vector<Eigen::Vector3d> Planner::plan_to_goal(Eigen::Vector3d& goal, double
     if (fresh && !physical->feasible && measured_physical_violation(node.properties)) continue;
     if (!visited && fresh && (!physical->feasible || physical->dynamic_risk >= 1.0f)) continue;
     const auto& p = node.pose.position;
-    const double gap = (Eigen::Vector3d(p.x, p.y, p.z) - goal).norm();
+    // Object measurements retain their height; navigation connects in XY.
+    const double gap = std::hypot(p.x - goal.x(), p.y - goal.y());
     const double cost = goal_dist_cost_factor_ * gap;
     if (gap < goal_radius && std::isfinite(cost) && cost >= 0.0)
       graph_.add_edge(id, virtual_goal, cost);
